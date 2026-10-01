@@ -1,0 +1,39 @@
+name: Release (Tauri macOS + Windows)
+# Tag push (v*) builds unsigned Mac (.dmg) + Windows (.msi/.exe) bundles and
+# attaches them to a DRAFT private release. Unsigned per owner decision
+# (hold public binaries until signed); repo is private so drafts stay private.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: ""
+          - platform: windows-latest
+            args: ""
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm ci
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "LiberVacui ${{ github.ref_name }}"
+          releaseBody: "Unsigned Mac + Windows builds. Right-click open on Mac (unsigned); SmartScreen warning on Windows. See PROJECT-BRIEF.md."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
