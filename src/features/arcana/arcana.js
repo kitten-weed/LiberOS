@@ -294,7 +294,7 @@
     input.setAttribute('aria-label', 'the question');
     hostEl.appendChild(input);
     input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); onSubmit(input.value.trim()); }
+      if (e.key === 'Enter') { e.preventDefault(); if (typeof onSubmit === 'function') onSubmit(input.value.trim()); }
     });
     return { value: function () { return input.value.trim(); }, input: input };
   };

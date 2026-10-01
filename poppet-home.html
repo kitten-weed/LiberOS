@@ -6,6 +6,7 @@
 <link rel="icon" href="data:,">
 <title>Poppet Home — the little room</title>
 <link rel="stylesheet" href="./poppet-home/home.css?v=home16">
+<script src="src/boot-gate.js"></script>
 </head>
 <body>
 <div class="doorway">
@@ -16,7 +17,15 @@
   <div class="keep-card" id="keep-card"></div>
   <div class="artifact-view" id="artifact-view" hidden></div>
   <div class="hint">click the floor and it walks there · poke it · flick the yarn ball · drag to orbit, wheel to zoom</div>
+  <a class="door-leave" id="door-leave" href="desktop.html" hidden>leave — back to the machine</a>
 </div>
 <script type="module" src="./poppet-home/home.js?v=home18"></script>
+<script>
+  // standalone visits (not the desktop rug) get a door out.
+  if (window.top === window) {
+    var door = document.getElementById('door-leave');
+    if (door) door.hidden = false;
+  }
+</script>
 </body>
 </html>

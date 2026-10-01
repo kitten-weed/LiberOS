@@ -157,10 +157,20 @@ export function createHud({ onThought, onFinished, onDispose }) {
       con.querySelector('#q-count').textContent = `question ${i + 1} of ${QUESTIONS.length}`;
       con.querySelector('#q-text').textContent = QUESTIONS[i];
       input.value = '';
+      input.placeholder = 'speak, and the water listens…';
+      input.removeAttribute('aria-invalid');
       input.focus();
     };
     const next = () => {
-      state.answers.push(input.value.trim());
+      const said = input.value.trim();
+      if (!said) { // the water takes no silence: reprompt, do not advance
+        input.setAttribute('aria-invalid', 'true');
+        input.placeholder = 'the water heard nothing. say something.';
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      state.answers.push(said);
       i += 1;
       if (i < QUESTIONS.length) advance();
       else { con.remove(); onFinished(state); }
@@ -236,7 +246,10 @@ export function createHud({ onThought, onFinished, onDispose }) {
     hudRoot().appendChild(d);
     requestAnimationFrame(() => d.classList.add('show'));
     d.querySelector('#dp-keep').addEventListener('click', () => finish(true, d));
-    d.querySelector('#dp-throw').addEventListener('click', () => finish(false, d));
+    d.querySelector('#dp-throw').addEventListener('click', () => {
+      if (!window.confirm('gone for good? what you cast out cannot be brought back across.')) return;
+      finish(false, d);
+    });
   }
 
   function finish(keep, d) {

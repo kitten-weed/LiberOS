@@ -41,6 +41,7 @@
   var DESTINATIONS = {
     'vanir.html': { room: 'sea', traveller: 'vanir', motif: 'tide', acc: '#7ab8a8', verbs: 'think · seal · release · keep' },
     'divination.html': { room: 'divination', traveller: 'arcana', motif: 'magic', acc: '#f4e8d2', verbs: 'ask · draw · interpret' },
+    'poppet-lab.html': { room: 'workshop', traveller: 'physius', motif: 'chisel', acc: '#aa5a18', verbs: 'paint · map · keep' },
     'sigil.html': { room: 'workshop', traveller: 'physius', motif: 'chisel', acc: '#aa5a18', verbs: 'paint · map · keep' },
     'dreams.html': { room: 'dreams', traveller: 'insightful inquiry', motif: 'fog', acc: '#a48ad4', verbs: 'catch · remember · soften' },
     'games.html': { room: 'games', traveller: 'whimsy wow', motif: 'bulbs', acc: '#d4af37', verbs: 'play · miss · keep' },

@@ -217,14 +217,13 @@
         var id = b.getAttribute('data-slot');
         var base = b.textContent.split(' — ')[0];
         b.textContent = base + ' — ' + slotSummary(id);
-        if (id === cur) b.classList.add('on');
-        else b.classList.remove('on');
+        if (id === cur) { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); }
+        else { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
       })(btns[i]);
     }
   }
   function back() {
-    if (window.history.length > 1) window.history.back();
-    else window.location.href = 'desktop.html';
+    window.location.href = 'desktop.html';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -263,6 +262,7 @@
         btn.addEventListener('click', function () {
           var st = (window.Liber && window.Liber.state) || null;
           if (st && st.setSlot) st.setSlot(btn.getAttribute('data-slot'));
+          paintSlots();
         });
       })(slotBtns[si]);
     }

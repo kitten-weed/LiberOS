@@ -19,7 +19,7 @@
   // cart-summon/cart-hover, per-room dock-cart gradients, vacui-seat drop).
   var CARTS = [
     { id: 'home', label: 'home', page: null, acc: '#d6ae5d', home: true, mat: 'starfield' },
-    { id: 'sigil', label: 'poppet', page: 'sigil.html', acc: '#aa5a18', mat: 'stone' },
+    { id: 'sigil', label: 'poppet', page: 'poppet-lab.html?v=lab53', acc: '#aa5a18', mat: 'stone' },
     { id: 'vanir', label: 'sea', page: 'vanir.html', acc: '#7ab8a8', mat: 'water' },
     { id: 'journal', label: 'journal', page: 'journal.html', acc: '#aa7838', mat: 'vellum' },
     { id: 'games', label: 'games', page: 'games.html', acc: '#d4af37', mat: 'marquee' },
@@ -37,6 +37,27 @@
   var QUIET = 'keys quiet · not yet named';
 
   function getState() { return (window.Liber && window.Liber.state && window.Liber.state.get()) || {}; }
+  // Next-cartridge guide (2026-10-01): exactly one glowing door. While no
+  // keepsake exists the poppet cart glows; after the first keep the sea
+  // takes over. Re-armed on every render, so it survives tray re-renders.
+  function keptCount() {
+    var n = 0;
+    try {
+      var raw = localStorage.getItem('poppet.keepsakes.v1');
+      if (raw) { var arr = JSON.parse(raw); if (arr && arr.length) n += arr.length; }
+    } catch (e) {}
+    var s = getState();
+    if (s && s.buddy && s.buddy.length) n += s.buddy.length;
+    return n;
+  }
+  function nextCartId() {
+    var s = getState();
+    if (!s || !s.tutorialDone) return null;
+    if (keptCount() === 0) return 'sigil';
+    var v = s.visited || {};
+    if (!v.vanir) return 'vanir';
+    return null;
+  }
   // Naming the console is the existing wake gate. Tutorial completion is not
   // required: the opening ritual explicitly hands the named machine its dock.
   function alive() { var s = getState(); return !!(s && (s.keysNamed || s.tutorialDone)); }
@@ -432,6 +453,7 @@
     var visitedMap = getState().visited || {};
     var isAlive = alive();
     var locked = isSigilLocked();
+    var nextId = nextCartId();
     grid.innerHTML = '';
     CARTS.forEach(function (c, i) {
       var b = document.createElement('button');
@@ -442,6 +464,8 @@
       b.dataset.label = c.label;
       // the stone's lock rides the shell: the sigil cart wears the cross
       if (c.id === 'sigil' && locked) b.classList.add('crossed');
+      // the guide: one glowing door at a time (poppet first, then the sea)
+      if (c.id === nextId) b.classList.add('crt-next');
       b.style.setProperty('--ac', c.acc);
       b.style.setProperty('--glow', hexGlow(c.acc));
       b.setAttribute('role', 'option');

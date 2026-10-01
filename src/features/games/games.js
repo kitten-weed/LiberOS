@@ -111,6 +111,8 @@
   }
 
   var current = null;
+  var roundDirty = false;   // the round has been played, not yet kept
+  var hashLock = false;
 
   // ── the promenade camera (pitch: The Full Promenade) ──────────────────
   // Whimsy barks ONLY when his booth is camera-centered — the pitch's rule:
@@ -287,18 +289,69 @@
     } catch (e) { return null; }
   }
 
+  // What reaches localStorage is a thumbnail, never the booth's frame. The
+  // full-size picture lives in this session only, long enough for the save
+  // dialog's PNG button to hand it over through the browser's own Save dialog.
+  var SHOT_W = 320;              // stored width, in pixels
+  var lastFullShot = null;       // { booth, url } — memory only, never stored
+
+  function capShot(dataUrl, done) {
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var w = img.naturalWidth || img.width;
+        var h = img.naturalHeight || img.height;
+        var scale = w > SHOT_W ? SHOT_W / w : 1;
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(w * scale));
+        c.height = Math.max(1, Math.round(h * scale));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        done(c.toDataURL('image/jpeg', 0.7));
+      } catch (e) { done(null); }
+    };
+    img.onerror = function () { done(null); };
+    img.src = dataUrl;
+  }
+
+  // a real PNG, not a JPEG wearing a .png name
+  function shotAsPng(dataUrl, done) {
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth || img.width;
+        c.height = img.naturalHeight || img.height;
+        c.getContext('2d').drawImage(img, 0, 0);
+        done(c.toDataURL('image/png'));
+      } catch (e) { done(null); }
+    };
+    img.onerror = function () { done(null); };
+    img.src = dataUrl;
+  }
+
   function saveToDesktopAndJournal(b, result, shot) {
     if (!window.Liber || !window.Liber.state) return;
+    var st = window.Liber.state;
     var payload = { kind: b.id, name: b.name, glyph: b.glyph, result: result, ts: Date.now() };
-    if (shot) payload.shot = shot;
-    if (window.Liber.state.addArtifact) {
-      window.Liber.state.addArtifact('games', WL(0, payload));
+    lastFullShot = shot ? { booth: b.id, url: shot } : null;
+    var kept = null;
+    if (st.addArtifact) kept = st.addArtifact('games', WL(0, payload));
+    // one keeps, one remembers: the journal row points at the artifact
+    // instead of copying it, so the picture is stored once, not twice
+    if (st.addArtifact && kept) {
+      st.addArtifact('journal', WL(0, {
+        kind: 'game',
+        ref: { room: 'games', id: kept.id },
+        name: b.name,
+        ts: Date.now()
+      }));
     }
-    if (window.Liber.state.addArtifact) {
-      var mirror = { kind: 'game', ref: b.id, name: b.name, result: result, ts: Date.now() };
-      if (shot) mirror.shot = shot;
-      window.Liber.state.addArtifact('journal', WL(0, mirror));
+    if (shot && kept && st.updateArtifact) {
+      capShot(shot, function (small) {
+        if (small) st.updateArtifact('games', kept.id, { shot: small });
+      });
     }
+    roundDirty = false;
     if (window.Liber.sound) { try { window.Liber.sound.play('chime'); } catch (e) {} }
   }
 
@@ -306,14 +359,46 @@
   // DBT distress tolerance, walked one skill at a time. Never scores; the
   // ratings only describe what helped, for the next storm.
 
+  // The keep prompt is a place in the room, not a floating state: it takes
+  // a hash so the browser's own Back button steps out of it, and the round
+  // underneath stays exactly where it was left.
+  function setHash(h) {
+    if ((location.hash || '') === h) return;
+    try {
+      if (h) { location.hash = h; hashLock = true; }
+      else if (history.length > 1) { history.back(); hashLock = true; }
+    } catch (e) { hashLock = false; }
+  }
+
   function promptSave(b, summary, doSave, doDiscard) {
     var prompt = document.getElementById('games-save-prompt');
     var body = document.getElementById('games-save-prompt-body');
     if (!prompt) { doSave(); return; }
     pendingPayload = { summary: summary, doSave: doSave, doDiscard: doDiscard };
+    lastFullShot = null;   // the previous booth's frame is not this one's
     if (body) body.innerHTML = 'booth: <em>' + esc(b.name) + '</em>. ' + summary;
+    addPngButton(b);
     prompt.classList.add('open');
     prompt.removeAttribute('inert');
+    setHash('#save');
+  }
+
+  // the export lives in the dialog, not on the shelf: PNG only, and the
+  // browser's Save dialog decides where it lands
+  function addPngButton(b) {
+    var row = document.querySelector('#games-save-prompt .games-save-prompt-actions');
+    if (!row || row.querySelector('.games-save-prompt-png')) return;
+    var keepBtn = document.getElementById('games-save-prompt-keep');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    // reuses the dialog's neutral button treatment rather than shipping a
+    // second style for a third button; the class is the hook if it ever earns
+    // one of its own
+    btn.className = 'games-save-prompt-png games-save-prompt-discard';
+    btn.textContent = 'keep a png';
+    btn.setAttribute('aria-label', 'keep this one, and hand the picture over as a PNG');
+    if (keepBtn && keepBtn.nextSibling) row.insertBefore(btn, keepBtn.nextSibling);
+    else row.insertBefore(btn, row.firstChild);
   }
 
   var pendingPayload = null;
@@ -324,6 +409,9 @@
     prompt.classList.remove('open');
     prompt.setAttribute('inert', '');
     pendingPayload = null;
+    if ((location.hash || '') === '#save' && !hashLock) {
+      try { history.back(); } catch (e) {}
+    }
   }
 
   function closeStage() {
@@ -331,15 +419,40 @@
     if (stage._teardown) { try { stage._teardown(); } catch (e) {} stage._teardown = null; }
     stage.innerHTML = '';
     stage.setAttribute('inert', '');
+    roundDirty = false;
     setView('facade');
   }
 
+  // Walking away from a played-but-unkept round is the one irreversible loss
+  // the midway asks about. Nothing else here nags.
+  function requestClose() {
+    if (roundDirty && !window.confirm('this round is not kept yet. walk away from it?')) return false;
+    closeStage();
+    return true;
+  }
+
+  // The stage element outlives its contents, so one delegated pair of
+  // listeners covers every booth: anything the player touches in the body
+  // means there is now something to lose.
+  function watchRound() {
+    if (!stage) return;
+    var inBody = function (e) {
+      if (e.target && e.target.closest && e.target.closest('.games-stage-head')) return;
+      roundDirty = true;
+    };
+    stage.addEventListener('pointerdown', inBody);
+    stage.addEventListener('keydown', inBody);
+  }
+
   function stepBack() {
-    closePrompt();
+    // the keep prompt holds the Back button while it is open — one step
+    // closes the prompt, and the round is still there to play
+    var prompt = document.getElementById('games-save-prompt');
+    if (prompt && prompt.classList.contains('open')) { closePrompt(); return; }
     closeRaisonSafe();
     if (stage && !stage.hasAttribute('inert')) {
       var gid = current ? current.id : null;
-      closeStage();
+      if (!requestClose()) return;
       if (gid) {
         var back = grid && grid.querySelector('.games-booth[data-game="' + gid + '"]');
         if (back) back.focus();
@@ -367,7 +480,7 @@
     html += '</div>';
     stage.innerHTML = html;
     var closeBtn = document.getElementById('games-stage-close');
-    if (closeBtn) closeBtn.addEventListener('click', closeStage);
+    if (closeBtn) closeBtn.addEventListener('click', requestClose);
     var body = document.getElementById('games-stage-body');
     if (!body) return;
     renderPlay(b, body);
@@ -408,6 +521,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     buildPicker();
+    watchRound();
 
     // Deep link: #<booth id> pans the midway to that booth and opens it.
     // The Learn shelf's TIPP card cross-links here as #tipp.
@@ -522,6 +636,31 @@
     });
     if (closeBtn) closeBtn.addEventListener('click', closePrompt);
     if (prompt) prompt.addEventListener('click', function (e) { if (e.target === prompt) closePrompt(); });
+    // the png button is built per prompt, so it is caught by delegation
+    if (prompt) prompt.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.classList || !t.classList.contains('games-save-prompt-png')) return;
+      e.stopPropagation();
+      var p = pendingPayload;
+      closePrompt();
+      if (p && p.doSave) p.doSave();
+      var s = lastFullShot;
+      if (!s) return;
+      shotAsPng(s.url, function (png) {
+        if (!png) return;
+        var a = document.createElement('a');
+        a.href = png;
+        a.download = s.booth + '-' + new Date().toISOString().slice(0, 10) + '.png';
+        document.body.appendChild(a);
+        a.click();
+        if (a.parentNode) a.parentNode.removeChild(a);
+      });
+    });
+    window.addEventListener('hashchange', function () {
+      if (hashLock) { hashLock = false; return; }
+      if ((location.hash || '') === '#save') return;
+      if (prompt && prompt.classList.contains('open')) closePrompt();
+    });
     if (window.LiberRoomShell) window.LiberRoomShell.bindRoomOverlays({ overlays: [
       { id: 'games-save-prompt', close: closePrompt }
     ] });

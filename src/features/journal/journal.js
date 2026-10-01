@@ -869,18 +869,17 @@
     wirePop();
 
     // PORT: the ribbon IS the exit — mark your page, leave the room.
+    // Explicit desktop: history.back() inherits boot/gate redirects.
     if (exit) exit.addEventListener('click', function () {
       try { if (current) persist(true); } catch (e) {}
-      if (history.length > 1) history.back(); else location.href = 'desktop.html';
+      location.href = 'desktop.html';
     });
 
     if (slipEl) slipEl.addEventListener('click', function () {
       if (!current) return;
       try { persist(true); } catch (e) {}
       var home = slipFor(current.type);
-      if (home) {
-        if (history.length > 1) history.back(); else location.href = home[0];
-      }
+      if (home) location.href = home[0];
     });
 
     if (findEl) {

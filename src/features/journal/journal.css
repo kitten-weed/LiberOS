@@ -658,9 +658,9 @@
   transform: translateX(-50%);
   font-size: 0.9rem;
   letter-spacing: 0.18em;
-  /* faintly legible at rest — an exit you can find is an exit that works;
+  /* legible at rest — an exit you can find is an exit that works;
      it warms to full ink on approach */
-  color: rgba(232, 200, 144, 0.45);
+  color: rgba(232, 200, 144, 0.62);
   transition: color 0.15s ease;
   pointer-events: none;
 }

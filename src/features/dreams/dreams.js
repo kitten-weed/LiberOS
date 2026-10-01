@@ -368,13 +368,15 @@ function WL(kind, data) {
     var text = (el('dreams-text-input').value || '').trim();
     if (!text) return;
     if (!title) title = 'an unnamed dream';
-    state().addArtifact('dreams', WL(0, { title: title, text: text }));
+    var entry = state().addArtifact('dreams', WL(0, { title: title, text: text }));
     el('dreams-title-input').value = '';
     el('dreams-text-input').value = '';
     renderLedger();
     var note = el('dreams-record-note');
-    if (note) note.textContent = 'recorded. select the entry when you want to open a possible association.';
+    if (note) note.textContent = 'recorded. here is what the room makes of it.';
     if (global.Liber && global.Liber.sound) global.Liber.sound.play('chime');
+    // the reading opens at the emotional peak — no second click to reach it.
+    if (entry && entry.id) openReading(entry.id);
   }
 
   function isKept(id) {

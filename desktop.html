@@ -77,7 +77,7 @@
               </div>
 
               <div class="status-line">
-                <span class="status-phrase">liber.os is listening.</span>
+                <span class="status-phrase">liber.os is awake.</span>
               </div>
 
               <button class="settings-cog" id="settings-cog" type="button" aria-label="settings" title="settings">
@@ -142,12 +142,12 @@
                   </svg>
                 </button>
                 <div class="enter-backdrop" id="enter-backdrop" hidden></div>
-                <div class="enter-popup" id="enter-popup" role="dialog" aria-modal="true" aria-label="enter your name" hidden>
+                <form class="enter-popup" id="enter-popup" role="dialog" aria-modal="true" aria-label="enter your name" hidden>
                   <button class="enter-close" id="enter-close" type="button" aria-label="close">×</button>
                   <p class="enter-prompt">(Enter your name)</p>
                   <input class="enter-name" id="enter-name" type="text" maxlength="40" autocomplete="off" spellcheck="false" aria-label="your name" />
-                  <button class="enter-proceed" id="enter-proceed" type="button" disabled>[proceed]</button>
-                </div>
+                  <button class="enter-proceed" id="enter-proceed" type="submit" disabled>[proceed]</button>
+                </form>
                 <div class="enter-build" id="enter-build" hidden aria-live="polite">
                   <span class="enter-build-box" id="enter-build-box" aria-hidden="true"></span>
                   <span class="enter-build-name" id="enter-build-name"></span>

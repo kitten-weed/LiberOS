@@ -1214,6 +1214,7 @@ import {
   const photoActions = document.getElementById('mem-photo-actions');
   const photoLabelRow = document.getElementById('mem-photo-label-row');
   const photoLabel = document.getElementById('mem-photo-label');
+  const photoCommit = document.getElementById('mem-photo-commit');
   const photoStory = document.getElementById('mem-photo-story');
   let pendingShot = null;
   let snapCamera = null;   // the tray-portrait camera, built on first shot
@@ -1398,7 +1399,6 @@ import {
       photoTitle.textContent = '— write it on the back —';
       photoImg.src = S.photos[soFar].dataUrl;
       photoImg.hidden = false;
-      photoActions.style.display = 'none';
       photoLabelRow.hidden = false;
       photoStory.innerHTML = '';
       photoLabel.value = '';
@@ -1407,18 +1407,21 @@ import {
       showStory();
     }
   });
+  function commitLabel() {
+    const i = S.photos.length - 1;
+    if (i < 0) return;
+    S.photos[i].label = photoLabel.value.trim();
+    labelPolaroid(i, S.photos[i].label);
+    if (i === 2) showStory();
+    else closePhotoUI();
+    saveSoon();
+  }
   photoLabel.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
-    const i = S.photos.length - 1;
-    if (i >= 0) {
-      S.photos[i].label = photoLabel.value.trim();
-      labelPolaroid(i, S.photos[i].label);
-      if (i === 2) showStory();
-      else closePhotoUI();
-      saveSoon();
-    }
+    commitLabel();
   });
+  if (photoCommit) photoCommit.addEventListener('click', commitLabel);
 
   /* ── studies, new tray, exit ───────────────────────────────────────── */
 
@@ -1433,6 +1436,7 @@ import {
 
   document.getElementById('mem-new').addEventListener('click', () => {
     if (S.busy) return;
+    if ((S.photos.length > 0 || S.placed.length > 0) && !window.confirm('the tray holds unkept work; clear it anyway?')) return;
     for (const fig of S.placed.slice()) liftFigure(fig);
     sand.reset();
     sand.rebuild();
@@ -1443,8 +1447,7 @@ import {
   });
 
   document.getElementById('mem-exit').addEventListener('click', () => {
-    if (history.length > 1) history.back();
-    else location.href = 'desktop.html';
+    location.href = 'desktop.html';
   });
 
   /* ── the frame loop ────────────────────────────────────────────────── */

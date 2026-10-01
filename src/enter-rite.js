@@ -92,7 +92,11 @@
       proceed.disabled = nameInput.value.trim().length === 0;
     });
 
-    proceed.addEventListener('click', function () {
+    // The popup is a form, so Enter in the name field commits the name exactly
+    // as clicking [proceed] does. The click binding is gone with it: the submit
+    // button fires submit, so one handler serves both routes.
+    popup.addEventListener('submit', function (e) {
+      e.preventDefault();
       var name = nameInput.value.trim();
       if (!name) return;
       store.set({ travellerAlias: name.slice(0, 40), enterRiteDone: true, nameTransition: true, tutorialBeat: 0 });

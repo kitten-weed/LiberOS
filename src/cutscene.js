@@ -1804,7 +1804,9 @@
         if (beat.speaker === 'riason') revealRiasonParentheticals(lineEl);
         if (beat.speaker === 'riason' && beat.text.indexOf('LEARN') >= 0) markLineWord(lineEl, 'LEARN', 'ctv-learn-door');
         if (beat.text && /imaginary/i.test(beat.text)) fxImaginaryWord(body);
-        if (idx === 4) fxLogicSlip(body);
+        // the slip rode on the "leave the meaning open" line; keying it to the
+        // words rather than a beat number survives the retuned opening.
+        if (beat.text && /leave the meaning open/i.test(beat.text)) fxLogicSlip(body);
         if (beat.effect === 'room-cycle' || beat.effect === 'pixel-smoke' || beat.effect === 'diegetic-cracks') fxWindowBreath();
         if (beat.effect === 'color-cycle') fxColorCycle(body, 2400);
         // The shadow material arrives with Vanir's authored warning; the
@@ -2040,21 +2042,39 @@
 
   /* handoff: the tutorial returns to the desktop with a single glowing
      "poppet" cartridge waiting on the TraveROM. Seating it opens the lab,
-     where the guided workshop takes over. The beat resolves the moment the
-     seat is armed; the actual leave happens through the normal pipeline. */
+     where the guided workshop takes over. The beat parks on the desktop and
+     never advances: the finale waits until a poppet is actually kept, and the
+     leave happens through the normal pipeline. */
+  function keptCount() {
+    // The same store poppet-lab's keepsakeCount() reads, plus the state mirror
+    // the lab writes when a poppet is seated, so the park lifts whichever way
+    // the keep landed.
+    try {
+      var kept = JSON.parse(localStorage.getItem('poppet.keepsakes.v1') || '[]');
+      if (Array.isArray(kept) && kept.length) return kept.length;
+    } catch (e) {}
+    try {
+      var g = st();
+      var buddies = g && g.buddy;
+      if (Array.isArray(buddies)) {
+        for (var i = 0; i < buddies.length; i++) {
+          if (buddies[i] && buddies[i].kind === 'poppet') return buddies.length;
+        }
+      }
+    } catch (e) {}
+    return 0;
+  }
+
   function playHandoff(next) {
     // Already been? If a lab poppet exists, the handoff already happened —
     // resuming from the parked cursor must walk straight into the finale,
     // never replay the tray seat (that replay is what made the returned
     // desktop feel dead: pause, tray, pause).
-    try {
-      var kept = JSON.parse(localStorage.getItem('poppet.keepsakes.v1') || '[]');
-      if (Array.isArray(kept) && kept.length) {
-        try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
-        next();
-        return;
-      }
-    } catch (e) {}
+    if (keptCount()) {
+      try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
+      next();
+      return;
+    }
     var dock = (window.Liber && window.Liber.crtBay) || null;
     if (!dock || !dock.openTray) { setTimeout(function () { location.href = 'sigil.html'; }, 600); next(); return; }
     document.body.classList.add('ctv-poppet-glow');
@@ -2066,12 +2086,17 @@
         try {
           if (window.LiberTraveROM && window.LiberTraveROM.soloPoppet) window.LiberTraveROM.soloPoppet();
         } catch (e) {}
+        // No next() here. The cursor parks on the handoff, so the finale
+        // cannot run over the open tray — the old call advanced into it right
+        // here, and a fast clicker watched it play before the workshop.
+        // The response rail is closed too, so a gate left behind by the
+        // previous line cannot be clicked twice into the finale.
+        closeGate('action-lock');
         // Pause the tutorial while the traveller is in the workshop: the
         // cutscene stays down on the desktop, and when keepdrop pops the
         // flag and walks them home, the DOMContentLoaded watcher below
         // resumes straight from the saved cursor — no tray replay.
         try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
-        next();
       }, 700);
     }, 500);
   }
@@ -2214,6 +2239,10 @@
     if (screen) screen.classList.remove('ctv-screen-pulse');
     var machine = document.querySelector('.machine');
     if (machine) machine.classList.remove('flame-glow', 'machine-break', 'machine-break-hard', 'ctv-time-hijack-machine', 'do-shake-hard');
+    // The handoff dims the machine to point at the poppet cart. That lesson is
+    // over now, and the desktop is not a dimmed room: hand the desktop its own
+    // brightness back.
+    document.body.classList.remove('ctv-poppet-glow');
     if (st()) {
       if (!canceled) {
         persistFinaleResidue();

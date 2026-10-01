@@ -75,9 +75,19 @@
     (function () {
       // leave → the desktop, where the home room now lives
       var backBtn = document.getElementById('sigil-back');
-      if (backBtn) backBtn.addEventListener('click', function () {
+      // the lab is same-origin, so its unsaved-work flag is readable directly:
+      // a doll with ink on it and no keepsake yet is half-made
+      function labHalfMade() {
+        try {
+          var f = document.getElementById('lab-frame');
+          return !!(f && f.contentWindow && f.contentWindow.__labDirty);
+        } catch (e) { return false; }
+      }
+      function goDesktop() {
+        if (labHalfMade() && !window.confirm('the doll is half-made; leave anyway?')) return;
         location.href = 'desktop.html';
-      });
+      }
+      if (backBtn) backBtn.addEventListener('click', goDesktop);
       // a kept poppet flies home: the desktop hosts the home room and its rug
       // catches the drop, so the keeping hands off through the parent frame.
       window.addEventListener('message', function (ev) {

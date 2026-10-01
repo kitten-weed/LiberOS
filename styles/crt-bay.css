@@ -1433,3 +1433,9 @@ html.pixel-register .crt-bay-tray.closing .crt-cartridge {
   52% { opacity: .88; transform: translateY(28px) scale(.72) rotate(0deg); }
   100% { opacity: 0; transform: translateY(170px) scale(.18) rotate(0deg); }
 }
+
+/* ── next-cartridge guide (2026-10-01): one glowing door at a time.
+   Reuses the cutscene handoff glow keyframes; applied by render() via
+   .crt-next while keeps are empty (poppet) and then until the sea is visited. */
+#crt-cartridge-sigil.crt-next .crt-cart-label,
+#crt-cartridge-vanir.crt-next .crt-cart-label { animation: ctv-cart-glow 1.5s ease-in-out infinite; }

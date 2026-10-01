@@ -1368,14 +1368,35 @@
         at(950 + tl - 200, function () { stamp('READ IT UPSIDE DOWN', cx, cy - 120, { color: '#79dac8', size: 15, hold: 200, holdFor: 2400 }); });
       }
 
-      // the actions: keep / discard, inline on the stage, after the type
-      at(950 + tl + 600 + typeMs, function () {
+      // the actions: keep / discard, inline on the stage, after the type.
+      // landActions is named so the skip button can jump straight here.
+      var landed = false;
+      var landActions = function () {
+        if (landed) return;
+        landed = true;
+        var sk = doc.querySelector('.act-skip');
+        if (sk && sk.parentNode) sk.parentNode.removeChild(sk);
         stageActions(function (choice) {
           if (choice === 'keep') { if (opts.onKeep) opts.onKeep(); }
           else if (choice === 'discard') { if (opts.onDiscard) opts.onDiscard(); }
           endScene(500);
         });
+      };
+      var skip = document.createElement('button');
+      skip.type = 'button';
+      skip.className = 'act act-skip on';
+      skip.innerHTML = '<span class="act-key">[s]</span> skip';
+      skip.style.left = 'auto';
+      skip.style.right = '12px';
+      skip.style.top = '12px';
+      skip.style.transform = 'none';
+      skip.addEventListener('click', function () {
+        for (var si = 0; si < SCENE.timers.length; si++) clearTimeout(SCENE.timers[si]);
+        SCENE.timers = [];
+        landActions();
       });
+      doc.appendChild(skip);
+      at(950 + tl + 600 + typeMs, landActions);
 
       // if the stage is torn down before a choice (pane closed, menu hit),
       // the card quietly returns to the stack — nothing is kept unseen

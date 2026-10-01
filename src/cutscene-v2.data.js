@@ -22,13 +22,13 @@
   // Every dialogue beat receives the existing progress gate. Angle-bracket
   // responses remain player choices; >> remains a simple progress response.
   var BEATS = [
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'What just happened?', response: 'what?', effect: 'opening-disturbance' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'WHOA. That\'s me? Looking back at the.. Wha..', response: '???', effect: 'partial-recognition' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Uh.. I sound a little like you, <name>. Is that strange?', response: 'No you\'re not', effect: 'name-loosen' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'That is fair. I am a voice in a room; you know who you are better than I do.', response: 'I don\'t believe you', effect: 'name-loosen' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'You do not have to. We can leave the meaning open and keep walking.', response: 'Okay..', effect: 'inside-screen-reveal' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'There\'s something written on the floor..', response: 'what?', effect: 'floor-inscription' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Should I read it?', response: 'yeah..', effect: 'floor-inscription' },
+    // The release script opened on seven beats of the machine talking to
+    // itself, and five of them handed the traveller a fake choice they had no
+    // part in ("what?", "No you're not", "Okay.."). Three beats instead, each
+    // with a plain advance: disorientation, recognition, the invitation.
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'What just happened? WHOA. That\'s me? Looking back at the..', response: '>>', effect: 'opening-disturbance' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Uh.. I sound a little like you, <name>. Is that strange? That is fair. I am a voice in a room; you know who you are better than I do. You do not have to. We can leave the meaning open and keep walking.', response: '>>', effect: 'name-loosen' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'There\'s something written on the floor.. Should I read it?', response: '>>', effect: 'floor-inscription' },
     { speaker: 'liber-vacui', kind: 'ritual', text: '', response: '' },
 
     // grand: true — her FIRST entrance is staged: two knocks land on the
@@ -38,12 +38,10 @@
     { speaker: 'liber-vacui', kind: 'dialogue', text: 'Scared, it\'s dark and cold.', response: '>>', tone: 'still' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'OH! You\'re so right, let me fix that.', response: '>>', effect: 'infection', tone: 'jovial' },
     { speaker: 'liber-vacui', kind: 'dialogue', text: 'Nothing happened', response: '>>', tone: 'still' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends.', response: '>>', effect: 'room-cycle', tone: 'suspicious' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'WHOA.', response: '>>', tone: 'still' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Haha. I love these guys.', response: '>>', tone: 'jovial' },
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends. I do love these guys.', response: '>>', effect: 'room-cycle', tone: 'suspicious' },
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'WHOA.', response: '>>', tone: 'still' },
 
     /* ── the new opening, per the release script: only one traveller comes ── */
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh..', response: '>>', tone: 'still' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'Well we better make a poppet first and see what happens', response: '>>', tone: 'suspicious' },
     { kind: 'handoff', text: '', response: '' },
 
@@ -54,16 +52,19 @@
      { speaker: 'liber-vacui', kind: 'dialogue', text: 'Yay!', response: '>>', tone: 'jovial' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh and monosyllabic too. Little <name> why don’t you ask for some more travellers?', response: '>>', tone: 'jovial' },
     { kind: 'summon', text: 'I summon you across all times|With magic words enriched by rhymes|To help me find the parts of me|Provide your light and make me see!', response: '' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Listen.. you\'ll hear them before you see them. The crossing arrives first, then the ones who keep and name. Let them come one at a time, little <name>. First meetings deserve room.', response: 'okay..', tone: 'still' },
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'Listen.. you\'ll hear them before you see them. The crossing arrives first, then the ones who keep and name. Let them come one at a time, <name>. First meetings deserve room.', response: 'okay..', tone: 'still' },
     { kind: 'carts', text: '', response: '' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'There. Every one of them answered. Go say hello — they\'ll wait for you.', response: '>>', tone: 'jovial' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'WOW! That was amazing!', response: '>>', tone: 'jovial' },
      { speaker: 'liber-vacui', kind: 'dialogue', text: 'THANKS!', response: '>>', tone: 'jovial' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'No worries little buddy.', response: '>>', tone: 'jovial' },
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'No worries, buddy.', response: '>>', tone: 'jovial' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'I think it’s time I let you explore. More changes are to come', response: '>>', tone: 'suspicious' },
     { kind: 'rat', text: '', response: '' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Ew. Forth wall breaks. Begone RAT', response: '>>', tone: 'alarmed' },
-    { kind: 'rat-explode', text: '', response: '' },
+    // RAT built this thing and is not thrown out of it: the fourth wall breaks
+    // and he is thanked for the watch. The rat's own line uses the authored
+    // 'skulks-away' effect, which withdraws his box and leaves the room quiet.
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'The fourth wall breaks. RAT — thank you for the watch. Go carefully.', response: '>>', tone: 'still' },
+    { speaker: 'rat', kind: 'dialogue', text: 'Understood. I built this; I can let it go. Good luck in there.', response: '>>', tone: 'still', effect: 'skulks-away' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'Before you continue, let me leave you with some parting words:', response: '>>', tone: 'suspicious' },
     { speaker: 'liber-vacui', kind: 'finale', text: 'I ARISE THE SAME BUT DIFFERENT', response: '' }
   ];
