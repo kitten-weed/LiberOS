@@ -87,6 +87,39 @@ export function saveKeepsake(atlasCv, clothCv, spec) {
   return list.length;
 }
 
+/* Mirror a keepsake into the ship's buddy array, so every surface that
+   reads the buddy (journal, constellation, home rug) sees the same poppet.
+   Goes through window.Liber.state when available (correct slot); falls back
+   to the legacy direct write. Single source of truth for both the lab
+   (keepdrop) and the tutorial rite. */
+export function mirrorKeepsakeToBuddy(n, name, idPrefix) {
+  if (!n) return false;
+  try {
+    const w = (typeof window !== 'undefined') ? window : {};
+    const st = w.Liber && w.Liber.state;
+    if (st && typeof st.get === 'function' && typeof st.set === 'function') {
+      const g = st.get() || {};
+      const arr = Array.isArray(g.buddy) ? g.buddy.slice() : [];
+      if (!arr.some(function (e) { return e && e.kind === 'poppet' && e.keepsakeN === n; })) {
+        arr.push({ id: (idPrefix || 'poppet-keep') + '-' + n, kind: 'poppet', name: name || ('Poppet Nº ' + n), keepsakeN: n, ts: Date.now() });
+        st.set({ buddy: arr });
+      }
+      return true;
+    }
+  } catch (err) { /* fall through to legacy */ }
+  try {
+    const raw = localStorage.getItem('liber_vacui_v1__keep');
+    const st = raw ? JSON.parse(raw) : {};
+    const arr = Array.isArray(st.buddy) ? st.buddy : [];
+    if (!arr.some(function (e) { return e && e.kind === 'poppet' && e.keepsakeN === n; })) {
+      arr.push({ id: (idPrefix || 'poppet-keep') + '-' + n, kind: 'poppet', name: name || ('Poppet Nº ' + n), keepsakeN: n, ts: Date.now() });
+      st.buddy = arr;
+      localStorage.setItem('liber_vacui_v1__keep', JSON.stringify(st));
+    }
+    return true;
+  } catch (err) { return false; }
+}
+
 export const KEYP_KEY = KEYP;
 
 /* home side: count + async materialize. The fresh flag covers the walk-across

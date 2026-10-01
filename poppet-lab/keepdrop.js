@@ -4,6 +4,8 @@
    keepsake data is already in localStorage; then the page walks to home.
    HOME SIDE: home reads poppet.keepdrop.v1 and drops the poppet onto the rug. */
 
+import { mirrorKeepsakeToBuddy } from './keepsake.js?v=lab51';
+
 const DROP_KEY = 'poppet.keepdrop.v1';
 
 /* ── lab side: the transition ─────────────────────────────────────────────── */
@@ -52,26 +54,11 @@ export function beginKeeping(durationMs) {
        reads the buddy (journal, constellation, home room's parent state)
        sees the same poppet the lab just kept. Single source of truth: the
        lab keepsake store holds the atlas/params; the buddy entry points
-       at it. */
+       at it. Goes through the mirror helper (correct slot via Liber.state). */
     try {
       const keeps = JSON.parse(localStorage.getItem('poppet.keepsakes.v1') || '[]');
       const k = keeps[keeps.length - 1];
-      if (k) {
-        const raw = localStorage.getItem('liber_vacui_v1__keep');
-        const st = raw ? JSON.parse(raw) : {};
-        const arr = Array.isArray(st.buddy) ? st.buddy : [];
-        if (!arr.some(function (e) { return e && e.kind === 'poppet' && e.keepsakeN === k.n; })) {
-          arr.push({
-            id: 'poppet-lab-' + k.n,
-            kind: 'poppet',
-            name: k.name || ('Poppet Nº ' + k.n),
-            keepsakeN: k.n,
-            ts: Date.now()
-          });
-          st.buddy = arr;
-          localStorage.setItem('liber_vacui_v1__keep', JSON.stringify(st));
-        }
-      }
+      if (k) mirrorKeepsakeToBuddy(k.n, k.name || ('Poppet Nº ' + k.n), 'poppet-lab');
     } catch (err) { /* state stays as it was; the keepsake store is intact */ }
     /* standalone: the home room page. Seated in the ship's bezel (sigil.html
        frames the lab): hand the poppet to the parent desktop instead — it

@@ -14,17 +14,10 @@
   var MOD = null;
   var session = null;
 
-  var INKS = ['#2b2016', '#b03a2a', '#c9962e', '#7fb069'];
-  var SIZES = [6, 10, 18];
-
-  // Default proportions — the same bare clay the lab starts from.
-  var DEFAULT_P = {
-    head: 0.42, chest: 1, waist: 0.55, hips: 1,
-    arml: 1, armt: 1, legl: 1, legt: 1, flop: 0.45,
-    pose: 'stand', showRig: false,
-    worn: { robe: false, dress: false, top: false, hoodie: false, pants: false, bralet: false },
-    thoughts: { fears: [], wishes: [], likes: [], dislikes: [], thoughts: [] }
-  };
+  // Shared first-making vocabulary (inks, sizes, proportions, sheet set)
+  // lives in poppet-lab/paint-kit.js so the rite and the alt workshop
+  // cannot drift apart. The lab keeps its own literals (freshP randomizes).
+  var INKS = null, SIZES = null;
 
   // Step → surface + camera push (pos/look) + guide box (% of shown canvas).
   // Boxes are suggestions ("a mark here") — paint anywhere counts.
@@ -37,9 +30,7 @@
     { id: 'clothes', label: 'clothes', surf: 'clothes', hint: 'the hulls appear where you paint them', cam: [[0, 1.0, 4.6], [0, 0.95, 0]], box: null }
   ];
 
-  function inkName(hex) {
-    return { '#2b2016': 'ink', '#b03a2a': 'blood', '#c9962e': 'gold', '#7fb069': 'moss' }[hex] || 'ink';
-  }
+  function inkName(hex) { return MOD.kit.inkName(hex); }
 
   function loadModules() {
     if (MOD) return Promise.resolve(MOD);
@@ -50,9 +41,11 @@
       import('../vendor/three.module.js'),
       import('../poppet-lab/doll.js?v=lab51'),
       import('../poppet-lab/surface.js?v=lab51'),
-      import('../poppet-lab/keepsake.js?v=lab51')
+      import('../poppet-lab/keepsake.js?v=lab51'),
+      import('../poppet-lab/paint-kit.js?v=kit1')
     ]).then(function (m) {
-      MOD = { THREE: m[0], doll: m[1], surface: m[2], keep: m[3] };
+      MOD = { THREE: m[0], doll: m[1], surface: m[2], keep: m[3], kit: m[4] };
+      INKS = m[4].INKS; SIZES = m[4].SIZES;
       return MOD;
     });
   }
@@ -79,7 +72,7 @@
   }
 
   function build(s) {
-    var THREE = MOD.THREE, dollMod = MOD.doll, surfaceMod = MOD.surface;
+    var THREE = MOD.THREE, dollMod = MOD.doll;
     var shell = s.shell;
 
     // ── the doll: real textures, owned by this rite ──
@@ -108,7 +101,7 @@
       doll = dollMod.createDoll(pvScene, atlasCv, null, {
         rng: null, brush: function () { return { ink: s.ink, size: s.size }; }
       });
-      doll.setParams(JSON.parse(JSON.stringify(DEFAULT_P)));
+      doll.setParams(MOD.kit.defaultProportions());
       doll.rebuild('stand');
       // the preview always wears its shells — every stroke shows live.
       try { doll.setFaceShell(true); doll.setHulls(true); } catch (e) {}
@@ -118,28 +111,10 @@
       s.pvCanvas = pvCanvas;
     } catch (e) { doll = null; }
 
-    // ── worksurfaces on the doll's own canvases ──
-    // ws.el (the DISPLAY canvas for pointer mapping) must be set — without
-    // it pos() collapses to 0,0 and every stroke lands in a corner.
-    function wsFor(surf) {
-      var made;
-      if (surf === 'face') {
-        var fm = doll.faceMaps.face;
-        made = surfaceMod.makeWorksurface({ cv: fm.cv, tex: fm.tex, key: 'face' });
-      } else if (surf === 'hair') {
-        var hm = doll.faceMaps.hair;
-        made = surfaceMod.makeWorksurface({ cv: hm.cv, tex: hm.tex, key: 'hair' });
-      } else if (surf === 'clothes') {
-        made = surfaceMod.makeWorksurface({ cv: doll.hullCanvas, tex: doll.hullTex, key: 'clothes', panels: doll.hullRects });
-      } else {
-        made = surfaceMod.makeWorksurface({ cv: atlasCv, tex: doll.bodyTex, key: 'body', panels: doll.ATLAS });
-      }
-      made.ws.el = made.ws.cv;
-      return made;
-    }
+    // ── worksurfaces on the doll's own canvases, via the shared kit ──
+    s.sheets = MOD.kit.buildSheetSet(doll, atlasCv);
 
     s.ink = INKS[0]; s.size = SIZES[1]; s.tool = 'brush';
-    s.sheets = { face: wsFor('face'), hair: wsFor('hair'), body: wsFor('body'), clothes: wsFor('clothes') };
     s.touched = {}; s.idx = 0; s.strokes = 0; s.kept = false;
     STEPS.forEach(function (st) { s.touched[st.id] = 0; });
 
@@ -321,7 +296,7 @@
       var n;
       try {
         n = MOD.keep.saveKeepsake(atlasCv, null, {
-          P: JSON.parse(JSON.stringify(DEFAULT_P)),
+          P: MOD.kit.defaultProportions(),
           pose: 'stand', worn: {},
           ink: s.ink, brush: s.size,
           name: 'Poppet Nº 1',
@@ -329,17 +304,7 @@
           coverage: MOD.keep.atlasCoverage(doll.bodyCtx, doll.ATLAS)
         });
       } catch (e) { return; }
-      try {
-        var st = window.Liber && window.Liber.state;
-        if (st) {
-          var g = st.get() || {};
-          var arr = Array.isArray(g.buddy) ? g.buddy.slice() : [];
-          if (!arr.some(function (x) { return x && x.kind === 'poppet' && x.keepsakeN === n; })) {
-            arr.push({ id: 'poppet-rite-' + n, kind: 'poppet', name: 'Poppet Nº ' + n, keepsakeN: n, ts: Date.now() });
-            st.set({ buddy: arr });
-          }
-        }
-      } catch (e) {}
+      MOD.keep.mirrorKeepsakeToBuddy(n, 'Poppet Nº ' + n, 'poppet-rite');
       try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
       s.kept = true;
       var cb2 = s.onKeep;
@@ -387,6 +352,18 @@
 
     function teardown() {
       try { cancelAnimationFrame(raf); } catch (e) {}
+      // release GPU: geometries, materials and the renderer context would
+      // otherwise leak one WebGL context per open (browsers cap ~16).
+      try {
+        if (pvScene) {
+          pvScene.traverse(function (o) {
+            if (o.geometry) { try { o.geometry.dispose(); } catch (e) {} }
+            var mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+            mats.forEach(function (mt) { try { mt.dispose(); } catch (e) {} });
+          });
+        }
+        if (pvRenderer) { try { pvRenderer.dispose(); } catch (e) {} }
+      } catch (e) {}
       if (shell.parentNode) shell.parentNode.removeChild(shell);
       if (session === s) session = null;
     }

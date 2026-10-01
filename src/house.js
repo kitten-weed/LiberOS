@@ -25,7 +25,10 @@
 
   var PAGE = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '');
   var ROOMS = window.LiberRooms || {};
-  var ROOM = ROOMS[PAGE];
+  // page→room aliases where the file name is not the room id (vanir.html
+  // hosts the sea room; the data file keys it 'sea').
+  var ALIAS = { vanir: 'sea' };
+  var ROOM = ROOMS[PAGE] || ROOMS[ALIAS[PAGE]];
   if (!ROOM) return;   // the house's own room is the authored DOM room
 
   // patina thresholds mirror src/shadow.js PATINA_TIERS (visits + keeps)

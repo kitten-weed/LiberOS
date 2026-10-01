@@ -48,7 +48,6 @@
     // 'toybox.html' retired — Pip's room lives in archive/toybox/
     'memory.html': { room: 'memory', traveller: 'the sand', motif: 'reactions', acc: '#d8b877', verbs: 'place · shape · remember' },
     'journal.html': { room: 'satchel', traveller: 'riason', motif: 'pages', acc: '#aa7838', verbs: 'browse · annotate · return' },
-    'memory.html': { room: 'memory', traveller: 'the sand', motif: 'reactions', acc: '#d8b877', verbs: 'place · shape · remember' },
     'settings.html': { room: 'settings', traveller: 'riason', motif: 'calibration', acc: '#c8a878', verbs: 'tune · protect · continue' },
     'about.html': { room: 'about', traveller: 'riason', motif: 'pages', acc: '#c8a878', verbs: 'read · keep · leave' },
     'desktop.html': { room: 'desktop', traveller: 'wanderlust', motif: 'signal', acc: '#d4af65', verbs: 'seat · keep · bind' }

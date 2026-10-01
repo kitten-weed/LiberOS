@@ -9,7 +9,7 @@
 // Figures are not part of the field; the room manages them, and this module
 // only tells them what ground height to sit at and how far to sink.
 import * as THREE from '../../../vendor/three.module.js';
-import { woodTexture } from './figures.js';
+import { woodTexture } from './figures.js?v=plastic14';
 
 export const TRAY = 10;          // world units across
 export const HALF = TRAY / 2;

@@ -186,7 +186,31 @@
     if (!s2 || s2.disabled) return;
     wipeSafe();
     if (window.Liber && window.Liber.state) window.Liber.state.reset();
-    try { localStorage.removeItem('liber_vacui_consent'); } catch (e) {}
+    // Factory reset means everything: the state reset above only clears the
+    // CURRENT slot, but the rug reads poppet.keepsakes.v1 (a global sidecar),
+    // so a wiped save would still show the old doll. Sweep all of ours.
+    try {
+      var kill = [
+        'liber_vacui_v1', 'liber_vacui_v1__play', 'liber_vacui_v1__keep', 'liber_vacui_v1__show',
+        'liber_vacui_slot', 'liber_vacui_consent',
+        'poppet.keepsakes.v1', 'poppet.keepdrop.v1', 'poppet.keepsake.fresh', 'poppet.dropannounce',
+        'vanir.shelf.v1', 'vanir.exited.v1',
+        'apptut.seen', 'liber_diag'
+      ];
+      for (var i = 0; i < kill.length; i++) localStorage.removeItem(kill[i]);
+      // future-proofing: any other sidecar under our prefixes goes too.
+      var prefixes = ['liber_vacui_', 'liber_vacui', 'poppet.', 'vanir.', 'apptut.', 'liber_diag'];
+      var k, p, hit;
+      var gone = [];
+      for (var n = 0; n < localStorage.length; n++) {
+        k = localStorage.key(n);
+        if (!k) continue;
+        for (p = 0; p < prefixes.length; p++) {
+          if (k === prefixes[p] || k.indexOf(prefixes[p]) === 0) { gone.push(k); break; }
+        }
+      }
+      for (hit = 0; hit < gone.length; hit++) localStorage.removeItem(gone[hit]);
+    } catch (e) {}
     if (window.Liber && window.Liber.sound) window.Liber.sound.play('thunk');
     renderState();
   }
