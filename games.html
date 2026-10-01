@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Games — Whimsy Wow</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css"/>
+  <link rel="stylesheet" href="src/features/games/games.css"/>
+  <link rel="stylesheet" href="src/features/games/house.css"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <header class="games-titlebar">
+              <span class="games-titlebar-name">Whimsy Wow's Game Suite</span>
+              <span class="games-titlebar-sub">eight games, all of them keep.</span>
+              <button class="games-help" type="button" id="games-help" aria-label="how this room works">?</button>
+              <button class="games-exit" type="button" id="games-exit" aria-label="leave">×</button>
+            </header>
+            <div class="games-app" data-state="games" data-view="facade">
+
+              <div class="games-save-prompt" id="games-save-prompt" inert>
+                <div class="games-save-prompt-inner">
+                  <div class="games-save-prompt-head">
+                    <span class="games-save-prompt-name">— keep it? —</span>
+                    <button class="games-save-prompt-close" type="button" id="games-save-prompt-close" aria-label="cancel">×</button>
+                  </div>
+                  <div class="games-save-prompt-body" id="games-save-prompt-body">result: (none).</div>
+                  <div class="games-save-prompt-actions">
+                    <button class="games-save-prompt-keep" type="button" id="games-save-prompt-keep">keep</button>
+                    <button class="games-save-prompt-discard" type="button" id="games-save-prompt-discard">discard</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="games-raison" id="games-raison" inert>
+                <div class="games-raison-inner">
+                  <div class="games-raison-head">
+                    <span class="games-raison-name">riason</span>
+                    <button class="games-raison-close" type="button" id="games-raison-close" aria-label="close">×</button>
+                  </div>
+                  <div class="games-raison-body">
+                    eight attractions around a dirt midway, and every one of them keeps. Follow the path to the big tent, use the arrows to pan left or right, then pull a floating poster to open that game full-screen in the CRT. No refunds — the barker keeps what the barker keeps.
+                  </div>
+                  
+                </div>
+              </div>
+
+              <div class="games-bulbs games-bulbs-top"></div>
+              <div class="games-bulbs games-bulbs-bottom"></div>
+              <div class="games-entrance" aria-hidden="true">
+                <span class="games-entrance-kicker">THE LIBER MIDWAY</span>
+                <span class="games-entrance-sign">WHIMSY<br><i>WOW'S</i></span>
+                <span class="games-entrance-rule">★ &nbsp; ADMIT ONE &nbsp; ★</span>
+                <span class="games-entrance-plate" aria-hidden="true">GATE BOARD Nº 7 · REV. C<br>SUPERSEDES REV. B</span>
+              </div>
+              <div class="games-pennants" aria-hidden="true">
+                <span class="games-pennant games-pennant-left">◆</span>
+                <span class="games-pennant games-pennant-right">◆</span>
+              </div>
+              <div class="games-ground-sign" aria-hidden="true">
+                <span>WHIMSY WOW'S</span>
+                <small>NO REFUNDS · KEEP THE STUB</small>
+              </div>
+
+              <div class="games-tent">
+                <div class="games-marquee">
+                  <div class="games-marquee-text">★ STEP RIGHT UP ★ STEP RIGHT UP ★ STEP RIGHT UP ★ STEP RIGHT UP ★<span aria-hidden="true">★ STEP RIGHT UP ★ STEP RIGHT UP ★ STEP RIGHT UP ★ STEP RIGHT UP ★</span></div>
+                </div>
+                <div class="games-ticket" aria-hidden="true">admit one · keep the stub</div>
+
+                <div class="games-routes" role="group" aria-label="painted route signs">
+                  <button class="games-shingle games-shingle-quiet" type="button" data-goto="tipp">
+                    <span class="games-shingle-who" aria-hidden="true">OVERWHELMED</span>
+                    <span class="games-shingle-to">THE QUIET FLOOR ›</span>
+                  </button>
+                  <button class="games-shingle games-shingle-curious" type="button" data-goto="wheel">
+                    <span class="games-shingle-who" aria-hidden="true">CURIOUS</span>
+                    <span class="games-shingle-to">EMOTION WHEEL ›</span>
+                  </button>
+                </div>
+                <div class="games-title">WHIMSY WOW'S</div>
+                <div class="games-sub">eight honest games · everything kept</div>
+
+                <div class="games-shell">
+                  <div class="games-side">
+                    <div class="games-camera-controls" aria-label="move along the midway">
+                      <button class="games-pan games-pan-left" id="games-pan-left" type="button" aria-label="show the attraction to the left">◀</button>
+                      <span class="games-camera-caption">MIDWAY / CAMERA · ← → WALK · ESC BACK</span>
+                      <button class="games-pan games-pan-right" id="games-pan-right" type="button" aria-label="show the attraction to the right">▶</button>
+                    </div>
+                    <div class="games-grid" id="games-grid"></div>
+                    <div class="games-desc" id="games-desc">
+                      <div class="games-desc-name">pick a game, friend.</div>
+                    </div>
+                  </div>
+                  <div class="games-stage" id="games-stage" inert></div>
+                </div>
+
+                <div class="games-barker">— the barker is loud. try not to listen. —</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="src/features/games/booths/context.js"></script>
+  <script src="src/features/games/booths/tipp.js"></script>
+  <script src="src/features/games/booths/wheel.js"></script>
+  <script src="src/features/games/booths/mask.js"></script>
+  <script src="src/features/games/booths/shield.js"></script>
+  <script src="src/features/games/booths/circles.js"></script>
+  <script src="src/features/games/booths/sand.js"></script>
+  <script src="src/features/games/booths/tide.js"></script>
+  <script src="src/features/games/booths/storm.js"></script>
+  <script src="src/features/games/games.js"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'games',
+    traveller: 'WHIMSY WOW',
+    accent: '#d4af37',
+    title: 'the arcade',
+    helpButton: '#games-help',
+    lines: ['Pick a booth and play. When a round ends you can keep the result — it becomes an artifact the poppet can hold.']
+  });
+</script>
+</body>
+</html>

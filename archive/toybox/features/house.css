@@ -1,0 +1,115 @@
+/* ============================================================================
+   toybox/house.css — the bathroom.
+
+   Pip's room of the house. Glazed tile to shoulder height, chipped enamel,
+   wet grout, brass; one bare bulb on a cord because nobody has got round to
+   a shade.
+
+   COMPOSITION. Seen past the machine: the tile wall above the desk tube and
+   the boards below it, everything measured in machine units. The bath is not
+   built here — a bath is a floor's worth of object and this wall is a wall,
+   not a floor. What is left is what reads: the tile, the water damage, the
+   towel, the mop nobody put away, the powder.
+
+   SUBSTRATE  glazed tile, chipped enamel, wet grout, brass
+   LIGHT      one bare bulb on a cord, warm; a frosted fanlight, cold
+   TELLS      powder swept as far as the drain and left, the towel on its rail,
+              a run of tile gone and nothing done about it
+   ============================================================================ */
+
+.house-scene[data-house="toybox"] {
+  --house-wall-hi: #3f5a4e;
+  --house-wall: #2c4038;
+  --house-wall-lo: #17231e;
+  --house-wall-pattern:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0 1px, rgba(0, 0, 0, 0) 1px 44px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0 1px, rgba(0, 0, 0, 0) 1px 44px),
+    radial-gradient(circle at 50% 12%, rgba(214, 244, 230, 0.07) 0%, rgba(0, 0, 0, 0) 58%);
+  --house-wall-sheen: linear-gradient(180deg, rgba(220, 255, 240, 0.10) 0%, rgba(0, 0, 0, 0) 44%);
+
+  --house-floor-lit: #33473c;
+  --house-floor: #1c2a24;
+  --house-floor-pattern:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0 1px, rgba(0, 0, 0, 0) 1px 26px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.24) 0 1px, rgba(0, 0, 0, 0) 1px 22px);
+
+  --house-frame: #6a7a72;
+  --house-glass: #93a89c;
+  --house-door: #5c6b62;
+  --house-door-frame: #38443c;
+  --house-brass: #b08a3c;
+
+  --house-lamp-x: 8.2;
+  --house-lamp-y: 1.2;
+  --house-lamp-cord: 6;
+  --house-lamp-core: #ffe2a4;
+  --house-lamp-wash: rgba(255, 206, 140, 0.22);
+  --house-accent: #d88a3c;
+
+  --house-shelf-x: 1.2;
+  --house-shelf-y: 1.2;
+  --house-shelf-w: 5;
+  --house-shelf-h: 5;
+  --house-shelf-wood: #6a5238;
+  --house-shelf-lit: #9c7c56;
+}
+
+/* ── the glass: frosted, with the day in it and nothing to see ───────────── */
+.house-scene[data-house="toybox"] .house-window {
+  background-image:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.14) 0%, rgba(0, 0, 0, 0) 40%),
+    radial-gradient(circle at 30% 22%, rgba(245, 252, 250, 0.5) 0%, rgba(0, 0, 0, 0) 52%),
+    linear-gradient(180deg, #b9c9bd 0%, #8fa398 58%, #64766c 100%);
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 0 1px var(--house-line);
+}
+
+/* the bulb is bare on its cord — the whole of the room's lighting */
+.house-scene[data-house="toybox"] .house-lamp-body {
+  border-radius: 50% 50% 42% 42%;
+  background: radial-gradient(circle at 42% 34%, #fffaea 0%, var(--house-lamp-core) 46%, #9a6c24 100%);
+  box-shadow:
+    0 0 12px 3px color-mix(in srgb, var(--house-lamp-core) 62%, transparent),
+    0 0 46px 14px var(--house-lamp-wash);
+}
+
+/* ── the towel on its rail ──────────────────────────────────────────────── */
+.house-scene[data-house="toybox"] .house-prop[data-prop="towel"] {
+  --x: 12.4; --y: 1.2; --w: 2.8; --h: 5;
+  border-radius: 2px 2px 4px 4px;
+  background: repeating-linear-gradient(0deg, #8a9a90 0 6px, #6f8078 6px 12px);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.14), 2px 0 6px rgba(0, 0, 0, 0.45);
+}
+
+/* ── a run of tile gone, and the grout gone with it ─────────────────────── */
+.house-scene[data-house="toybox"] .house-prop[data-prop="crack"] {
+  --x: 1.2; --y: 6.8; --w: 5; --h: 5;
+  /* where the tile has come away the bed is paler than the tile, and the
+     grout line stops dead at the edge of the hole — which is what makes a
+     missing tile read as missing and not as a shadow on a green wall */
+  background:
+    linear-gradient(160deg, rgba(186, 180, 156, 0.62) 0%, rgba(132, 128, 108, 0.44) 54%, rgba(0, 0, 0, 0) 94%),
+    linear-gradient(72deg, rgba(0, 0, 0, 0) 0 47%, rgba(0, 0, 0, 0.7) 48% 49.6%, rgba(0, 0, 0, 0) 50.6%),
+    linear-gradient(108deg, rgba(0, 0, 0, 0) 0 58%, rgba(0, 0, 0, 0.5) 59% 60%, rgba(0, 0, 0, 0) 61%);
+  clip-path: polygon(2% 14%, 44% 0, 88% 8%, 100% 54%, 86% 100%, 18% 94%, 0 62%);
+}
+
+/* ── the mop nobody put away, leaning where it was left ─────────────────── */
+.house-scene[data-house="toybox"] .house-prop[data-prop="mop"] {
+  --x: 6.8; --y: 6.8; --w: 1.6; --h: 5;
+  border-radius: 2px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0 62%, #6f5a34 62% 70%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0 68%, #b8ad92 68% 100%);
+  transform: rotate(3deg);
+  transform-origin: bottom center;
+}
+
+/* ── powder on the tiles, swept as far as the drain and no further ──────── */
+.house-scene[data-house="toybox"] .house-prop[data-prop="spill"] {
+  --x: 2; --y: 0.4; --w: 10; --h: 3;
+  border-radius: 50% 42% 46% 50% / 60% 70% 40% 40%;
+  background: radial-gradient(ellipse at 42% 40%, rgba(232, 200, 144, 0.52) 0%, rgba(214, 178, 120, 0.24) 46%, rgba(0, 0, 0, 0) 74%);
+}

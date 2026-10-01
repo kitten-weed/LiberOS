@@ -1,0 +1,20 @@
+/* boot-dom.css — the boot/loading screens are DOM-first.
+   The retired pixi-boot canvas once painted these titles; its phosphor
+   treatment now lives on the DOM text itself (styles/boot.css,
+   styles/loading.css). What remains here is the honest DOM presentation:
+   visible text, visible buttons, working focus — with no second renderer
+   to wait for and no transparency tricks. */
+/* machine.css holds .screen-stage at absolute inset:0 (the tube's fill).
+   That was re-declared here as position:relative, which silently dropped
+   the stage out of the tube on boot/loading: the state root shrank to its
+   content height and the bottom of the glass showed a dead red panel
+   behind the LIBER.OS card. The fill is load-bearing everywhere, so this
+   file now only layers the boot states above the stage, never resizes it. */
+.screen-stage { overflow: hidden; }
+.state-boot,
+.state-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.state-boot .boot-help { z-index: 3; }

@@ -1,0 +1,157 @@
+/* ============================================================================
+   journal/house.css — the study.
+
+   Riason's room of the house. Oak panelling with a dado rail across it, a
+   bookcase that has stopped being shelving and become a wall, vellum and ink,
+   brass clasps — and a green-glass banker's lamp, which is the brightest thing
+   in the room and the reason the wall behind it reads at all.
+
+   COMPOSITION. The band above the desk tube, and the boards below the machine,
+   in machine units. The desk, the globe, the blotter and the chair are not
+   built: they were a floor's worth of furniture seen through a gap the width
+   of a shelf. What is left is the study's actual argument — the wall of books,
+   the index board, the papers, the drawers.
+
+   SUBSTRATE  indexed vellum, brass clasps, oak, ink
+   LIGHT      one green-glass banker's lamp, warm. The window is dark behind
+              its curtain and contributes nothing.
+   TELLS      a card pulled out of the file and not put back, the date stamp
+              set to a day that is not today, papers left where they fell
+   ============================================================================ */
+
+.house-scene[data-house="journal"] {
+  --house-wall-hi: #4a3620;
+  --house-wall: #33240f;
+  --house-wall-lo: #1a1207;
+  /* panelling: vertical boards, and a dado rail across them */
+  --house-wall-pattern:
+    repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, 0.34) 0 1px,
+      rgba(0, 0, 0, 0) 1px 52px,
+      rgba(255, 255, 255, 0.022) 52px 53px,
+      rgba(0, 0, 0, 0) 53px 54px),
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0) 0 62%,
+      rgba(0, 0, 0, 0.45) 62% 63.2%,
+      rgba(0, 0, 0, 0.16) 63.2% 100%),
+    radial-gradient(ellipse 34% 40% at 86% 70%, rgba(232, 200, 144, 0.10) 0%, rgba(0, 0, 0, 0) 72%);
+  --house-wall-sheen: linear-gradient(180deg, rgba(255, 232, 190, 0.06) 0%, rgba(0, 0, 0, 0) 42%);
+
+  --house-floor-lit: #3a2a16;
+  --house-floor: #201608;
+  --house-floor-pattern: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.34) 0 2px, rgba(0, 0, 0, 0) 2px 54px);
+
+  --house-frame: #4a3a20;
+  --house-glass: #161c2a;
+  --house-door: #3d2a14;
+  --house-door-frame: #1f1408;
+  --house-brass: #aa7838;
+
+  --house-lamp-x: 8.2;
+  --house-lamp-y: 1.2;
+  --house-lamp-cord: 3;
+  --house-lamp-core: #ffd89c;
+  --house-lamp-wash: rgba(255, 206, 140, 0.26);
+  --house-accent: #aa7838;
+
+  --house-shelf-x: 1.2;
+  --house-shelf-y: 1.2;
+  --house-shelf-w: 5;
+  --house-shelf-h: 5;
+  --house-shelf-wood: #4a3418;
+  --house-shelf-lit: #7d5c30;
+
+  /* the index board — a card per relation, pinned in its own grid */
+  --house-pins-x: 12.4;
+  --house-pins-y: 1.2;
+  --house-pins-w: 5;
+  --house-pins-h: 5;
+
+  /* the opening is the building's, so its size is in machine units like
+     everything else — a percentage here would resolve against the window
+     and make the glass change shape with the browser */
+  --house-window-h: 14;
+  --house-window-t: 2;
+}
+
+/* ── the glass: night, and a curtain that is drawn ──────────────────────── */
+.house-scene[data-house="journal"] .house-window {
+  background-image: linear-gradient(180deg, #1b2334 0%, #131a28 60%, #0b0f18 100%);
+}
+
+/* the lamp is a banker's lamp: a green glass half-dome with the light under
+   it, which is why the wall behind it is the brightest thing in the room */
+.house-scene[data-house="journal"] .house-lamp-body {
+  border-radius: 50% 50% 10% 10% / 90% 90% 14% 14%;
+  background: linear-gradient(180deg, #2f6a44 0%, #1d4a2e 58%, #0e2417 100%);
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.5),
+    0 6px 12px rgba(0, 0, 0, 0.6),
+    0 0 34px 10px var(--house-lamp-wash);
+}
+
+/* ── the index board: a card per relation ───────────────────────────────── */
+.house-scene[data-house="journal"] .house-pins {
+  background: linear-gradient(180deg, #6a5232 0%, #4a381c 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+.house-scene[data-house="journal"] .house-pin {
+  background: linear-gradient(180deg, #ece2c8 0%, #c8bca0 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* ── the bookcase, below the ledger: a wall that stopped being shelving ─── */
+.house-scene[data-house="journal"] .house-prop[data-prop="bookcase"] {
+  --x: 1.2; --y: 6.8; --w: 5; --h: 5;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.55) 0 2px,
+      rgba(0, 0, 0, 0) 2px 22px,
+      rgba(255, 214, 150, 0.05) 22px 24px,
+      rgba(0, 0, 0, 0) 24px 46px),
+    linear-gradient(180deg, #5a4020 0%, #3a2812 100%);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.house-scene[data-house="journal"] .house-prop[data-prop="curtain"] {
+  /* hangs at the near edge of the glass, wherever the glass is */
+  --y: 0; --h: 9;
+  left: calc(var(--house-band-x) + var(--house-glass-x) - 1.4 * var(--house-unit) / 100);
+  width: calc(1.4 * var(--house-unit) / 100);
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 5px, rgba(0, 0, 0, 0) 5px 13px),
+    linear-gradient(180deg, #5a3a1e 0%, #3d2612 100%);
+  border-radius: 2px;
+  box-shadow: inset 0 -6px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* ── below the machine: the drawer unit, and the papers on the boards ──── */
+.house-scene[data-house="journal"] .house-prop[data-prop="cabinet"] {
+  --x: 1; --y: 0; --w: 4.6; --h: 3.6;
+  border-radius: 2px 2px 1px 1px;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.5) 0 2px,
+      rgba(0, 0, 0, 0) 2px 13px,
+      rgba(255, 214, 150, 0.045) 13px 14px,
+      rgba(0, 0, 0, 0) 14px 30px),
+    linear-gradient(180deg, #6a4c26 0%, #3d2810 100%);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.55);
+}
+
+/* one card left proud of the drawer, because it was pulled out and not back */
+.house-scene[data-house="journal"] .house-prop[data-prop="card"] {
+  --x: 5.6; --y: 0.4; --w: 1.4; --h: 2.2;
+  background: linear-gradient(180deg, #ece2c8 0%, #c0b498 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
+  transform: rotate(-6deg);
+}
+
+.house-scene[data-house="journal"] .house-prop[data-prop="papers"] {
+  --x: 8; --y: 0.3; --w: 8; --h: 1.5;
+  background:
+    linear-gradient(102deg, rgba(0, 0, 0, 0) 0 46%, #d8ccb0 46% 100%),
+    linear-gradient(78deg, rgba(0, 0, 0, 0) 0 52%, #c4b69a 52% 100%);
+  opacity: 0.85;
+}

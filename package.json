@@ -1,0 +1,1 @@
+{"name":"liberos","version":"0.1.0","private":true,"description":"LiberOS ShipBuild static rig (GitHub Pages + toolchain hooks).","type":"commonjs","scripts":{"start":"node serve.cjs","test":"node smoke.mjs"},"engines":{"node":">=18"}}

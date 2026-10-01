@@ -1,0 +1,238 @@
+/* poppet-loop.css — the orbit rail, and the line the traveller speaks.
+ *
+ * Neither of these is a dialog. The rail is what is already circling the
+ * poppet, opened by touching the thing it circles; the line is the machine
+ * speaking while a traveller is in it. So: no overlay, no scrim, no close X,
+ * no rounded card floating over a blurred backdrop.
+ *
+ * Material: stamped tin and typed card, held to the machine's register —
+ * cream #eadfc6, gold #d4af65, muted #b19a78 on panel #160b08.
+ * Voice: the house font (Germania) — the home room's own lettering, since
+ * this rail speaks for the home room's poppet.
+ */
+
+@font-face {
+  font-family: 'Germania';
+  src: url('../fonts/Germania.ttf') format('truetype');
+  font-display: swap;
+}
+
+.poppet-orbit, .poppet-spoken {
+  font-family: 'Germania', 'Courier New', monospace;
+}
+  position: absolute;
+  left: 43%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: none;
+  /* Explicit: the constellation family sets pointer-events:none on its
+     furniture, and inheriting that made every row unclickable — the click fell
+     through to #desktop. These two are controls, so they opt back in. */
+  pointer-events: auto;
+  flex-direction: column;
+  gap: 2px;
+  width: min(260px, calc(100% - 24px));
+  max-width: calc(100% - 24px);
+  max-height: 70%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 6px;
+  background: linear-gradient(180deg, #21100b 0%, #160b08 100%);
+  border: 1px solid rgba(212, 175, 101, 0.42);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(234, 223, 198, 0.12);
+}
+
+.poppet-orbit[data-open="yes"] { display: flex; }
+
+.poppet-orbit-heading {
+  padding: 3px 6px 5px;
+  color: #b19a78;
+  font: 600 10px/1.3 'Courier New', monospace;
+  letter-spacing: .04em;
+}
+
+.poppet-orbit-none {
+  font: 12px/1.4 'Courier New', monospace;
+  color: #b19a78;
+  padding: 4px 6px;
+  font-style: normal;
+}
+
+.poppet-orbit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  min-height: 52px;
+  padding: 5px 6px;
+  text-align: left;
+  font: 700 13px/1.3 'Courier New', monospace;
+  letter-spacing: 0.04em;
+  color: #eadfc6;
+  background: linear-gradient(180deg, #2b1711 0%, #1d0f0a 100%);
+  border: 1px solid rgba(212, 175, 101, 0.3);
+  cursor: default;
+  transition: background 140ms ease-in-out, transform 140ms ease-in-out, opacity 320ms ease-in;
+}
+
+.poppet-orbit-row:hover { background: linear-gradient(180deg, #3a1f16 0%, #26140d 100%); }
+
+.poppet-orbit-name {
+  grid-column: 1 / -1;
+  min-width: 0;
+  color: #eadfc6;
+  font: 700 11px/1.3 'Courier New', monospace;
+  overflow-wrap: break-word;
+}
+
+.poppet-orbit-verb,
+.poppet-orbit-bind {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 6px;
+  color: #eadfc6;
+  background: #160b08;
+  border: 1px solid rgba(212, 175, 101, .5);
+  font: 600 11px/1.2 'Courier New', monospace;
+}
+.poppet-orbit-bind {
+  cursor: pointer;
+  background: linear-gradient(180deg, #3a1f16 0%, #26140d 100%);
+  white-space: nowrap;
+}
+.poppet-orbit-bind:hover,
+.poppet-orbit-verb:focus-visible,
+.poppet-orbit-bind:focus-visible {
+  border-color: #ffe09a;
+  outline: 2px solid #ffe09a;
+  outline-offset: 1px;
+}
+.poppet-orbit-bind:disabled {
+  color: #8d7a5b;
+  cursor: not-allowed;
+}
+.poppet-orbit-row[data-consumed="yes"] .poppet-orbit-name {
+  font-style: italic;
+  opacity: .7;
+}
+.poppet-orbit-row[data-consumed="yes"] .poppet-orbit-verb {
+  opacity: .55;
+}
+.poppet-orbit-row[data-consumed="yes"] .poppet-orbit-bind {
+  opacity: .5;
+}
+
+/* the fall: it drops toward the poppet and is taken */
+.poppet-orbit-row[data-consumed="yes"] {
+  transform: translateY(-26px) scale(0.82);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── the line the traveller speaks ──────────────────────────────────────── */
+
+.poppet-spoken {
+  position: absolute;
+  left: 50%;
+  bottom: 26%;
+  transform: translateX(-50%);
+  z-index: 9;
+  display: none;
+  pointer-events: auto;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: min(74%, 560px);
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #21100b 0%, #130a07 100%);
+  border-left: 3px solid #d4af65;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.62);
+}
+
+.poppet-spoken[data-spoken="yes"] { display: flex; }
+
+/* ONE VOICE PER ACTION. The desktop already had a .prompt-line that fires on
+   bind — "Your buddy carries the unmarked. What does a weight let go ask of
+   that carrying?" — generated from the verb and the artifact's name. It is not
+   traveller-attributed, and with the traveller now speaking they collided
+   visually and answered the same action twice. The traveller's line wins,
+   because the design is that the traveller possesses the console and speaks
+   through it; the generic line stands down while they are talking.
+   REVERSIBLE: delete this rule and the original returns, unmodified. */
+.state-desktop:has(#poppet-spoken[data-spoken="yes"]) .prompt-line {
+  display: none;
+}
+
+.poppet-spoken-summary {
+  flex: 1 0 100%;
+  color: #d4af65;
+  font: 600 12px/1.35 'Courier New', monospace;
+  letter-spacing: .03em;
+}
+
+.poppet-spoken-label {
+  flex: 0 0 auto;
+  color: #b19a78;
+  font: 600 10px/1.3 'Courier New', monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.poppet-spoken-who {
+  flex: 0 0 auto;
+  font: 700 11px/1.5 'Courier New', monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d4af65;
+}
+
+.poppet-spoken-line {
+  font: 15px/1.5 'EB Garamond', Georgia, serif;
+  color: #eadfc6;
+}
+
+.poppet-spoken-keep {
+  flex: 0 0 auto;
+  min-height: 30px;
+  min-width: 44px;
+  padding: 4px 10px;
+  font: 700 12px/1.2 'Courier New', monospace;
+  letter-spacing: 0.08em;
+  color: #eadfc6;
+  background: linear-gradient(180deg, #3a1f16 0%, #26140d 100%);
+  border: 1px solid rgba(212, 175, 101, 0.5);
+  cursor: pointer;
+}
+
+.poppet-spoken-keep:disabled { color: #b19a78; cursor: default; opacity: 0.7; }
+
+.poppet-spoken-skip {
+  flex: 0 0 auto;
+  min-height: 30px;
+  min-width: 44px;
+  padding: 4px 10px;
+  color: #b19a78;
+  background: transparent;
+  border: 1px solid rgba(212, 175, 101, .35);
+  font: 600 12px/1.2 'Courier New', monospace;
+  cursor: pointer;
+}
+.poppet-spoken-skip:hover,
+.poppet-spoken-skip:focus-visible {
+  color: #fff1c9;
+  border-color: #ffe09a;
+  outline: 2px solid #ffe09a;
+  outline-offset: 2px;
+}
+
+/* The poppet is a target once it exists, so it says so in the cursor and not
+   in a caption. */
+.poppet-readback[data-poppet="read"] { cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .poppet-orbit-row { transition: none !important; }
+  .poppet-orbit-row[data-consumed="yes"] { transform: none; }
+}

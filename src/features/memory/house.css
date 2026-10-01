@@ -1,0 +1,126 @@
+/* ============================================================================
+   memory/house.css — the therapy annex.
+
+   The room past the machine where the sand tray lives. Bare plaster to the
+   picture rail, warm lamplight pulled low over the bench, and a floor that
+   is always a little gritty. The tray itself is not built here — it lives
+   inside the glass, on the room's own page.
+
+   SUBSTRATE  damp sand, bound tray wood, warm lamp, bare plaster
+   LIGHT      one lamp pulled low over the tray, warm; the wall behind bare
+   TELLS      the rake and the stick crossed on the bench, the spill of sand
+              that crossed the boards, three frames hung not quite level
+   ============================================================================ */
+
+.house-scene[data-house="memory"] {
+  --house-wall-hi: #4a3f30;
+  --house-wall: #33291d;
+  --house-wall-lo: #1a1410;
+  --house-wall-pattern:
+    radial-gradient(circle at 50% 14%, rgba(240, 220, 168, 0.06) 0%, rgba(0, 0, 0, 0) 55%);
+  --house-wall-sheen: linear-gradient(180deg, rgba(240, 220, 168, 0.08) 0%, rgba(0, 0, 0, 0) 40%);
+
+  --house-floor-lit: #3a2e20;
+  --house-floor: #221a12;
+  --house-floor-pattern:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.26) 0 1px, rgba(0, 0, 0, 0) 1px 30px),
+    radial-gradient(circle at 30% 40%, rgba(216, 184, 119, 0.05) 0 22%, rgba(0, 0, 0, 0) 24%);
+
+  --house-frame: #6a5a42;
+  --house-glass: #8a7c60;
+  --house-brass: #c8a050;
+
+  --house-lamp-x: 6.4;
+  --house-lamp-y: 1.0;
+  --house-lamp-cord: 7;
+  --house-lamp-core: #ffe2a4;
+  --house-lamp-wash: rgba(255, 210, 140, 0.24);
+  --house-accent: #d8b877;
+
+  --house-shelf-x: 1.0;
+  --house-shelf-y: 1.2;
+  --house-shelf-w: 5;
+  --house-shelf-h: 5;
+  --house-shelf-wood: #5a4028;
+  --house-shelf-lit: #8a6a42;
+}
+
+/* the window keeps its dust: this room never had a view, only a wall for
+   the frames, so the glass is the plaster's own tone, fogged */
+.house-scene[data-house="memory"] .house-window {
+  background-image:
+    linear-gradient(180deg, #46392a 0%, #35291c 60%, #241a10 100%);
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(240, 220, 168, 0.08),
+    0 0 0 1px var(--house-line);
+}
+
+/* the lamp hangs low and warm, almost onto the bench */
+.house-scene[data-house="memory"] .house-lamp-body {
+  border-radius: 40% 40% 52% 52%;
+  background: radial-gradient(circle at 42% 34%, #fffaea 0%, var(--house-lamp-core) 46%, #96682a 100%);
+  box-shadow:
+    0 0 14px 4px color-mix(in srgb, var(--house-lamp-core) 60%, transparent),
+    0 0 52px 16px var(--house-lamp-wash);
+}
+
+/* ── the workbench along the band ─────────────────────────────────────── */
+.house-scene[data-house="memory"] .house-prop[data-prop="bench"] {
+  --x: 1.4; --y: 2.4; --w: 6.2; --h: 2.2;
+  background:
+    linear-gradient(180deg, rgba(240, 220, 168, 0.16), rgba(0, 0, 0, 0) 42%),
+    linear-gradient(180deg, #5a4028 0%, #4a331e 62%, #33220f 100%);
+  border-radius: 2px 3px 1px 1px;
+  box-shadow:
+    inset 0 2px 0 rgba(240, 220, 168, 0.22),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.55),
+    0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* the stick and the rake crossed on it */
+.house-scene[data-house="memory"] .house-prop[data-prop="stick"] {
+  --x: 2.2; --y: 2.2; --w: 3.4; --h: 0.6;
+  background: linear-gradient(80deg, #7a5a34 0%, #5a4028 100%);
+  border-radius: 3px;
+  transform: rotate(-2.2deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.house-scene[data-house="memory"] .house-prop[data-prop="stick"]::after {
+  content: '';
+  position: absolute;
+  inset: 42% 10% 40% 34%;
+  background: linear-gradient(84deg, transparent 44%, #3a2814 46% 54%, transparent 56%);
+}
+
+/* ── the spill that crossed the boards, floor slot ─────────────────────── */
+.house-scene[data-house="memory"] .house-prop[data-prop="spill"] {
+  --x: 3.4; --y: 8.1; --w: 3.2; --h: 0.9;
+  background:
+    radial-gradient(60% 90% at 40% 50%, rgba(216, 184, 119, 0.34) 0%, rgba(216, 184, 119, 0.12) 55%, rgba(0, 0, 0, 0) 75%),
+    radial-gradient(30% 60% at 72% 42%, rgba(216, 184, 119, 0.22) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  filter: blur(0.4px);
+}
+
+/* ── the three frames, hung on the band, none quite level ─────────────── */
+.house-scene[data-house="memory"] .house-prop[data-prop="frames"] {
+  --x: 1.6; --y: 0.9; --w: 5.4; --h: 1.5;
+  background:
+    linear-gradient(90deg,
+      rgba(240, 228, 200, 0.14) 0 4px, rgba(0, 0, 0, 0) 4px calc(33.3% - 4px),
+      rgba(240, 228, 200, 0.14) calc(33.3% - 4px) 33.3%, rgba(0, 0, 0, 0) 33.3% calc(66.6% - 4px),
+      rgba(240, 228, 200, 0.14) calc(66.6% - 4px) 66.6%, rgba(0, 0, 0, 0) 66.6% calc(100% - 4px),
+      rgba(240, 228, 200, 0.14) calc(100% - 4px) 100%);
+  box-shadow: none;
+}
+.house-scene[data-house="memory"] .house-prop[data-prop="frames"]::after {
+  content: '';
+  position: absolute;
+  inset: 8% 6%;
+  background:
+    linear-gradient(180deg, rgba(20, 16, 10, 0.85), rgba(28, 22, 14, 0.85));
+  transform: rotate(-0.5deg);
+  border: 2px solid rgba(90, 64, 40, 0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}

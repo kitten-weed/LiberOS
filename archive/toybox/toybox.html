@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <title>Toybox — Pip</title>
+  <link rel="stylesheet" href="../../styles/room.css"/>
+  <link rel="stylesheet" href="../../styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="../../styles/bezel.css"/>
+  <link rel="stylesheet" href="../../styles/scars.css"/>
+  <link rel="stylesheet" href="../../styles/crt-bay.css?v=cleanup-20260922"/>
+  <link rel="stylesheet" href="../../styles/cartridge-transit.css"/>
+  <link rel="stylesheet" href="../../styles/house.css"/>
+  <link rel="stylesheet" href="features/toybox.css"/>
+  <link rel="stylesheet" href="features/house.css"/>
+  <link rel="stylesheet" href="../../styles/shadow.css"/>
+  <link rel="stylesheet" href="../../styles/trave-rom.css?v=run11d-20260929" />
+  <link rel="stylesheet" href="../../styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <header class="toybox-titlebar">
+              <span class="toybox-titlebar-name">toybox</span>
+              <span class="toybox-titlebar-sub">wash basins · no drinking water</span>
+              <button class="toybox-help" type="button" id="toybox-help" aria-label="how this room works">?</button>
+              <button class="toybox-exit" type="button" id="toybox-exit" aria-label="leave">×</button>
+            </header>
+
+            <div class="toybox-app" data-state="toybox">
+              <!-- the world: damp motes above enamel, window light, one bulb -->
+              <div class="toybox-motes" aria-hidden="true"></div>
+              <div class="sink-window" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="sink-bulblight" aria-hidden="true"></div>
+              <div class="sink-leftpipe" aria-hidden="true"></div>
+              <div class="sink-towel" aria-hidden="true"></div>
+
+              <div class="toybox-raison" id="toybox-raison" inert>
+                <div class="toybox-raison-inner">
+                  <div class="toybox-raison-head">
+                    <span class="toybox-raison-name">for pip</span>
+                    <button class="toybox-raison-close" type="button" id="toybox-raison-close" aria-label="close">×</button>
+                  </div>
+                  <div class="toybox-raison-body">
+                    the boards are ours — what's on them stays for pip, one shelf apiece, labelled so she knows whose is whose. if you open the thunder cell, stand back from the basin. the fourth shelf went over the side with the tide and we do not speak of it. the count is chalked on the tiles.
+                    <span class="raison-sign">— the travellers, seen off by vanir at the trapdoor</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- splashback: tiles, rain window, the tap that runs the world -->
+              <div class="sink-splash">
+                <div class="sink-tally" aria-hidden="true"><span>day 214</span></div>
+                <div class="toybox-sign" aria-label="pip was here">
+                  <span class="word"><i class="mag">p</i><i class="mag">i</i><i class="mag">p</i></span>
+                  <span class="word"><i class="mag">w</i><i class="mag">a</i><i class="mag">s</i></span>
+                  <span class="word"><i class="mag">h</i><i class="mag">e</i><i class="mag">r</i><i class="mag">e</i></span>
+                </div>
+                <div class="tap-assembly" aria-hidden="true">
+                  <i class="tap-pipe"></i><i class="tap-spout"></i><i class="tap-spout-hole"></i>
+                </div>
+                <button class="toybox-action tap-handle" type="button" id="toybox-pause" aria-pressed="false" title="turn the tap — the world runs on it">
+                  <i class="tool-art" aria-hidden="true"></i><span>tap on</span>
+                </button>
+                <div class="sink-scumline" aria-hidden="true"></div>
+              </div>
+
+              <!-- the side shelves: objects on boards, one thing per material -->
+              <div class="toybox-flank flank-left" id="toybox-shelf-left" role="group" aria-label="materials, left shelf"></div>
+              <div class="toybox-flank flank-right" id="toybox-shelf-right" role="group" aria-label="materials, right shelf"></div>
+
+              <!-- the basin: the whole world pours into it -->
+              <div class="toybox-pit" id="toybox-pit">
+                <canvas class="toybox-canvas" id="toybox-canvas" width="468" height="375"></canvas>
+                <div class="toybox-tray-shine" aria-hidden="true"></div>
+                <button class="toybox-action plug" type="button" id="toybox-drain" title="pull the plug — wet things drain away">
+                  <i class="plug-chain" aria-hidden="true"></i><i class="tool-art" aria-hidden="true"></i><span>pull</span>
+                </button>
+              </div>
+
+              <!-- the residents live on the back rim; drag one into the water -->
+              <div class="toybox-crewbar" id="toybox-crew" role="group" aria-label="residents on the rim">
+                <button class="toybox-crew-btn" type="button" data-crew="crab" title="crab — digs piles flat, sidles around water, flees fire" aria-label="place a crab"><span class="toybox-crew-name">crab</span></button>
+                <button class="toybox-crew-btn" type="button" data-crew="snail" title="snail — trails slime, shelters from fire, rides oil rafts" aria-label="place a snail"><span class="toybox-crew-name">snail</span></button>
+                <button class="toybox-crew-btn" type="button" data-crew="duck" title="duck — bobs on water, paddles to seed and eats it" aria-label="place a duck"><span class="toybox-crew-name">duck</span></button>
+              </div>
+
+              <!-- the towel rail: pip's own two tools -->
+              <div class="toybox-actions">
+                <button class="toybox-action tool-broom" type="button" id="toybox-sweep" title="sweep the basin clean — an old toothbrush"><i class="tool-art" aria-hidden="true"></i><span>sweep</span></button>
+                <button class="toybox-action tool-camera" type="button" id="toybox-keep" title="keep the picture — polaroid into the journal"><i class="tool-art" aria-hidden="true"></i><span>keep</span></button>
+              </div>
+              <div class="toybox-result" id="toybox-result"></div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../src/boot-gate.js"></script>
+  <script src="../../src/state.js"></script>
+  <script src="../../src/stage.js?v=big1"></script>
+  <script src="../../src/room-shell.js"></script>
+  <script src="../../data/rooms.data.js"></script>
+  <script src="../../src/house.js"></script>
+  <script src="../../src/sound.js"></script>
+  <script src="../../src/shadow.js"></script>
+  <script src="../../src/apply-theme.js"></script>
+  <script src="../../src/carvings.js"></script>
+  <script src="features/powder.js"></script>
+  <script src="features/crew.js"></script>
+  <script src="features/toybox.js"></script>
+  <script src="../../src/cartridge-transit.js"></script>
+  <script src="../../src/crt-bay.js?v=mem2-20260929"></script>
+  <script src="../../vendor/pixi.min.js"></script>
+  <script src="../../src/pixi-runtime.js"></script>
+  <script src="../../src/pixi-palette.js?v=cleanup-20260921"></script>
+  <script src="../../src/pixi-layer.js?v=cleanup-20260921"></script>
+  <script src="../../src/trave-rom.js?v=fit2"></script>
+</body>
+</html>

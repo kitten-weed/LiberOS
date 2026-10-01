@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Journal — riason</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css"/>
+  <link rel="stylesheet" href="src/features/journal/journal.css?v=cta2"/>
+  <link rel="stylesheet" href="src/features/journal/house.css"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <!-- No chrome: the room is the book on the desk. The ribbon
+                 bookmark is the exit; the brass bell summons riason. -->
+            <div class="journal-app" data-state="journal">
+
+              <!-- desk dressing: sheets slipped under the folio -->
+              <div class="desk-sheets" aria-hidden="true">
+                <i class="sheet sheet-a"></i>
+                <i class="sheet sheet-b"></i>
+                <i class="sheet sheet-c"></i>
+              </div>
+
+              <div class="journal-raison" id="journal-raison" inert>
+                <div class="journal-raison-inner">
+                  <div class="journal-raison-head">
+                    <span class="journal-raison-name">riason</span>
+                    <button class="journal-raison-close" type="button" id="journal-raison-close" aria-label="close">×</button>
+                  </div>
+                  <div class="journal-raison-body">
+                    riason keeps this book. three tab-cards at the bound edge — buddies, artifacts, knots. choose a card, then an entry; write on the leaf. the pens are yours: highlight a passage, click the highlight, leave a note. the red ribbons are what arrived since you last opened the book.
+                  </div>
+                </div>
+              </div>
+
+              <div class="journal-binding">
+                <div class="journal-cap tl" aria-hidden="true"></div>
+                <div class="journal-cap tr" aria-hidden="true"></div>
+                <div class="journal-cap bl" aria-hidden="true"></div>
+                <div class="journal-cap br" aria-hidden="true"></div>
+
+                <!-- the ribbon is the exit; the bell summons riason. Both
+                     ride the book itself: they move when the book moves. -->
+                <button class="journal-exit-ribbon" id="journal-exit" type="button" aria-label="leave — the ribbon marks your page"></button>
+                <button class="journal-summon-bell" id="journal-summon" type="button" aria-label="summon riason">
+                  <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+                    <path d="M12 3c-3.6 0-6 2.6-6 6v4l-1.6 2.6h15.2L18 13V9c0-3.4-2.4-6-6-6z" fill="currentColor" stroke="#5a3a10" stroke-width="1.2"/>
+                    <circle cx="12" cy="18.4" r="1.7" fill="currentColor" stroke="#5a3a10" stroke-width="1"/>
+                  </svg>
+                  <span class="journal-summon-label">summon riason?</span>
+                </button>
+
+                <div class="journal-cabinet" id="journal-cabinet">
+
+                  <div class="journal-drawers" id="journal-drawers">
+                    <div class="journal-tabcards" role="tablist" aria-label="journal drawers">
+                      <button type="button" class="journal-tab" data-tab="buddy" role="tab" aria-selected="true">buddy</button>
+                      <button type="button" class="journal-tab" data-tab="artifacts" role="tab" aria-selected="false">artifacts</button>
+                      <button type="button" class="journal-tab" data-tab="relations" role="tab" aria-selected="false">relations</button>
+                    </div>
+                    <div class="journal-list" id="journal-list" role="tabpanel"></div>
+                    <input class="journal-find" id="journal-find" type="text" autocomplete="off" spellcheck="false" placeholder="find in drawer…" aria-label="find in this drawer" />
+                  </div>
+
+                  <div class="journal-spine" id="journal-spine">
+                    <div class="journal-spine-text">RIASON</div>
+                    <div class="journal-spine-text">BOUND MMXXVI</div>
+                    <div class="journal-spine-tally" id="journal-spine-tally">—</div>
+                  </div>
+
+                  <div class="journal-note" id="journal-note">
+                    <div class="journal-note-head">
+                      <div class="journal-note-title" id="journal-note-title">— — —</div>
+                      <div class="journal-note-date" id="journal-note-date">— —</div>
+                      <button type="button" class="journal-slip" id="journal-slip" hidden></button>
+                    </div>
+                    <img class="journal-polaroid" id="journal-polaroid" alt="kept image" hidden />
+                    <div class="journal-intention" id="journal-intention"></div>
+                    <div class="journal-editor" id="journal-editor" contenteditable="true" spellcheck="false" aria-label="note"></div>
+                    <div class="journal-pen-say" id="journal-pen-say" aria-live="polite"></div>
+                    <div class="journal-tools" id="journal-tools" role="toolbar" aria-label="pens"></div>
+                    <div class="journal-stamp" aria-hidden="true">ex libris · liber vacui</div>
+                  </div>
+
+                </div>
+
+                <div class="journal-pop" id="journal-pop" hidden>
+                  <div class="journal-pop-text" id="journal-pop-text"></div>
+                  <textarea class="journal-pop-note" id="journal-pop-note" rows="3" aria-label="note on this passage"></textarea>
+                  <div class="journal-pop-actions">
+                    <button type="button" id="journal-pop-save">keep</button>
+                    <button type="button" id="journal-pop-clear">unmark</button>
+                    <button type="button" id="journal-pop-close" aria-label="close">×</button>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- riason's chat box: the recall, then the teaching. Built
+                   like the tutorial's speaker bodies: voice label + text
+                   line + response gate, typewriter reveal, visible skip. -->
+              <div class="journal-chat" id="journal-chat" hidden>
+                <div class="journal-chat-head">
+                  <span class="journal-chat-voice">riason</span>
+                  <button type="button" class="journal-chat-skip" id="journal-chat-skip">skip</button>
+                </div>
+                <div class="journal-chat-text" id="journal-chat-text"></div>
+                <button type="button" class="journal-chat-gate" id="journal-chat-gate" hidden>&gt;&gt;</button>
+              </div>
+              <div class="journal-recall" id="journal-recall" hidden>
+                <div class="journal-recall-label">recall — type the line (case and punctuation don't matter)</div>
+                <div class="journal-recall-line" id="journal-recall-line"></div>
+                <button type="button" class="journal-chat-skip" id="journal-recall-skip">skip</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="src/features/journal/journal.js?v=cta1"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+  <!-- the three.js desk layer: photoreal instruments lying at the page
+       foot. Degrades silently — without WebGL the DOM pens take the corner. -->
+  <script type="module" src="src/features/journal/folio-3d.js?v=big4"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'journal',
+    traveller: 'THE MAD SCRIBE',
+    accent: '#aa7838',
+    title: 'the journal',
+    lines: ['Everything you keep lands here. Read an entry to open it; new keeps appear on their own as you visit the other rooms.']
+  });
+</script>
+</body>
+</html>

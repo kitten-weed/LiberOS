@@ -1,0 +1,426 @@
+/* ============================================================================
+   cutscene-stage.css — the stage. It owns three things and only three things:
+
+     1. the ROOM the cutscene happens in (`.ctv-world`)
+     2. the LIGHT in that room (the machine's own spill)
+     3. the STAGING rules — who holds the floor, and what "next" looks like
+
+   It does NOT own the plates. Their materials, seals, ink trails, type and
+   personalities live in cutscene.css, authored per speaker. This file only ever
+   says where they are and how brightly the room treats them.
+
+   This file used to be the bridge for an early Pixi cutscene attempt that hid
+   `.ctv-body` and drew its own boxes on a canvas. That experiment was measured
+   against the CSS it would have replaced and lost (3 tonal bands against 7), so
+   it was pulled. The architecture that replaced it is the opposite: the plates
+   stay exactly where they are, and src/pixi-cast.js owns the SPACE they move
+   through — physics, projected shadows, motion wakes, lit dust.
+
+   ---------------------------------------------------------------------------
+   WHY THE ROOM IS HERE
+
+   src/cutscene.js has always built this markup:
+
+     <div class="ctv-world"><div class="ctv-world-glow"></div>
+                            <div class="ctv-world-floor"></div></div>
+
+   and no stylesheet in this project's history has ever written a single rule
+   for `.ctv-world`, `.ctv-world-glow` or `.ctv-world-floor` (checked with
+   `git log -S` across all branches: zero hits). So the cutscene announced a
+   room and rendered nothing, and what you actually saw was the root's own
+   magenta centre-glow sitting on 76% black — a coloured wash with no light
+   source, floating in a void with no floor. That is the "weird glowing
+   background", and the blackness behind it is the missing room.
+
+   The V3 script's Beat 05 is explicit about what belongs in this space:
+
+     "the stage subtly expands beyond the desktop. Show a floor plane, a faint
+      reflection, and a shadow beneath Y."
+
+   and Beat 06 adds the floor's inscription, "visible only where reflected
+   monitor light touches it... it continues outside the visible stage."
+
+   So the room is built from one motivated source. The machine's tube IS the
+   light: it throws a warm pool forward onto the floor, grazes the wall behind
+   with a low wash, and leaves the ceiling dark because nothing lights it.
+   Everything in this file follows from that single source.
+
+   The plates' cast shadows are drawn by src/pixi-cast.js in real time; the
+   floor plane here is what those shadows land on.
+   ============================================================================ */
+
+/* ── the plates' physics layer ─────────────────────────────────────────────
+   src/pixi-cast.js mounts its canvas as the cast's first child: shadows, air
+   and contact flares. Behind the plates, above the room. */
+.pixi-cast {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── the room ──────────────────────────────────────────────────────────────
+   Wall above, floor below, horizon between them. Deepest visible layer, so the
+   root's own dark backdrop never needs to be anything but dark.
+
+   The selectors here are `.cutscene.ctv > .ctv-world`, not bare `.ctv-world`.
+   That is not style: cutscene.css has `.cutscene.ctv>*{position:relative;
+   z-index:1}` at (0,2,0), which outranks a bare `.ctv-world` at (0,1,0) — so
+   `position:absolute` loses, the element falls into normal flow, its `inset:0`
+   means nothing, and the room renders at zero height. The stage only escapes
+   this because its own rule is written `!important`. Descending one level
+   reaches (0,3,0) and wins honestly. */
+.cutscene.ctv > .ctv-world {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* The back wall. Lit in exactly one place: a wide low wash hugging the
+     horizon, because the tube's light rakes across it just above the floor
+     line and cannot reach the ceiling. Nothing brightness-weights the top of
+     this frame — the dark at the top is the light direction, not a vignette. */
+  background:
+    radial-gradient(ellipse 122% 40% at 50% 57%, rgba(255, 198, 128, 0.075), rgba(255, 198, 128, 0) 72%),
+    linear-gradient(180deg, #030203 0%, #070506 34%, #0d0a09 62%, #080606 100%);
+}
+
+/* The tube's spill. A warm screened ellipse anchored below the frame, so the
+   light in this room provably comes from the machine the player is holding,
+   not from an unmotivated wash behind the text. It breathes very slowly: on a
+   held beat that slow change is the difference between "the scene is alive" and
+   "the screen has frozen", which is the risk the sweep flagged at the opening. */
+.cutscene.ctv > .ctv-world > .ctv-world-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -30%;
+  width: 168%;
+  height: 96%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 46% 56% at 50% 100%,
+    rgba(255, 202, 138, 0.17),
+    rgba(255, 166, 96, 0.055) 44%,
+    rgba(0, 0, 0, 0) 72%
+  );
+  mix-blend-mode: screen;
+  animation: ctv-world-breathe 7.4s ease-in-out infinite;
+}
+
+.cutscene.ctv > .ctv-world > .ctv-world-glow::after {
+  /* the tube's refresh, caught in the air: one faint band crossing the pool */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  top: -8%;
+  background: linear-gradient(180deg, rgba(255, 220, 170, 0), rgba(255, 220, 170, 0.05), rgba(255, 220, 170, 0));
+  animation: ctv-world-refresh 9.5s linear infinite;
+}
+
+@keyframes ctv-world-breathe {
+  0%, 100% { opacity: 0.86; }
+  50% { opacity: 1; }
+}
+
+@keyframes ctv-world-refresh {
+  0% { transform: translateY(60%); opacity: 0; }
+  12% { opacity: 1; }
+  78% { opacity: 0.7; }
+  100% { transform: translateY(-150%); opacity: 0; }
+}
+
+/* The floor plane. Narrower at the horizon, full width at the near edge, so the
+   room has a direction and the plates above it have somewhere to stand. The
+   bright hairline on its top edge is the tube's light grazing the seam between
+   wall and floor — the one place the room is sharpest. */
+.cutscene.ctv > .ctv-world > .ctv-world-floor {
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  top: 56%;
+  bottom: -6%;
+  clip-path: polygon(9.5% 0, 90.5% 0, 100% 100%, 0 100%);
+  /* The floor runs the other way round from the wall, and that is the whole
+     point: the machine is the light, and the machine is in front of the player,
+     so the floor is brightest at the NEAR edge (closest to the tube) and falls
+     off into the dark as it recedes to the horizon. Brightening it toward the
+     horizon instead is what made the first pass read as a black hole with a lit
+     rim rather than a floor with a light on it. */
+  background:
+    /* the tube's reflection, streaked across the near floor toward the player */
+    linear-gradient(180deg, rgba(255, 198, 128, 0) 0%, rgba(255, 198, 128, 0.04) 46%, rgba(255, 198, 128, 0.115) 100%),
+    /* dust settled in rows, the grain of a floor that is never swept */
+    repeating-linear-gradient(180deg, rgba(255, 210, 150, 0.02) 0 1px, rgba(0, 0, 0, 0) 1px 27px),
+    linear-gradient(180deg, rgba(10, 7, 7, 0.9) 0%, rgba(26, 18, 17, 0.8) 42%, rgba(52, 36, 32, 0.74) 100%);
+  box-shadow: 0 -1px 0 rgba(255, 214, 160, 0.14);
+}
+
+/* Beat 06. Writing on the floor, legible only where the reflected light
+   reaches it — built from strokes rather than words, because an inscription
+   that ran off both edges into the dark is what the script asks for, and
+   inventing copy here would be writing dialogue the script did not author. */
+.cutscene.ctv > .ctv-world > .ctv-world-floor::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 14%;
+  height: 26%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 226, 180, 0.16) 0 1px,
+      rgba(0, 0, 0, 0) 1px 5px,
+      rgba(255, 226, 180, 0.1) 5px 6px,
+      rgba(0, 0, 0, 0) 6px 15px,
+      rgba(255, 226, 180, 0.14) 15px 16px,
+      rgba(0, 0, 0, 0) 16px 23px
+    );
+  /* only the light pool reads it; the rest of the line is dark */
+  mask-image: radial-gradient(ellipse 62% 150% at 50% 40%, #000 0%, rgba(0, 0, 0, 0.25) 52%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 150% at 50% 40%, #000 0%, rgba(0, 0, 0, 0.25) 52%, transparent 80%);
+  transform: perspective(180px) rotateX(52deg);
+  transform-origin: 50% 0;
+  /* the far half of the floor, where the reflected light is thin, and running
+     off both sides into the dark */
+  opacity: 0.72;
+}
+
+/* ── authority: the sweep's `sceneAuthority` model, made visible ───────────
+   The controller already publishes who holds the floor (`data-scene-authority`)
+   on every beat, and already marks every other plate `is-dim`. Until now
+   `is-dim` only lowered opacity, so a listener stayed a fully-lit, glowing,
+   animated box that merely looked slightly washed out — the sweep's finding
+   that "all non-authority boxes should become materially quiet, not merely
+   lower-opacity".
+
+   So a plate that does not hold the floor stops being lit: no glow, no seal
+   drama, no shadow depth, no performance. It does not get quieter — it stops
+   being on. */
+.cutscene.ctv .ctv-body.is-dim {
+  filter: grayscale(1) saturate(0) brightness(0.18) contrast(0.72) blur(1.4px);
+  opacity: 0.12;
+  box-shadow: none;
+  animation-play-state: paused;
+}
+
+.cutscene.ctv .ctv-body.is-dim .ctv-eye,
+.cutscene.ctv .ctv-body.is-dim .ctv-aura {
+  opacity: 0.08;
+}
+
+/* When the machine holds the floor — every ritual and action-lock beat — the
+   cast is not part of the scene at all. The player is typing, and the surface
+   they are typing into has no neighbours. */
+.cutscene.ctv[data-scene-authority='machine'] .ctv-body {
+  opacity: 0.26;
+  filter: grayscale(0.7) brightness(0.5) blur(0.6px);
+}
+
+/* ── the world steps back when the machine's own surface takes the screen ──
+   A full-machine beat (breach, finale) is the Vacui itself, and a worktable or
+   relation card is a real app the player is using. In all three the room is
+   behind the glass, not around the text. */
+.cutscene.ctv[data-scene-surface='full-machine'] > .ctv-world,
+.cutscene.ctv[data-scene-surface='poppet-worktable'] > .ctv-world,
+.cutscene.ctv[data-scene-surface='relation-card'] > .ctv-world,
+.cutscene.ctv.has-poppet > .ctv-world,
+.cutscene.ctv.desktop-reveal > .ctv-world {
+  opacity: 0;
+  transition: opacity 0.7s ease-out;
+}
+
+/* ── the response: three objects, not one button in three states ───────────
+   The sweep found the rail "mechanically consistent but dramaturgically
+   repetitive — a ritual answer feels like a menu selection". The controller
+   already publishes the mode; this is what each mode looks like.
+
+   advance  — a small physical tab, attached to the corner of the glass. It is
+              paperwork: "continue".
+   choice   — an attached response card: wider, sealed, warm. It is a thing the
+              player answers, not a thing they dismiss.
+   lock     — no rail at all. The only object on screen is the surface being
+              typed into. (The controller hides the rail; this keeps it hidden
+              even though the rail sits in a flex stage.) */
+.ctv-response-rail[hidden] {
+  display: none !important;
+}
+
+/* `!important` on the geometry because cutscene.css pins the gate centre with
+   `left:50%!important` — an attached corner tab cannot be expressed any other
+   way, and the tab is the whole point of the mode. */
+.cutscene.ctv[data-response-mode='advance'] .ctv-gate {
+  left: auto !important;
+  right: 18px !important;
+  bottom: 14px !important;
+  transform: none !important;
+  width: auto;
+  min-width: 0;
+  padding: 4px 8px;
+  background: rgba(10, 7, 6, 0.8);
+  border-color: rgba(232, 200, 144, 0.36);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+}
+
+.cutscene.ctv[data-response-mode='advance'] .ctv-response {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.94rem;
+  letter-spacing: 0.07em;
+  color: #c9b189;
+  background: transparent;
+  border-color: rgba(232, 200, 144, 0.22);
+}
+
+.cutscene.ctv[data-response-mode='advance'] .ctv-response:hover {
+  color: #e8c890;
+  border-color: rgba(232, 200, 144, 0.5);
+}
+
+/* The choice gate keeps the machine's own materials: warm gold on dark,
+   sized to its text — the wide violet-panel look read as chrome from a
+   different product sitting on the CRT. */
+.cutscene.ctv[data-response-mode='choice'] .ctv-gate {
+  width: auto;
+  min-width: 96px;
+  padding: 7px 9px;
+  border: 1px solid rgba(212, 175, 101, 0.62);
+  border-radius: 5px 2px 6px 3px;
+  background: linear-gradient(#17100a, #0b0607);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.66),
+    inset 0 0 18px rgba(212, 175, 101, 0.05);
+}
+
+.cutscene.ctv[data-response-mode='choice'] .ctv-response {
+  min-height: 42px;
+  color: #ffe4c2;
+  background: rgba(32, 22, 13, 0.9);
+  border-color: rgba(212, 175, 101, 0.45);
+}
+
+/* While an action lock is live the player is using the machine, so the room's
+   light drops and nothing in the world competes with the surface. It is
+   `filter`, not `opacity`: the glow's own breathe animation drives `opacity`,
+   and an animation beats a normal declaration, so setting opacity here would
+   simply never apply. */
+.cutscene.ctv.is-action-locked > .ctv-world > .ctv-world-glow {
+  filter: brightness(0.55);
+}
+
+/* ── the rail band: the response control's reserved floor ─────────────────
+   The V3 script is explicit that the choice box "remains fixed at the bottom
+   of the stage... narrow, quiet, and physically attached to the CRT". It is
+   also the only copy the player must be able to read, so it cannot be allowed
+   to land on top of a speaker's line.
+
+   The plates used to be placed by `top` percentages, which overflows a short
+   stage: the traveller's plate at `top:58%` is ~140px tall, so on a 316px
+   stage it ran past the bottom edge and the gate painted straight over the
+   line. `--ctv-rail` is the band the gate owns; the plates that live at the
+   bottom of the frame are anchored from the bottom up so they can never enter
+   it, and a plate that is taller than the stage is fitted by the controller
+   (see fitBody() in src/cutscene.js) rather than clipped. */
+.cutscene.ctv {
+  --ctv-rail: 96px;
+}
+
+/* The traveller is the plate the player reads, and it lives low and left.
+   Anchor it by its bottom edge, one rail plus a shove's worth of clearance
+   above the gate, so the physics leash cannot push its line under the
+   control either. */
+.cutscene.ctv .ctv-liber-vacui,
+.cutscene.ctv .ctv-traveller {
+  top: auto;
+  bottom: calc(var(--ctv-rail) + 26px);
+}
+
+/* Vanir is authored as "large negative space" that appears "somewhere other
+   than the center" and grows as he talks. Bottom-anchored for the same reason
+   as the traveller: a long line must extend upward into the room, never down
+   through the floor and the control. */
+.cutscene.ctv .ctv-vanir {
+  top: auto;
+  bottom: calc(var(--ctv-rail) + 22px);
+}
+
+/* The crop cap was the sweeps' own fix for long lines and it was the thing
+   cutting them: a plate whose content exceeded `calc(100% - 76px)` kept
+   painting its text past its own clipped material (Vanir's six-line shadow
+   speech read as two boxes fighting). Plates grow to their content again; the
+   controller fits the rare over-long line instead. */
+.cutscene.ctv .ctv-body {
+  max-height: none;
+  overflow: visible;
+}
+
+/* A plate that needed fitting says so, so the state is inspectable and the
+   narrower leading can be authored rather than inline-styled. */
+.cutscene.ctv .ctv-body.is-fitted .ctv-line {
+  line-height: 1.3;
+}
+
+/* ── plate presence, per the V3 traveller register ─────────────────────────
+   The physics in src/pixi-cast.js already gives each speaker mass and
+   temperament. These widths give the same characters a *size*, which is the
+   other half of the authored intent:
+
+     Wanderlust  "her chatbox enters too large for the available space. It is
+                  bright, colorful, and physically impossible to contain, and
+                  it pushes against the edges of the room."
+     Y           "becomes small and dim... the box's material is cold and
+                  physically contracted."
+     Vanir       "large negative space", present rather than loud.
+     Physius     settles under its own weight; Riason's vellum is measured. */
+/* Bounds rather than fixed widths, so `.is-centre` still does its job of
+   bringing the speaker forward without any of these characters changing size
+   when it happens — a big character stays big and a small one stays small. */
+.cutscene.ctv .ctv-wanderlust {
+  min-width: min(452px, 56%);
+  min-height: 150px;
+}
+
+.cutscene.ctv .ctv-liber-vacui {
+  max-width: min(400px, 50%);
+  min-height: 104px;
+}
+
+.cutscene.ctv .ctv-vanir {
+  min-width: min(400px, 42%);
+  min-height: 196px;
+}
+
+.cutscene.ctv .ctv-physius {
+  min-height: 132px;
+}
+
+@media (max-width: 640px) {
+  .cutscene.ctv .ctv-wanderlust,
+  .cutscene.ctv .ctv-vanir {
+    min-width: 0;
+  }
+
+  .cutscene.ctv .ctv-liber-vacui {
+    max-width: 78%;
+  }
+
+  /* the corner tab has no room to be a corner tab on a narrow glass */
+  .cutscene.ctv[data-response-mode='advance'] .ctv-gate {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(300px, calc(100% - 32px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctv-world-glow,
+  .ctv-world-glow::after {
+    animation: none;
+  }
+}

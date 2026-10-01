@@ -1,0 +1,530 @@
+/* readability.css — Run 12 visual audit
+   A shared layer for every LiberOS surface. It does not own state, layout
+   mechanics, or interaction; it only makes the existing authored surfaces
+   easier to parse at the 900px composition floor.
+*/
+
+:root {
+  --read-ink: #f1dfbb;
+  --read-ink-strong: #fff1c9;
+  --read-muted: #cbb992;
+  --read-line: rgba(212, 175, 101, .72);
+  --read-line-soft: rgba(212, 175, 101, .42);
+  --read-focus: #ffe09a;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+/* LiberOS is a chunky machine. Body copy and controls should not fall back
+   to hairline browser defaults just because a room uses a delicate face. */
+button,
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  font-weight: 600;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[contenteditable="true"]:focus-visible {
+  outline: 3px solid var(--read-focus) !important;
+  outline-offset: 3px;
+}
+
+/* Shared room chrome ---------------------------------------------------- */
+/* Ends-with, NOT contains. `[class*="-titlebar"]` also matched the bar's own
+   children — `<room>-titlebar-name` and `-titlebar-sub` — so each label was
+   inflated to the full 46px bar height and given a 2px bottom border of its
+   own. In a 46px bar with `align-items:center` and `overflow:hidden` that
+   pushed the name a pixel above the bar and sheared the glyph tops, while
+   the subtitle's inflated box read as a translucent band washing the line
+   out. Both symptoms, in every one of the thirteen rooms, from this one
+   selector. Every bar's class attribute ends in `-titlebar` (including
+   sigil's `sigil-titlebar poppet-titlebar`), so ends-with hits the plate
+   and nothing inside it. */
+
+/* ── FLOOR, NOT LOOK ──────────────────────────────────────────────────────
+   This block used to be a shared component library: it gave every one of the
+   thirteen rooms the same title colour, weight, tracking, text-shadow and
+   border, which is the one thing the authoring covenant forbids — each
+   traveller built their own app, and a plate that looks identical in all of
+   them is shared software wearing thirteen names.
+   What stays is the part the covenant equally insists on: "the diegetic frame
+   must never cost the visitor the ability to use the room." So the SIZE floors
+   and the 44px hit targets remain, and every aesthetic property is handed back
+   to the traveller's own stylesheet. A room that wants a hairline rule, a
+   lighter weight, or no tracking at all may now have one; none of them may
+   have unreadable copy or an unhittable control. */
+
+[class$="-titlebar"] {
+  min-height: 46px;
+}
+[class*="-titlebar-name"] {
+  /* floor + a cap so a long room name cannot burst the plate; colour, weight,
+     tracking and shadow are the traveller's business now */
+  font-size: clamp(18px, 2.1cqi, 27px) !important;
+  line-height: 1.15 !important;
+}
+[class*="-titlebar-sub"] {
+  font-size: clamp(14px, 1.25cqi, 18px) !important;
+  line-height: 1.25 !important;
+}
+
+.room [class*="-help"],
+.room [class*="-exit"],
+.room [class*="-back"] {
+  /* hit target, not appearance: the exit must always be takeable */
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 17px !important;
+}
+
+/* A floor for prose, hints, and state copy. Intentional micro-labels are
+   handled below with their own 13px floor; nothing meaningful is 9px. */
+.screen-stage p,
+.screen-stage li,
+.screen-stage label,
+.screen-stage [class*="-body"],
+.screen-stage [class*="-description"],
+.screen-stage [class*="-intro"],
+.screen-stage [class*="-copy"],
+.screen-stage [class*="-hint"],
+.screen-stage [class*="-empty"],
+.screen-stage [class*="-status"],
+.screen-stage [class*="-note"] {
+  font-size: clamp(14px, 1.15vw, 19px) !important;
+  line-height: 1.48 !important;
+}
+
+.screen-stage small,
+.screen-stage [class*="-sub"] {
+  font-size: clamp(13px, 1vw, 16px) !important;
+  line-height: 1.35 !important;
+  font-weight: 600;
+}
+
+.screen-stage input,
+.screen-stage textarea,
+.screen-stage select,
+.screen-stage [contenteditable="true"] {
+  min-height: 44px;
+  border-width: 2px !important;
+  font-size: 16px !important;
+  line-height: 1.4 !important;
+}
+
+.screen-stage button,
+.screen-stage [role="button"] {
+  border-width: 2px;
+  font-size: max(15px, 1rem);
+  line-height: 1.25;
+}
+
+/* The monitor nameplate is an inscription, not dust. */
+.machine .liber-plate {
+  font-weight: 700 !important;
+  -webkit-text-stroke: .35px currentColor;
+  text-shadow: 2px 2px 0 rgba(82, 58, 30, .72), 0 0 5px rgba(255, 248, 225, .18);
+}
+
+/* Make linework read as authored marks rather than one-pixel browser noise. */
+.screen-stage svg line,
+.screen-stage svg polyline,
+.screen-stage svg path,
+.screen-stage svg circle,
+.screen-stage svg ellipse,
+.screen-stage svg rect {
+  vector-effect: non-scaling-stroke;
+}
+.constellation-svg line,
+.constellation-svg polyline,
+.constellation-svg path,
+.constellation-svg ellipse,
+.constellation-svg circle {
+  stroke-width: 2px !important;
+}
+.constellation-svg text {
+  font-size: 13px !important;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgba(10, 5, 14, .82);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.astral-orbit {
+  border-width: 2px !important;
+  opacity: .38;
+}
+
+/* Desktop: establish one clear reading order --------------------------- */
+.state-desktop .constellation-empty {
+  top: calc(50% + 72px) !important;
+  z-index: 25;
+  width: min(360px, 42%);
+  max-width: none !important;
+  padding: 13px 18px 14px;
+  background: rgba(12, 6, 18, .86);
+  border: 2px solid var(--read-line);
+  border-radius: 3px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .52), inset 0 0 0 1px rgba(255, 238, 193, .12);
+  color: var(--read-ink-strong) !important;
+  font-family: 'VT323', 'Courier New', monospace !important;
+  font-size: clamp(18px, 1.65vw, 25px) !important;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.2 !important;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #09050b;
+}
+.state-desktop .constellation-empty-sub {
+  margin-top: 8px;
+  color: var(--read-muted) !important;
+  font-size: clamp(15px, 1.2vw, 19px) !important;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1.35 !important;
+  text-transform: none;
+}
+.state-desktop .astral-barycenter .barycenter-caption {
+  width: auto;
+  min-width: 210px;
+  padding: 4px 9px;
+  background: rgba(10, 5, 14, .78);
+  border: 2px solid rgba(212, 175, 101, .42);
+  color: var(--read-muted) !important;
+  font-size: 14px !important;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-shadow: 2px 2px 0 #09050b;
+}
+.state-desktop .status-line {
+  right: 16px !important;
+  bottom: 14px !important;
+  padding: 7px 12px 8px !important;
+  background: rgba(12, 6, 8, .86) !important;
+  border: 2px solid rgba(212, 175, 101, .58) !important;
+  color: var(--read-ink) !important;
+  font-size: 15px !important;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0 #09050b;
+}
+.state-desktop .settings-cog-label {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: .14em !important;
+  -webkit-text-stroke: .2px currentColor;
+}
+.state-desktop .flaming-q-repeat {
+  width: 44px;
+  height: 44px;
+  border-width: 2px;
+  font-size: 28px;
+  line-height: 40px;
+}
+
+/* The scratch note is a note, not an opaque second app. Its paper, label
+   and entry field now have enough contrast to explain themselves. */
+.state-desktop .notes {
+  width: min(204px, 22%);
+  top: clamp(16px, 3.5%, 30px);
+  left: clamp(14px, 2.5%, 28px);
+  transform: rotate(-2deg);
+}
+.state-desktop .notes-pad {
+  min-height: 84px;
+  padding: 14px 13px 12px;
+  border: 2px solid rgba(125, 91, 48, .78) !important;
+  color: #2e2116;
+  font-size: 16px !important;
+  font-weight: 600;
+  line-height: 1.35 !important;
+  box-shadow: 4px 6px 0 rgba(0, 0, 0, .3), inset 0 0 20px rgba(112, 75, 38, .14);
+}
+.state-desktop .notes-pad::placeholder {
+  color: rgba(62, 45, 29, .76);
+  opacity: 1;
+}
+.state-desktop .influence-word {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(10, 5, 8, .72);
+  border: 2px solid rgba(212, 175, 101, .42);
+  color: var(--read-ink) !important;
+  font-size: 15px !important;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-shadow: 2px 2px 0 #09050b;
+}
+.state-desktop .influence:focus-visible {
+  outline: 3px solid var(--read-focus);
+  outline-offset: 4px;
+}
+.state-desktop .weaver-toggle {
+  min-height: 44px;
+  padding: 7px 16px;
+  border-width: 2px !important;
+  font-size: 15px !important;
+  font-weight: 700;
+}
+
+/* TraveROM labels are the floor for every other readable label. */
+.traverom-stage .traverom-desk-key {
+  outline-offset: 4px;
+}
+.traverom-stage .traverom-desk-key:focus-visible {
+  outline: 3px solid var(--read-focus);
+}
+
+/* Dialogue: bigger type, heavier boundaries, still the same choreography. */
+.ctv-body,
+.cutscene-box,
+.ctv-gate,
+.ctv-relate,
+.ctv-poppet {
+  border-width: 2px !important;
+}
+.ctv-body {
+  padding: 17px 21px 19px;
+}
+.ctv-voice,
+.cutscene-voice {
+  font-size: clamp(17px, 1.55vw, 23px) !important;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.2 !important;
+}
+.ctv-line,
+.cutscene-line {
+  min-height: 3.4em;
+  font-size: clamp(17px, 1.65vw, 25px) !important;
+  line-height: 1.5 !important;
+  font-weight: 500;
+}
+.ctv-response,
+.ctv-option,
+.cutscene-option,
+.cutscene-nav button,
+.demo-keep,
+.demo-bind {
+  min-height: 48px;
+  border-width: 2px !important;
+  padding: 9px 16px;
+  font-size: clamp(16px, 1.35vw, 20px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700;
+}
+.ctv-ritual-line {
+  border-width: 2px !important;
+  font-size: clamp(16px, 1.65vw, 22px) !important;
+  line-height: 1.22 !important;
+}
+.ritual-line {
+  border-width: 2px !important;
+  font-size: clamp(18px, 2.2vw, 30px) !important;
+  line-height: 1.35 !important;
+}
+.ctv-ritual-input,
+.demo-relate-verb,
+.ctv-relate-verb,
+.ctv-relate-bind {
+  border-width: 2px !important;
+  font-size: 18px !important;
+}
+
+/* Compact room tools: retain their character but stop making users squint. */
+.poppet-station,
+.poppet-station b,
+.poppet-station small,
+.poppet-label,
+.poppet-hint,
+.journal-tab,
+.journal-find,
+.sea-question,
+.sea-release,
+.divination-card-hint,
+.settings-btn,
+.settings-section-title,
+.settings-hint,
+.themes-current-label,
+.themes-current-value {
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.35 !important;
+}
+.poppet-station b,
+.settings-section-title {
+  font-weight: 700;
+}
+.settings-section-title {
+  letter-spacing: .16em !important;
+}
+
+/* Page-wide borders: the machine's line language is a deliberate two-pixel
+   mark. This affects presentation only, never hit areas or state. */
+.settings-panel,
+.settings-section,
+.journal-cabinet,
+.journal-note,
+.sea-ritual,
+.divination-modes,
+.trash-action,
+.themes-panel,
+.about-card,
+.cohort-panel,
+.buddy-how,
+.sigil-raison-inner {
+  border-width: 2px !important;
+}
+
+@media (max-width: 900px) {
+  .state-desktop .constellation-empty {
+    width: min(330px, 52%);
+    font-size: 17px !important;
+  }
+  .state-desktop .notes {
+    width: min(190px, 25%);
+  }
+  .ctv-line,
+  .cutscene-line {
+    font-size: 17px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-desktop .notes,
+  .state-desktop .influence-core,
+  .astral-orbit {
+    animation: none !important;
+  }
+}
+
+/* Run 12 clarity lock: a strong line is part of LiberOS's voice. Keep the
+   same geometry and interactions, but replace hairlines with authored marks
+   and make the desktop's empty state a single, unmistakable instruction. */
+:where(button, input, textarea, select, [role="button"], [contenteditable="true"]) {
+  border-width: 2px !important;
+}
+:where(.screen-stage, .screen-stage *) {
+  text-underline-offset: 3px;
+}
+.state-desktop .constellation-empty {
+  width: min(430px, 42%);
+  max-width: none !important;
+  padding: 16px 20px 18px;
+  border: 3px solid rgba(212, 175, 101, .78);
+  background: rgba(10, 5, 14, .9);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, .55), inset 0 0 0 2px rgba(255, 238, 193, .12);
+  font-size: clamp(19px, 1.8vw, 27px) !important;
+  font-weight: 700;
+  letter-spacing: .09em;
+  line-height: 1.22 !important;
+}
+.state-desktop .constellation-empty-sub {
+  margin-top: 9px;
+  color: var(--read-ink-strong) !important;
+  font-size: clamp(16px, 1.35vw, 21px) !important;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+/* An unbound desktop does not need five competing invitations. The state
+   sentence is the instruction; the orbit and status remain atmospheric. */
+.state-desktop:not(.tutorial-done) .notes,
+.state-desktop:not(.tutorial-done) .influence,
+.state-desktop:not(.tutorial-done) .status-line,
+.state-desktop:not(.tutorial-done) .settings-cog,
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .influence,
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .status-line,
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .weaver-toggle,
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .astral-barycenter .barycenter-caption { display: none !important; }
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) { --desktop-empty-caption-offset: 92px; }
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .astral-barycenter { opacity: .5; }
+.state-desktop:has(.constellation-empty[data-empty-state="cast"]) .constellation-empty {
+  top: calc(50% + var(--desktop-empty-caption-offset)) !important;
+  width: min(420px, 72%);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--read-muted) !important;
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-size: clamp(14px, 1.15vw, 17px) !important;
+  font-weight: 400;
+  letter-spacing: .02em;
+  line-height: 1.35 !important;
+  text-transform: none;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .9);
+  opacity: .76;
+}
+.state-desktop:has(.poppet-readback[data-poppet="read"]) .constellation-empty { display: none !important; }
+.state-desktop:not(.tutorial-done) .constellation-empty { top: 62% !important; }
+.state-desktop:not(.tutorial-done) .astral-barycenter .barycenter-caption { display: none; }
+.state-desktop:not(.tutorial-done) .astral-orbits { opacity: .3; }
+.state-desktop .astral-barycenter .barycenter-caption {
+  min-width: 250px;
+  padding: 6px 12px;
+  border-width: 2px;
+  font-size: 15px !important;
+}
+.state-desktop .notes-pad {
+  border-width: 2px !important;
+  font-size: 17px !important;
+  font-weight: 700;
+}
+.state-desktop .influence-word,
+.state-desktop .influence-source,
+.state-desktop .influence-text { font-weight: 700; }
+
+/* Dialogue and modal copy: readable at the 900px floor without changing
+   timing, positions, or response behavior. */
+.boot-warning-card,
+.enter-popup,
+.buddy-how-inner,
+.buddy-raison-inner,
+.cohort-raison-inner,
+.divination-raison-inner,
+.dreams-raison-inner,
+.games-raison-inner,
+.trash-raison-inner {
+  border-width: 3px !important;
+}
+.boot-warning .boot-letter,
+.boot-warning .boot-consent,
+.enter-prompt,
+.enter-name,
+.enter-proceed {
+  font-size: clamp(17px, 1.35vw, 21px) !important;
+  line-height: 1.55 !important;
+}
+
+/* Intentionally small system metadata keeps a floor and a heavier stroke. */
+.status-line,
+.settings-cog-label,
+.barycenter-caption,
+.notes-status,
+[class*="-camera-caption"],
+[class*="-hint"],
+[class*="-note"] {
+  font-weight: 700 !important;
+}
+
+@media (max-width: 900px) {
+  .state-desktop .constellation-empty {
+    width: min(390px, 58%);
+    padding: 13px 15px;
+    font-size: 18px !important;
+  }
+  .state-desktop .constellation-empty-sub { font-size: 15px !important; }
+}

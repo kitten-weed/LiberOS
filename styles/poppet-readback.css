@@ -1,0 +1,42 @@
+/* poppet-readback.css — the poppet, hanging at the barycenter.
+ *
+ * The composite sits at the centre of the constellation, where the artifacts
+ * already orbit. It is furniture, not a control: pointer-events stay off until
+ * the relate flow is wired, so it cannot swallow a click meant for the belt.
+ *
+ * Nothing here glows. The poppet is lit by the room it hangs in — one soft
+ * contact shadow beneath it so it reads as hanging rather than as pasted on,
+ * and that is all.
+ */
+
+.poppet-readback {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(76px, 12cqi, 148px);
+  pointer-events: none;
+  z-index: 3;
+  line-height: 0;
+}
+
+.poppet-readback[data-poppet="none"] { display: none; }
+
+.poppet-readback canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: auto;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+
+/* A kept poppet dims the bare core it replaces: the empty centre is correct
+   before the first sitting, and wrong after it. */
+.astral-barycenter:has(.poppet-readback[data-poppet="read"]) .barycenter-core {
+  opacity: 0.18;
+}
+
+/* The composite is a still image. It does not drift, pulse, or breathe — the
+   shadow layer is ephemeral in the model, not animated in the picture, and a
+   pulsing soul would be the machine editorialising. Reduced motion therefore
+   has nothing to switch off here, which is the intended end state. */

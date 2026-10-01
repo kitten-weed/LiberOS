@@ -1,0 +1,903 @@
+/* ============================================================================
+   machine.css — the physical CRT monitor
+
+   A fat beige `#e8dcc0` bezel, chunky plastic grain, inset CRT screen
+   with visible curvature, brass bezel ring inside, side ventilation
+   slits, a small power LED, a "LIBER" plate on the lower bezel, and a
+   yellow base. The screen itself holds the actual UI; everything else
+   is the machine's body.
+   ============================================================================ */
+
+.machine {
+  /* The whole machine fits in ~70% of the viewport. The rest is the
+     room's empty void. The height-based term keeps the full body —
+     screen, bezel and base — inside short windows instead of clipping
+     top and bottom (96px reserves the monitor base and breathing room). */
+  position: relative;
+  /* src/stage.js holds the machine at one of a ladder of sizes and writes
+     --stage-w, so dragging a window edge lands on a step instead of sliding
+     the whole room pixel by pixel. The fluid rule below is the fallback, and
+     it is the rule that still runs below the smallest step — see
+     liberdev/scaling-checklist.md. */
+  width: var(--stage-w, min(96vw, calc((100vh - 40px) * 4 / 3)));
+  width: var(--stage-w, min(96vw, calc((100dvh - 40px) * 4 / 3)));
+  aspect-ratio: 4 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* The bezel — the fat plastic frame. Holds the screen and the carvings. */
+
+/* ── THE MACHINE'S LIGHT ─────────────────────────────────────────────────
+   Two sources, declared as objects per COVENANT § light is declared: the
+   room's lamp, high and to the right, and the tube itself, which is the
+   nearer and warmer of the two. Everything else is falloff. Composited as
+   the first background layer on every .bezel, so a traveller's theme
+   supplies the plastic and this supplies the room it stands in. */
+.machine {
+  --machine-lit:
+    /* the tube, spilling onto its own surround — the thing a dark-room CRT
+       does that a flat frame never did */
+    radial-gradient(ellipse 64% 54% at 50% 41%, rgba(255, 206, 138, 0.17) 0%, rgba(255, 186, 104, 0.06) 48%, rgba(255, 186, 104, 0) 74%),
+    /* the room's lamp, upper right: one key, one lit flank */
+    radial-gradient(ellipse 86% 74% at 90% 4%, rgba(255, 224, 164, 0.19) 0%, rgba(255, 210, 140, 0.05) 46%, rgba(255, 210, 140, 0) 66%),
+    /* reflected light: the cool flank is a blue-black patch, not a darker
+       brown — COVENANT § reflected light is what makes matte read as material */
+    radial-gradient(ellipse 74% 62% at 5% 97%, rgba(94, 122, 150, 0.14) 0%, rgba(94, 122, 150, 0) 58%),
+    /* dust and grime settle low and in the corners */
+    radial-gradient(ellipse 128% 96% at 50% 46%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.30) 84%, rgba(0, 0, 0, 0.48) 100%);
+}
+
+.bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background:
+    /* Plastic grain — very subtle, organic. */
+    repeating-linear-gradient(
+      90deg,
+      rgba(180, 160, 130, 0.04) 0px,
+      rgba(180, 160, 130, 0.04) 2px,
+      rgba(220, 200, 170, 0.06) 2px,
+      rgba(220, 200, 170, 0.06) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.02) 1px,
+      rgba(0, 0, 0, 0) 1px,
+      rgba(0, 0, 0, 0) 3px
+    ),
+    var(--machine-lit),
+    /* The yellowing is uneven: one flank took more sun than the other. Warm
+       amber over cream reads as aged ABS; the same overlay over the dark
+       plastic that briefly replaced it read as mud. */
+    linear-gradient(104deg, rgba(196, 158, 96, 0.14) 0%, rgba(196, 158, 96, 0) 38%, rgba(150, 124, 78, 0.18) 100%),
+    /* RESTORED 3.0: the cream fat-monitor plastic. This is the 80s register
+       the machine is built on — the dark #4b4136/#362d24/#241d16 ramp that
+       replaced it lost the whole aesthetic, per the author. Recovered from
+       LiberOS-Working/styles/machine.css, the tree the reference 2.16.0 app
+       was built from. The declared-light layer above is KEPT: it was a real
+       gain, and its warm radials over cream give the tube's spill and the
+       room's lamp somewhere to land. */
+    linear-gradient(180deg, #efe5cf 0%, #e8dcc0 50%, #d8ccb0 100%);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 1px #c0b290,
+    inset 0 0 0 3px #d8ccb0,
+    inset 0 0 30px rgba(0, 0, 0, 0.18),
+    0 6px 30px rgba(0, 0, 0, 0.6);
+  /* Reserve a real lower-bezel bay for the cartridge dock. The former
+     padding let the dock float over the last 20px of every app window. */
+  padding: 5.2cqi 5.2cqi calc(4.4cqi + clamp(24px, 2.8cqi, 42px)) 5.2cqi;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* Container query units: bezel's children size relative to the bezel. */
+.bezel { container-type: inline-size; }
+
+/* Bezel inner frame: a slightly darker hairline to give the plastic
+   the look of a moulded edge. */
+.bezel::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 1px rgba(140, 120, 90, 0.4),
+    inset 0 0 0 2px rgba(232, 220, 192, 0.6);
+  pointer-events: none;
+}
+
+/* Corruption scars live in styles/scars.css (covenant S.6). */
+
+/* The lower bevel is hardware, not a caption rail. This clean plate reserves
+   the dock's landing zone and masks legacy/cached status copy without
+   touching the screen or the cable route. The dock and ribbon sit above it. */
+.bezel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(48px, 7cqi, 84px);
+  background:
+    repeating-linear-gradient(90deg, rgba(150, 128, 96, 0.05) 0 2px, transparent 2px 4px),
+    /* RESTORED 3.0: the dock bay is the SAME cream plastic as the rest of the
+       case, just sitting in its own shadow. The dark ramp it used to carry
+       read as a black bar bolted across the bottom of a cream machine. */
+    linear-gradient(180deg, #dbcfb2 0%, #cdbfa0 62%, #bcac8c 100%);
+  border-top: 1px solid rgba(120, 100, 70, 0.42);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 252, 240, 0.55),
+    inset 0 0 14px rgba(120, 96, 58, 0.14);
+  z-index: 21;
+  pointer-events: none;
+}
+.screw,
+.power-button { z-index: 22; }
+
+
+/* Side ventilation slits — vertical lines on the right side of the
+   bezel. Subtle, decorative. */
+.vent-slits {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 40%;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(80, 60, 30, 0.5) 0px,
+    rgba(80, 60, 30, 0.5) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  border-radius: 2px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* The screen — the recessed CRT, deep red, holds the actual UI. */
+.screen {
+  position: relative;
+  flex: 1;
+  background: #2a0000;
+  border-radius: 12px;
+  /* The brass bezel ring — 5px gold-metallic border. */
+  border: 5px solid transparent;
+  border-image: linear-gradient(
+    135deg,
+    #8a6a2a 0%,
+    #d4af37 20%,
+    #f5d76e 40%,
+    #8a6a2a 50%,
+    #5a3a10 70%,
+    #d4af37 90%,
+    #8a6a2a 100%
+  ) 1;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  /* Visible CRT curvature — slight inner shadow, slight outer
+     rounded. */
+}
+
+/* CRT curvature effect: subtle radial darken at edges. */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* A thin CSS pane makes the glass legible without changing the DOM beneath
+   it: dark phosphor between rows, with the existing warm reflections left
+   to the machine's own glass and brass. The screen clips this pane at its
+   curved edge; pointer input stays with the controls. */
+.crt-tube-glass {
+  position: absolute;
+  inset: 0;
+  display: block;
+  z-index: 40;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--crt-glass) * var(--crt-still, 1));
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(7, 4, 3, 0) 0 3px,
+      rgba(7, 4, 3, 0.14) 3px 4px
+    ),
+    linear-gradient(
+      112deg,
+      rgba(234, 223, 198, 0.035) 0%,
+      transparent 26% 74%,
+      rgba(212, 175, 101, 0.025) 100%
+    );
+}
+
+.crt-tube-glass::after {
+  content: '';
+  position: absolute;
+  inset: -100% 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 49.84%,
+    rgba(234, 223, 198, 0.065) 50%,
+    rgba(212, 175, 101, 0.026) 50.11%,
+    transparent 50.36%
+  );
+  opacity: 0;
+  transform: translateY(-33.333%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crt-tube-glass::after {
+    opacity: calc(0.26 * var(--crt, 0));
+    animation: crt-glass-refresh 28s linear infinite;
+  }
+
+  @keyframes crt-glass-refresh {
+    from { transform: translateY(-33.333%); }
+    to { transform: translateY(33.333%); }
+  }
+}
+
+body.crt-off .crt-tube-glass {
+  display: none;
+}
+
+body.crt-off .crt-tube-glass::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* The glass is glass: a warm-white glare band crosses the tube every
+   ~40s — barely visible (3%), one 8s crossing, then long dark rest.
+   The room reflects in the tube whether anyone watches or not. */
+.screen::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -34%;
+  width: 26%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 240, 220, 0) 0%,
+    rgba(255, 240, 220, 0.03) 45%,
+    rgba(255, 244, 226, 0.05) 50%,
+    rgba(255, 240, 220, 0.03) 55%,
+    rgba(255, 240, 220, 0) 100%
+  );
+  transform: skewX(-18deg);
+  pointer-events: none;
+  z-index: 6;
+  animation: screen-glare 40s linear infinite;
+}
+
+@keyframes screen-glare {
+  0%, 72%   { left: -34%; opacity: 0; }
+  73%       { opacity: 1; }
+  81%       { opacity: 1; }
+  82%, 100% { left: 118%; opacity: 0; }
+}
+
+/* The LED — a pilot flame, not a dot. Top-right of the bezel.
+   Two-phase burn: fast candle jitter inside a slow breathe, a warm
+   halo falling on the plastic below, and a wax mound that builds in
+   the recess under it as presence deepens (patina tiers). */
+.led {
+  /* furniture, never a hit target (see .monitor-base note) */
+  pointer-events: none;
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ffb08a 0%, #ff5030 38%, #d81808 78%);
+  box-shadow:
+    0 0 6px rgba(255, 96, 48, 0.9),
+    0 0 12px rgba(255, 48, 24, 0.6),
+    0 3px 5px rgba(255, 140, 80, 0.22),
+    inset 0 0 2px rgba(255, 220, 200, 0.85);
+  animation:
+    led-flicker 0.9s steps(2, end) infinite,
+    led-breathe 5.6s ease-in-out infinite;
+  z-index: 20;
+}
+
+/* fast jitter — the candle's small instability */
+@keyframes led-flicker {
+  0%, 100% { opacity: 0.92; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.05); }
+}
+
+/* slow breathe — the flame's resting rhythm */
+@keyframes led-breathe {
+  0%, 100% { filter: brightness(0.82); }
+  50%      { filter: brightness(1.08); }
+}
+
+/* the wax mound — presence pools in the recess under the flame */
+.led::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 10px;
+  height: 3px;
+  transform: translateX(-50%);
+  border-radius: 45% 55% 50% 50% / 100% 100% 0 0;
+  background: linear-gradient(180deg, #e8d0a8 0%, #c8a878 60%, #a88858 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+
+/* wax widens and catches the flame's light as presence etches the room */
+.machine.patina-1 .led::after { opacity: 0.45; height: 4px; }
+.machine.patina-2 .led::after { opacity: 0.7;  height: 5px; width: 12px; }
+.machine.patina-3 .led::after { opacity: 0.95; height: 6px; width: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 0 4px rgba(255,160,96,0.25); }
+
+/* The "LIBER" plate — small metal-looking text on the lower bezel. */
+.liber-plate {
+  /* furniture, never a hit target: at 439px this plate rides over the
+     bottom strip of the screen and was eating the room's own buttons */
+  pointer-events: none;
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: clamp(1rem, 1.45cqi, 1.35rem);
+  letter-spacing: 0.28em;
+  color: #6a5a3a;
+  text-transform: uppercase;
+  z-index: 20;
+  text-shadow:
+    0 1px 0 rgba(255, 245, 220, 0.6),
+    0 -1px 0 rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+}
+
+/* The base — a yellow/cream block under the monitor. */
+.monitor-base {
+  /* furniture, never a hit target: at 439px the scaled machine lets the
+     base ride over the bottom of the screen and it was eating the room's
+     own controls (sigil, divination, dreams, learn, garden) */
+  pointer-events: none;
+  position: relative;
+  width: 38%;
+  height: 30px;
+  margin-top: -2px;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 216, 0.28), rgba(255, 246, 216, 0) 42%),
+    /* RESTORED 3.0: the plinth is cream plastic too, a shade deeper than the
+       case so it reads as a separate moulding catching less light. */
+    linear-gradient(180deg, #d8c890 0%, #b8a070 100%);
+  border-radius: 0 0 12px 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 220, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.monitor-base::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  height: 8px;
+  background: linear-gradient(180deg, #2b2319 0%, #17120d 100%);
+  border-radius: 0 0 8px 8px;
+  /* nothing floats: the machine's weight on the desk, opposite the lamp */
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.55),
+    0 16px 34px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* The screen contents — every state (1, 2, 3, 4) renders inside this. */
+.screen-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The state-root inside the screen, used by JS state management. */
+[data-state] {
+  position: absolute;
+  inset: 0;
+}
+
+/* Power button — small circular recess on the bottom-right of the
+   bezel, decorative. */
+.power-button {
+  /* furniture, never a hit target (see .monitor-base note) */
+  pointer-events: none;
+  position: absolute;
+  bottom: 16px;
+  right: 24px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #8a7a5a 0%, #4a3a1a 80%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 245, 220, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+/* A small recessed screw on the bottom-left of the bezel. */
+.screw {
+  /* furniture, never a hit target (see .monitor-base note) */
+  pointer-events: none;
+  position: absolute;
+  bottom: 16px;
+  left: 24px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #a09060 0%, #5a4a20 80%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 245, 220, 0.3);
+  z-index: 20;
+}
+
+.screw::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateY(-50%) rotate(35deg);
+}
+
+/* ============================================================================
+   The haunted layer — weather, not meters (furniture is furniture). Cheap,
+   stateless presences on the case; none carries state, progress, or meaning,
+   and none is a hit target. They compose with every theme and with the
+   shadow mood instead of fighting them.
+
+     i.  the base heartbeat — a warm point on .monitor-base that beats every
+         few seconds. Not an LED that means anything. It just beats.
+     ii. vent breath — the slits exhale: a faint cold spill below the right
+         bezel edge, more visible the longer the room sits still.
+   ============================================================================ */
+
+/* i. the heartbeat — the machine's pulse, under the bezel's chin */
+.base-heart {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffdf9e, #b34a1e 70%);
+  box-shadow: 0 0 2px 0 rgba(255, 170, 80, 0.1);
+  opacity: 0.85;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .base-heart { animation: base-heart 5.5s ease-in-out infinite; }
+  @keyframes base-heart {
+    0%, 100% { box-shadow: 0 0 2px 0 rgba(255, 170, 80, 0.1);   filter: brightness(0.85); }
+    12%      { box-shadow: 0 0 14px 3px rgba(255, 170, 80, 0.55); filter: brightness(1.15); }
+    26%      { box-shadow: 0 0 4px 0 rgba(255, 170, 80, 0.2);   filter: brightness(0.9); }
+    34%      { box-shadow: 0 0 10px 2px rgba(255, 170, 80, 0.4); filter: brightness(1); }
+  }
+}
+
+/* ii. vent breath — a cold spill under the right bezel edge, the slits
+   exhaling. One blurred pseudo-element; the exhale is one slow swell every
+   ~19s, gone before it can be stared at. */
+.vent-slits::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 34%;
+  width: 10px;
+  height: 34%;
+  border-radius: 6px;
+  background: linear-gradient(
+    180deg,
+    rgba(160, 196, 214, 0) 0%,
+    rgba(160, 196, 214, 0.34) 30%,
+    rgba(160, 196, 214, 0.16) 70%,
+    rgba(160, 196, 214, 0) 100%
+  );
+  filter: blur(3px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vent-slits::after { animation: vent-breath 19s ease-in-out infinite; }
+  @keyframes vent-breath {
+    0%, 100% { opacity: 0.05; transform: translateY(0); }
+    42%      { opacity: 0.34; transform: translateY(4px); }
+    58%      { opacity: 0.16; transform: translateY(7px); }
+  }
+}
+
+/* WS4 motion pass: the LED's pulse is ambient — still under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .led { animation: none; opacity: 0.8; }
+  .screen::after { animation: none; opacity: 0; }
+  .crt-tube-glass::after { animation: none; opacity: 0; }
+  .base-heart { animation: none; }
+  .vent-slits::after { animation: none; opacity: 0.08; }
+}
+
+/* lane C: on the small screens the machine fills more of the room. The
+   default 72vw hands rooms ~286×208 of glass at 439px — less than a
+   postcard — and fixed furniture piles up on it. 96vw keeps the same
+   proportions but gives every room a workable stage (the shell's half of
+   the 439px contract: the shell sizes the glass; the room survives on it). */
+@media (max-width: 600px) {
+  .machine {
+    width: min(96vw, calc((100dvh - 40px) * 4 / 3));
+  }
+}
+
+/* ============================================================================
+   Theme skins — class swap on .machine, applied from themes.html.
+   These live on the machine layer (covenant Q.1: only machine hooks
+   global classes).
+   ============================================================================ */
+
+.machine.theme-clean .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #c8c0b0 0%, #8a8478 100%);
+  border-color: #4a4438;
+}
+.machine.theme-clean .liber-plate { color: #1a1a14; }
+.machine.theme-clean .corruption-scars { opacity: 0.15; }
+.machine.theme-clean .screen {
+  background: #1a1a18;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
+}
+
+.machine.theme-shadow .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #0a0508 0%, #050204 100%);
+  border-color: #050208;
+}
+.machine.theme-shadow .liber-plate { color: #6a4040; opacity: 0.4; }
+.machine.theme-shadow .vent-slits { opacity: 0.4; }
+.machine.theme-shadow .corruption-scars { opacity: 0.6; }
+.machine.theme-shadow .screen {
+  background: #020104;
+  box-shadow: inset 0 0 80px rgba(80, 10, 20, 0.3);
+}
+
+.machine.theme-mono .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 4px),
+    linear-gradient(180deg, #d0c8b8 0%, #6a6458 100%);
+  border-color: #1a1a14;
+}
+.machine.theme-mono .liber-plate { color: #0a0a08; letter-spacing: 0.4em; }
+.machine.theme-mono .corruption-scars { opacity: 0.1; }
+.machine.theme-mono .screen {
+  background: #050505;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.6);
+}
+.machine.theme-mono .corruption-scars .scar { filter: grayscale(1) contrast(1.5); }
+
+.machine.theme-gold .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #d4af37 0%, #8a6a20 100%);
+  border-color: #4a3010;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.4), inset 0 0 0 2px #f5d870;
+}
+.machine.theme-gold .liber-plate { color: #2a1408; text-shadow: 0 0 4px #f5d870; }
+.machine.theme-gold .vent-slits { opacity: 0.6; }
+.machine.theme-gold .corruption-scars { opacity: 0.3; }
+.machine.theme-gold .screen {
+  background: #1a0a04;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+/* Persona skins (themes.js ids). corrupted is the base look — no override.
+   Each restyles the same four chrome surfaces; the screen stays dark so
+   app palettes and D0003 floors hold. */
+
+.machine.theme-wanderlust .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #e8a8c8 0%, #a84a78 55%, #d8b850 100%);
+  border-color: #6a2a48;
+  box-shadow: 0 0 26px rgba(232, 168, 200, 0.35), inset 0 0 0 2px #f5d870;
+}
+.machine.theme-wanderlust .liber-plate { color: #4a1030; text-shadow: 0 0 4px #ffd8e8; }
+.machine.theme-wanderlust .corruption-scars { opacity: 0.35; }
+.machine.theme-wanderlust .screen {
+  background: #1c0714;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 22px rgba(232, 168, 200, 0.25);
+}
+
+.machine.theme-riason .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #5a78aa 0%, #2a3a5a 100%);
+  border-color: #1a2438;
+  box-shadow: 0 0 24px rgba(138, 202, 255, 0.3), inset 0 0 0 2px #8acaff;
+}
+.machine.theme-riason .liber-plate { color: #d8e8f5; letter-spacing: 0.32em; }
+.machine.theme-riason .corruption-scars { opacity: 0.25; }
+.machine.theme-riason .screen {
+  background: #060a14;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), 0 0 20px rgba(90, 138, 170, 0.25);
+}
+
+.machine.theme-physius .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #3a3236 0%, #16120f 100%);
+  border-color: #0a0705;
+  box-shadow: 0 0 22px rgba(200, 120, 60, 0.3), inset 0 0 0 2px #8a5a30;
+}
+.machine.theme-physius .liber-plate { color: #d8a870; text-shadow: 0 0 4px rgba(200, 120, 60, 0.5); }
+.machine.theme-physius .corruption-scars { opacity: 0.5; }
+.machine.theme-physius .screen {
+  background: #0c0806;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.6), 0 0 18px rgba(200, 120, 60, 0.2);
+}
+
+.machine.theme-whimsy .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #c83828 0%, #7a1810 100%);
+  border-color: #4a0c08;
+  box-shadow: 0 0 26px rgba(240, 190, 90, 0.35), inset 0 0 0 2px #f0e0c0;
+}
+.machine.theme-whimsy .liber-plate { color: #f5e8d0; text-shadow: 0 0 5px rgba(240, 190, 90, 0.7); }
+.machine.theme-whimsy .corruption-scars { opacity: 0.3; }
+.machine.theme-whimsy .screen {
+  background: #180604;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 22px rgba(200, 56, 40, 0.3);
+}
+
+.machine.theme-vanir .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #2a4a58 0%, #10222c 60%, #1a5a4a 100%);
+  border-color: #081418;
+  box-shadow: 0 0 24px rgba(80, 200, 180, 0.28), inset 0 0 0 2px #2a8a8a;
+}
+.machine.theme-vanir .liber-plate { color: #b8e0d8; text-shadow: 0 0 5px rgba(80, 200, 180, 0.5); }
+.machine.theme-vanir .corruption-scars { opacity: 0.4; }
+.machine.theme-vanir .screen {
+  background: #04100e;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), 0 0 22px rgba(42, 138, 138, 0.25);
+}
+
+.machine.theme-entity404 .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #0a140a 0%, #020602 100%);
+  border-color: #01180b;
+  box-shadow: 0 0 24px rgba(154, 212, 154, 0.25), inset 0 0 0 2px #9ad49a;
+}
+.machine.theme-entity404 .liber-plate { color: #9ad49a; text-shadow: 0 0 6px rgba(154, 212, 154, 0.6); }
+.machine.theme-entity404 .vent-slits { opacity: 0.4; }
+.machine.theme-entity404 .corruption-scars { opacity: 0.5; }
+.machine.theme-entity404 .corruption-scars .scar { filter: hue-rotate(90deg) saturate(1.4); }
+.machine.theme-entity404 .screen {
+  background: #010801;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.6), 0 0 22px rgba(154, 212, 154, 0.18);
+}
+
+.machine.theme-arcana .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #6a1018 0%, #2a060a 100%);
+  border-color: #1a0406;
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.14), inset 0 0 0 2px #e8dcc0;
+}
+.machine.theme-arcana .liber-plate { color: #f0ead8; text-shadow: 0 0 4px rgba(255, 255, 255, 0.4); }
+.machine.theme-arcana .corruption-scars { opacity: 0.35; }
+.machine.theme-arcana .screen {
+  background: #140305;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), 0 0 20px rgba(180, 30, 45, 0.3);
+}
+
+.machine.theme-librarian .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #d8c8a8 0%, #8a6a48 100%);
+  border-color: #4a3418;
+  box-shadow: 0 0 22px rgba(218, 165, 32, 0.3), inset 0 0 0 2px #b89858;
+}
+.machine.theme-librarian .liber-plate { color: #2a1c08; text-shadow: 0 0 3px rgba(218, 165, 32, 0.5); }
+.machine.theme-librarian .corruption-scars { opacity: 0.25; }
+.machine.theme-librarian .screen {
+  background: #120c06;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 20px rgba(150, 110, 60, 0.25);
+}
+
+.machine.theme-elizabeth .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #1c1518 0%, #0a0708 100%);
+  border-color: #050304;
+  box-shadow: 0 0 26px rgba(200, 168, 120, 0.3), inset 0 0 0 2px #aa8a3a;
+}
+.machine.theme-elizabeth .liber-plate { color: #d4af37; text-shadow: 0 0 5px rgba(212, 175, 55, 0.6); }
+.machine.theme-elizabeth .corruption-scars { opacity: 0.45; }
+.machine.theme-elizabeth .screen {
+  background: #0a0608;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.6), 0 0 22px rgba(138, 42, 32, 0.3);
+}
+
+.machine.theme-iris .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #e0d4b4 0%, #a89868 100%);
+  border-color: #5a4c2a;
+  box-shadow: 0 0 22px rgba(240, 228, 190, 0.3), inset 0 0 0 2px #f0e4c0;
+}
+.machine.theme-iris .liber-plate { color: #2a2010; }
+.machine.theme-iris .corruption-scars { opacity: 0.2; }
+.machine.theme-iris .screen {
+  background: #141008;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 20px rgba(220, 200, 150, 0.18);
+}
+
+.machine.theme-ravaging .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.09) 0px, rgba(0,0,0,0.09) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #4a3a28 0%, #241a10 100%);
+  border-color: #120c06;
+  box-shadow: 0 0 22px rgba(170, 90, 40, 0.3), inset 0 0 0 2px #6a4a28;
+}
+.machine.theme-ravaging .liber-plate { color: #d8b088; text-shadow: 0 0 4px rgba(170, 90, 40, 0.5); }
+.machine.theme-ravaging .corruption-scars { opacity: 0.55; }
+.machine.theme-ravaging .screen {
+  background: #0c0805;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), 0 0 20px rgba(160, 100, 40, 0.25);
+}
+.machine.theme-royalty .bezel {
+  background:
+    var(--machine-lit),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #5a2a8a 0%, #2a1040 60%, #3a1a50 100%);
+  border-color: #1a0a28;
+  box-shadow: 0 0 26px rgba(150, 90, 220, 0.4), inset 0 0 0 2px #e8c860;
+}
+.machine.theme-royalty .liber-plate { color: #e8c860; text-shadow: 0 0 6px rgba(232, 200, 96, 0.7); letter-spacing: 0.34em; }
+.machine.theme-royalty .corruption-scars { opacity: 0.3; }
+.machine.theme-royalty .corruption-scars .scar { filter: hue-rotate(70deg) saturate(1.2); }
+.machine.theme-royalty .screen {
+  background: #12081e;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), 0 0 22px rgba(150, 90, 220, 0.3);
+}
+
+/* ============================================================================
+   Whole-system grading — the theme reaches past the bezel. apply-theme.js
+   (included on every page) stamps body[data-theme] and mounts one
+   .theme-grade veil inside .screen: a single blend quad over all app
+   content, so every room takes the theme's cast without touching any app
+   stylesheet. Blend-only, never filter: fixed-position overlays inside
+   apps keep working. A second wash tints the void around the machine.
+   corrupted is the base look — no veil, no wash.
+   ============================================================================ */
+
+.theme-grade {
+  position: absolute;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+  display: none;
+  background: transparent;
+}
+
+body[data-theme="wanderlust"] .theme-grade { display: block; background: rgba(255, 158, 207, 0.30); mix-blend-mode: color; }
+body[data-theme="riason"] .theme-grade { display: block; background: rgba(127, 168, 224, 0.28); mix-blend-mode: color; }
+body[data-theme="physius"] .theme-grade { display: block; background: rgba(200, 128, 60, 0.24); mix-blend-mode: color; }
+body[data-theme="whimsy"] .theme-grade { display: block; background: rgba(240, 190, 90, 0.24); mix-blend-mode: color; }
+body[data-theme="vanir"] .theme-grade { display: block; background: rgba(42, 154, 154, 0.30); mix-blend-mode: color; }
+body[data-theme="entity404"] .theme-grade { display: block; background: rgba(48, 208, 96, 0.28); mix-blend-mode: color; }
+body[data-theme="arcana"] .theme-grade { display: block; background: rgba(232, 228, 218, 0.22); mix-blend-mode: color; }
+body[data-theme="librarian"] .theme-grade { display: block; background: rgba(200, 152, 88, 0.26); mix-blend-mode: color; }
+body[data-theme="elizabeth"] .theme-grade { display: block; background: rgba(212, 175, 55, 0.26); mix-blend-mode: color; }
+body[data-theme="iris"] .theme-grade { display: block; background: rgba(216, 204, 176, 0.24); mix-blend-mode: color; }
+body[data-theme="ravaging"] .theme-grade { display: block; background: rgba(160, 96, 56, 0.28); mix-blend-mode: color; }
+body[data-theme="royalty"] .theme-grade { display: block; background: rgba(144, 64, 192, 0.28); mix-blend-mode: color; }
+body[data-theme="clean"] .theme-grade { display: block; background: rgba(255, 244, 224, 0.12); mix-blend-mode: normal; }
+body[data-theme="shadow"] .theme-grade { display: block; background: rgba(0, 0, 0, 0.30); mix-blend-mode: normal; }
+body[data-theme="mono"] .theme-grade { display: block; background: rgba(128, 128, 128, 0.60); mix-blend-mode: saturation; }
+body[data-theme="gold"] .theme-grade { display: block; background: rgba(232, 184, 48, 0.26); mix-blend-mode: color; }
+
+.room::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+body[data-theme="wanderlust"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(232, 120, 170, 0.16) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="riason"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(120, 160, 220, 0.15) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="physius"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(200, 130, 60, 0.14) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="whimsy"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(240, 190, 90, 0.14) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="vanir"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(40, 150, 150, 0.16) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="entity404"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(40, 200, 90, 0.14) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="arcana"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(220, 215, 200, 0.10) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="librarian"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(200, 150, 80, 0.13) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="elizabeth"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(212, 175, 55, 0.13) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="iris"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(210, 195, 165, 0.10) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="ravaging"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(165, 100, 50, 0.14) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="royalty"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(140, 80, 210, 0.16) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="clean"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(240, 235, 220, 0.08) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="shadow"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.35) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="mono"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(160, 160, 160, 0.07) 0%, rgba(0,0,0,0) 60%); }
+body[data-theme="gold"] .room::after { background: radial-gradient(ellipse at 50% 45%, rgba(230, 180, 50, 0.14) 0%, rgba(0,0,0,0) 60%); }
+
+/* ── Run 5: the Vacui shell in the same pixel register ───────────────────
+   Proportions stay untouched. We only replace soft ornamental treatment with
+   stepped corners, crisp seams, and hard contact shadows so the machine reads
+   like a high-fidelity 64px sprite enlarged 1:1. Semantic copy is excluded. */
+html.pixel-register .bezel {
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 2px #b9aa86,
+    inset 0 0 0 4px #d8ccb0,
+    inset 0 0 0 6px rgba(86, 67, 42, 0.18),
+    8px 8px 0 rgba(0, 0, 0, 0.38);
+}
+html.pixel-register .bezel::before { inset: 8px; border-radius: 3px; }
+html.pixel-register .screen {
+  border-radius: 3px;
+  image-rendering: pixelated;
+}
+html.pixel-register .machine::after {
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.24);
+}

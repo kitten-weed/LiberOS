@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Sea — the crossing</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css"/>
+  <link rel="stylesheet" href="styles/vanir.css?v=hud4"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body data-vanir-exit="desktop.html">
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <div class="vanir-app">
+              <div id="app"></div>
+              <div class="vanir-glass"></div>
+              <div id="vignette"></div>
+              <div id="glitch"></div>
+              <div id="bar-top" class="bar"></div>
+              <div id="bar-bottom" class="bar"></div>
+              <div id="stage"><div id="stage-text"></div></div>
+              <div id="stage-sub"></div>
+              <button id="shelf-toggle">artifacts</button>
+              <button id="summon-toggle" title="how to use this app">{?} <span>summon</span></button>
+              <button id="exit-toggle" title="leave the crossing">{(&#124;)} <span>exit</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+  <script type="module" src="src/features/vanir/vanir-boot.js?v=hud8"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'sea',
+    traveller: 'VANIR',
+    accent: '#7ab8a8',
+    title: 'the crossing',
+    lines: ['Write the thought you are carrying. Vanir will seal it in a jar and row it across.']
+  });
+  /* vanir's cartridge-transit entry routes back here; keep room-shell and the
+     trave-rom console wired like every other app page so the machine, the
+     bevel and the tabletop console match the rest of LiberOS. */
+</script>
+</body>
+</html>

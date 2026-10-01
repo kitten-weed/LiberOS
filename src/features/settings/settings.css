@@ -1,0 +1,235 @@
+/* settings.css — The room's room. Sober, system-text.
+   This file is COMPLETELY INDEPENDENT. No imports, no shared variables (covenant Q.1). */
+
+.settings-app {
+  position: absolute;
+  inset: 0;
+  background: #0a0606;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Courier New', 'VT323', monospace;
+  color: #c8b890;
+}
+
+.settings-panel {
+  width: 80%;
+  max-width: 560px;
+  /* Reserve the physical cartridge dock and its status line. The panel
+     remains scrollable, but its last row can never disappear underneath
+     the machine's hardware. */
+  max-height: calc(100% - 92px);
+  overflow-y: auto;
+  background: #1a0a05;
+  border: 1px solid #4a2a18;
+  padding: 18px 24px;
+  box-shadow: inset 0 0 0 1px #0a0503, 0 0 30px rgba(0,0,0,0.6);
+}
+
+.settings-header {
+  text-align: center;
+  border-bottom: 1px solid #4a2a18;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.settings-title {
+  font-size: 1rem;
+  letter-spacing: 0.4em;
+  color: #c8b890;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.settings-sub {
+  font-size: 1rem;
+  font-style: italic;
+  color: #8a6a40;
+  margin-top: 2px;
+  letter-spacing: 0.1em;
+}
+
+.settings-section {
+  border-bottom: 1px dotted #4a2a18;
+  padding: 10px 0;
+}
+
+.settings-section:last-of-type { border-bottom: none; }
+
+.settings-section-title {
+  font-size: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #8a6a40;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.settings-btn {
+  background: linear-gradient(180deg, #3a2a1a 0%, #2a1808 100%);
+  border: 1px solid #4a2a18;
+  color: #c8b890;
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  padding: 8px 14px;
+  min-height: 44px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-right: 6px;
+}
+.settings-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.settings-btn:hover {
+  background: linear-gradient(180deg, #4a3a2a 0%, #3a2818 100%);
+  border-color: #8a6a40;
+  color: #f0d8a8;
+  box-shadow: 0 0 6px rgba(200, 144, 96, 0.3);
+}
+
+.settings-btn-danger {
+  color: #d88060;
+  border-color: #6a2a18;
+}
+
+.settings-btn-danger:hover {
+  background: linear-gradient(180deg, #4a0a08 0%, #2a0a05 100%);
+  color: #f0a080;
+  border-color: #aa3030;
+  box-shadow: 0 0 6px rgba(170, 48, 48, 0.4);
+}
+
+.settings-btn-back {
+  width: 100%;
+  margin-top: 4px;
+}
+/* The maintenance controls remain usable above the existing cartridge dock
+   when the dock occupies the lower edge of the CRT. */
+.settings-app .settings-btn { position: relative; z-index: 35; }
+
+.settings-hint {
+  font-size: 1rem;
+  color: #b08a58;
+  font-style: normal;
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+.settings-hint em {
+  color: #c8b890;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  border: 1px solid #4a2a18;
+  padding: 0 4px;
+  background: rgba(0,0,0,0.3);
+}
+
+.settings-state {
+  font-size: 1rem;
+  color: #b08a58;
+  font-style: normal;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #4a2a18;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  font-family: inherit;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* ─── the advanced hatch: raw state lives behind a plate, shut by default ─── */
+.settings-hatch {
+  border: 1px solid #4a2a18;
+  background: rgba(0,0,0,0.3);
+  margin-bottom: 8px;
+}
+.settings-hatch-plate {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c8b890;
+  cursor: pointer;
+  list-style: none;
+}
+.settings-hatch-plate::-webkit-details-marker { display: none; }
+.settings-hatch-plate::before {
+  content: '▸';
+  margin-right: 10px;
+  color: #8a6a40;
+}
+.settings-hatch[open] .settings-hatch-plate::before { content: '▾'; }
+.settings-hatch-plate:focus-visible {
+  outline: 2px solid #c89060;
+  outline-offset: 2px;
+}
+.settings-hatch .settings-state {
+  border: none;
+  border-top: 1px dotted #4a2a18;
+  margin-bottom: 0;
+}
+
+/* ─── the wipe interlock: cover over two pulls, 1 before 2 ─── */
+.settings-wipe-box {
+  border: 1px dashed #6a2a18;
+  padding: 8px;
+  margin-top: 8px;
+}
+.settings-wipe-switches {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.settings-wipe-switches[hidden] { display: none; }
+.settings-wipe-switches .settings-btn[aria-pressed="true"] {
+  border-color: #e8c890;
+  color: #e8c890;
+}
+
+.settings-footer {
+  margin-top: 8px;
+  border-top: 1px solid #4a2a18;
+  padding-top: 8px;
+}
+
+/* ─── WS4: pressed-bevel + focus (D0004 recipe, machine palette) ─── */
+.settings-btn {
+  border-width: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(240, 216, 168, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+    0 2px 0 #1a0c04,
+    0 3px 4px rgba(0, 0, 0, 0.5);
+}
+.settings-btn:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(240, 216, 168, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 #1a0c04,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.settings-btn:focus-visible {
+  outline: 2px solid #c89060;
+  outline-offset: 2px;
+}
+.settings-btn.on {
+  border-color: #e8c890;
+  color: #e8c890;
+}
+.settings-app ::-webkit-scrollbar, .settings-app::-webkit-scrollbar { width: 10px; height: 10px; }
+.settings-app ::-webkit-scrollbar-track, .settings-app::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); border-radius: 6px; }
+.settings-app ::-webkit-scrollbar-thumb, .settings-app::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #c8b890 0%, #4a2a18 100%); border-radius: 6px; border: 2px solid rgba(0, 0, 0, 0.45); }
+.settings-app ::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
+.settings-app, .settings-app * { scrollbar-width: thin; scrollbar-color: #c8b890 rgba(0, 0, 0, 0.35); }

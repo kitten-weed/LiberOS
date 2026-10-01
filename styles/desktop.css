@@ -1,0 +1,811 @@
+/* ============================================================================
+   desktop.css — State 3 (pre-tutorial) + State 4 (post-tutorial)
+
+   State 3: screen `#2a0000`, large flaming question mark centered, no
+            other elements (until tutorial pops up).
+   State 4: question mark receded to top-right (small, opacity 0.3),
+            artifacts as circles connected by pink lines, dial at bottom,
+            radial clock top-right, status line bottom-left.
+
+   The question mark is the visual focus until tutorial completes. The
+   dial is the post-tutorial nav.
+   ============================================================================ */
+
+.state-desktop {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #2a0000;
+  overflow: hidden;
+}
+
+/* Phase 7 — faint sigil bitmap overlay. Full-screen, ~8% opacity,
+   behind the dial + constellation but above the void background. */
+.sigil-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+}
+.sigil-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top left;
+  opacity: 0.08;
+  filter: invert(1) hue-rotate(180deg) saturate(0.4);
+}
+
+/* WS5 — the buddy becomes louder: as artifacts+relations accumulate
+   (buddy-N classes on .machine, set in src/shadow.js), the faint overlay
+   gains resolution — a little brighter, a little larger. Decorative only
+   (D0003): it carries no information. Static steps; nothing animates. */
+.machine.buddy-1 .sigil-overlay img { opacity: 0.11; transform: scale(1.01); }
+.machine.buddy-2 .sigil-overlay img { opacity: 0.145; transform: scale(1.02); }
+.machine.buddy-3 .sigil-overlay img { opacity: 0.18; transform: scale(1.03); }
+
+/* The flaming question mark — large, centered, with CSS-animated
+   pink/yellow flames around the edges. */
+.flaming-q {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(160px, 22vw, 280px);
+  height: clamp(220px, 30vw, 380px);
+  z-index: 5;
+  cursor: pointer;
+  transition: opacity 0.8s ease, top 0.8s ease, left 0.8s ease, transform 0.8s ease, width 0.8s ease, height 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The question mark body — black, gothic. */
+.flaming-q .q-body {
+  position: relative;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: clamp(180px, 22vw, 280px);
+  font-weight: 900;
+  line-height: 0.85;
+  color: #000;
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(20, 0, 0, 0.4);
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+  font-style: italic;
+}
+
+/* The flames — pink/yellow, animated flicker. Use pseudo-elements for
+   the glow halos. */
+.flaming-q::before, .flaming-q::after {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 105, 180, 0.5) 0%, rgba(255, 200, 100, 0.3) 30%, rgba(0, 0, 0, 0) 70%);
+  z-index: 1;
+  animation: flame-flicker 1.6s ease-in-out infinite alternate;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.flaming-q::after {
+  inset: -40px;
+  animation-delay: 0.4s;
+  background: radial-gradient(ellipse at center, rgba(255, 220, 100, 0.4) 0%, rgba(255, 105, 180, 0.2) 40%, rgba(0, 0, 0, 0) 70%);
+  animation-duration: 2.2s;
+}
+
+@keyframes flame-flicker {
+  0%   { transform: scale(1.0)  rotate(0deg);   opacity: 0.7; }
+  50%  { transform: scale(1.08) rotate(2deg);   opacity: 1.0; }
+  100% { transform: scale(0.96) rotate(-2deg);  opacity: 0.8; }
+}
+
+.flaming-q:hover {
+  filter: brightness(1.15);
+}
+
+/* Repeat-tutorial ? — separate class. Hidden until tutorial is done.
+   Visually echoes the big pre-tutorial ? but is small + dim, sits top-right
+   beside the ×. Wanderlust's mark, callable to re-open the summoning. */
+.flaming-q-repeat {
+  position: absolute;
+  top: 14px;
+  right: 56px;
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(40, 14, 8, 0.7);
+  border: 1px solid rgba(255, 180, 100, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255, 180, 100, 0.2);
+  color: rgba(255, 200, 100, 0.95);
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 22px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s, filter 0.15s, box-shadow 0.15s;
+  display: none;
+}
+.flaming-q-repeat:hover {
+  filter: brightness(1.2);
+  color: #fff0d0;
+  box-shadow: 0 0 14px rgba(255, 180, 100, 0.45);
+}
+.flaming-q-repeat:active {
+  transform: translateY(1px);
+}
+
+/* Show repeat ? only after tutorial completes. */
+.state-desktop.tutorial-done .flaming-q-repeat {
+  display: block;
+  opacity: 0.85;
+  pointer-events: auto;
+}
+
+/* After tutorial: hide the big pre-tutorial ?. */
+.state-desktop.tutorial-done .flaming-q {
+  display: none;
+}
+
+/* (legacy .state-desktop.tutorial-done .flaming-q rules removed — the
+   pre-tutorial ? is hidden via JS after tutorialDone; the repeat class
+   above is now the visible button.) */
+
+/* S.3 — operator's path: faint dotted polyline tracing the order in
+   which the user has visited each persona. Hidden pre-tutorial. */
+.operator-path {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 14;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.state-desktop.tutorial-done .operator-path {
+  opacity: 1;
+}
+
+.operator-path polyline,
+.operator-path line {
+  stroke: rgba(255, 105, 180, 0.85);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 4;
+  fill: none;
+}
+
+.operator-path circle {
+  fill: rgba(255, 105, 180, 1);
+  stroke: #ffe0f0;
+  stroke-width: 0.8;
+}
+
+/* Ghost ring: 12 fixed invisible divs that mirror the dial positions,
+   used as DOM anchors for the operator path. */
+.dial-ghost-ring {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 36%;
+  pointer-events: none;
+}
+
+.dial-ghost {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.dial-ghost[data-pos="-5"] { left: 2%;  bottom: 2%;  }
+.dial-ghost[data-pos="-4"] { left: 8%;  bottom: 7%;  }
+.dial-ghost[data-pos="-3"] { left: 18%; bottom: 16%; }
+.dial-ghost[data-pos="-2"] { left: 28%; bottom: 22%; }
+.dial-ghost[data-pos="-1"] { left: 37%; bottom: 27%; }
+.dial-ghost[data-pos="0"]  { left: 50%; bottom: 30%; transform: translateX(-50%); }
+.dial-ghost[data-pos="1"]  { right: 37%; bottom: 27%; }
+.dial-ghost[data-pos="2"]  { right: 28%; bottom: 22%; }
+.dial-ghost[data-pos="3"]  { right: 18%; bottom: 16%; }
+.dial-ghost[data-pos="4"]  { right: 8%;  bottom: 7%;  }
+.dial-ghost[data-pos="5"]  { right: 2%;  bottom: 2%;  }
+
+/* S.4 — wanderlust tutorial window. Visible pre-tutorial. The
+   "tell me more" button has a soft glow. */
+.tutorial-window {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  width: 70%;
+  max-width: 360px;
+  background: rgba(20, 8, 4, 0.85);
+  border: 1px solid #5a2a18;
+  padding: 14px 18px;
+  font-family: 'EB Garamond', 'Garamond', serif;
+  color: #c8b890;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  z-index: 10;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #2a1408;
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.state-desktop.tutorial-done .tutorial-window {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-20px);
+  pointer-events: none;
+}
+
+.tutorial-title {
+  font-size: 0.875rem;
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+  color: #aa7858;
+  text-align: center;
+  margin-bottom: 8px;
+  border-bottom: 1px dotted #5a2a18;
+  padding-bottom: 6px;
+}
+
+.tutorial-body {
+  margin-bottom: 12px;
+  text-align: left;
+  color: #c8b890;
+}
+
+.tutorial-more {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  background: linear-gradient(180deg, rgba(80, 40, 20, 0.6) 0%, rgba(40, 20, 10, 0.6) 100%);
+  border: 1px solid #aa5020;
+  color: #ffd0a0;
+  font-family: inherit;
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.15em;
+  padding: 6px 12px;
+  cursor: pointer;
+  animation: tutorial-glow 2.4s ease-in-out infinite;
+}
+
+.tutorial-more:hover {
+  background: linear-gradient(180deg, rgba(120, 60, 30, 0.8) 0%, rgba(60, 30, 15, 0.8) 100%);
+  color: #fff0d0;
+  border-color: #ff8040;
+  box-shadow: 0 0 12px rgba(255, 128, 64, 0.6);
+}
+
+.tutorial-dismiss {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 1px dotted #5a2a18;
+  color: #a8845a;
+  font-family: inherit;
+  /* D0003: clickable control label — dialogue-reply floor applies. */
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.tutorial-dismiss:hover {
+  color: #c8b890;
+  border-color: #c8b890;
+}
+
+@keyframes tutorial-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(255, 128, 64, 0.2);
+    border-color: #aa5020;
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 160, 80, 0.5);
+    border-color: #ff8040;
+  }
+}
+
+.state-desktop.tutorial-done .flaming-q::before,
+.state-desktop.tutorial-done .flaming-q::after {
+  display: none;
+}
+
+.state-desktop.tutorial-done .flaming-q .q-body {
+  font-size: 36px;
+  line-height: 32px;
+  color: #1a0000;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* The artifact canvas — invisible until tutorial-done. Pink lines
+   connect artifact circles. */
+.artifact-canvas,
+.artifact {
+  opacity: 0;
+  transition: opacity 1.2s ease 0.4s;
+  pointer-events: none;
+}
+
+.artifact-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.state-desktop.tutorial-done .artifact-canvas,
+.state-desktop.tutorial-done .artifact {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.artifact {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 105, 180, 0.85);
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+  border: 1px solid rgba(255, 200, 220, 0.5);
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #2a0000;
+  transition: transform 0.3s ease;
+}
+
+.artifact:hover {
+  transform: scale(1.15);
+}
+
+.artifact .artifact-label {
+  font-size: 0.875rem;
+  position: absolute;
+  bottom: -16px;
+  white-space: nowrap;
+  color: rgba(220, 180, 180, 0.85);
+  font-family: 'VT323', 'Courier New', Courier, monospace;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+}
+
+/* S.4 tutorial-window + .visible rule live earlier in this file
+   (line ~129) — see the wanderlust tutorial block. The original
+   scaffolded rules at line 295+ have been removed. */
+
+/* ============================================================================
+   settings cog (bottom-left, above the dial, slow spin) + settings modal.
+   Hash-driven (#settings) so the cog is deep-linkable and the back button
+   closes the modal.
+   ============================================================================ */
+
+.settings-cog {
+  position: absolute;
+  right: 28px;
+  /* keybank owns the lower-left; the cog holds the upper-right corner. */
+  bottom: 64px;
+  width: 60px;
+  height: 74px;
+  z-index: 12;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.8));
+  transition: filter 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings-cog svg {
+  width: 46px;
+  height: 46px;
+}
+
+.settings-cog-label {
+  margin-top: 2px;
+  font-family: 'VT323', 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  color: rgba(200, 168, 120, 0.95);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.settings-cog-gear {
+  transform-origin: 50% 50%;
+  animation: cog-spin 12s linear infinite;
+}
+
+@keyframes cog-spin {
+  to { transform: rotate(360deg); }
+}
+
+.settings-cog:hover {
+  filter: drop-shadow(0 0 10px rgba(200, 168, 120, 0.5));
+}
+
+.settings-cog:hover .settings-cog-gear {
+  animation-duration: 4s;
+}
+
+.settings-cog:active {
+  transform: scale(0.94);
+}
+
+.settings-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 2, 2, 0.88);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.settings-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.settings-modal-inner {
+  width: 80%;
+  max-width: 460px;
+  background: linear-gradient(180deg, #1a0a05 0%, #0a0503 100%);
+  border: 1px solid #4a2a18;
+  box-shadow:
+    inset 0 0 0 1px #0a0503,
+    0 0 30px rgba(0, 0, 0, 0.6);
+  font-family: 'Courier New', 'VT323', monospace;
+  color: #c8b890;
+}
+
+.settings-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 8px;
+  border-bottom: 1px solid #4a2a18;
+}
+
+.settings-modal-title {
+  font-size: 1rem;
+  letter-spacing: 0.4em;
+  color: #c8b890;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.settings-modal-close {
+  background: none;
+  border: 1px solid #4a2a18;
+  color: #a8845a;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  line-height: 30px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 2px;
+}
+
+.settings-modal-close:hover {
+  background: rgba(120, 60, 30, 0.2);
+  color: #c89060;
+  border-color: #8a5a30;
+}
+
+.settings-modal-body {
+  padding: 10px 18px 14px;
+}
+
+.settings-modal-section {
+  padding: 8px 0;
+  border-bottom: 1px dotted #4a2a18;
+}
+
+.settings-modal-section:last-of-type {
+  border-bottom: none;
+}
+
+.settings-modal-section-title {
+  font-size: 0.875rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #8a6a40;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.settings-modal-btn {
+  background: linear-gradient(180deg, #3a2a1a 0%, #2a1808 100%);
+  border: 1px solid #4a2a18;
+  color: #c8b890;
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-right: 6px;
+}
+
+.settings-modal-btn:hover {
+  background: linear-gradient(180deg, #4a3a2a 0%, #3a2818 100%);
+  border-color: #8a6a40;
+  color: #f0d8a8;
+  box-shadow: 0 0 6px rgba(200, 144, 96, 0.3);
+}
+
+.settings-modal-btn-danger {
+  color: #d88060;
+  border-color: #6a2a18;
+}
+
+.settings-modal-btn-danger:hover {
+  background: linear-gradient(180deg, #4a0a08 0%, #2a0a05 100%);
+  color: #f0a080;
+  border-color: #aa3030;
+  box-shadow: 0 0 6px rgba(170, 48, 48, 0.4);
+}
+
+.settings-modal-hint {
+  font-size: 0.875rem;
+  color: #9a7a50;
+  font-style: italic;
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+.settings-modal-hint em {
+  color: #c8b890;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  border: 1px solid #4a2a18;
+  padding: 0 4px;
+  background: rgba(0,0,0,0.3);
+}
+
+.settings-modal-state {
+  font-size: 0.875rem;
+  color: #8a6a40;
+  font-style: italic;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #4a2a18;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  font-family: inherit;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.settings-modal-foot {
+  border-top: 1px solid #4a2a18;
+  padding: 6px 18px 10px;
+  font-size: 0.875rem;
+  color: #9a7a50;
+  font-style: italic;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+/* emergent prompt line — shell-owned surface for the prompt engine.
+   Anchored inside the desktop stage, above the keybank block on the
+   left and clear of the status plate on the right. */
+.prompt-line {
+  position: absolute;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%) translateY(6px);
+  max-width: 72%;
+  text-align: center;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: rgba(255, 200, 220, 0.78);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  z-index: 40;
+}
+
+.prompt-line.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================================
+   WS4 — pressed-bevel + focus (D0004 recipe, machine amber), and the
+   reduced-motion gates for the shell's own ambient loops.
+   ============================================================================ */
+
+.settings-modal-btn,
+.settings-modal-close,
+.flaming-q-repeat,
+.tutorial-more,
+.tutorial-dismiss {
+  box-shadow:
+    inset 0 1px 0 rgba(240, 216, 168, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+    0 2px 0 #1a0c04,
+    0 3px 4px rgba(0, 0, 0, 0.5);
+}
+.settings-modal-btn:active,
+.settings-modal-close:active,
+.flaming-q-repeat:active,
+.tutorial-more:active,
+.tutorial-dismiss:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(240, 216, 168, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 #1a0c04,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.settings-modal-btn:focus-visible,
+.settings-modal-close:focus-visible,
+.settings-cog:focus-visible,
+.flaming-q:focus-visible,
+.flaming-q-repeat:focus-visible,
+.tutorial-more:focus-visible,
+.tutorial-dismiss:focus-visible {
+  outline: 2px solid #c89060;
+  outline-offset: 2px;
+}
+
+.state-desktop ::-webkit-scrollbar, .state-desktop::-webkit-scrollbar { width: 10px; height: 10px; }
+.state-desktop ::-webkit-scrollbar-track, .state-desktop::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); border-radius: 6px; }
+.state-desktop ::-webkit-scrollbar-thumb, .state-desktop::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #c8a878 0%, #2a1408 100%); border-radius: 6px; border: 2px solid rgba(0, 0, 0, 0.45); }
+.state-desktop ::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
+.state-desktop, .state-desktop * { scrollbar-width: thin; scrollbar-color: #c8a878 rgba(0, 0, 0, 0.35); }
+
+
+/* ── desktop starfield: felt depth over the flat maroon ────────────────
+   Desktop-owned (this file): the wallpaper element stays shared-theme
+   territory, so the sky lives here on the glass itself. Two parallax
+   layers above the tube paint (z 0–1), below the work (z 6+):
+   ::before = far stars (small, dim, slow), ::after = near dust (larger,
+   softer, faster). Both drift on ease-in-out alternates — reversible
+   light that eases in and out. Motion always plays. */
+.state-desktop::before,
+.state-desktop::after {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  pointer-events: none;
+}
+.state-desktop::before {
+  z-index: 2;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(255, 238, 210, 0.9), transparent 62%),
+    radial-gradient(1px 1px at 22% 68%, rgba(190, 210, 235, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 31% 14%, rgba(255, 238, 210, 0.6), transparent 60%),
+    radial-gradient(2px 2px at 38% 82%, rgba(255, 220, 190, 0.75), transparent 62%),
+    radial-gradient(1px 1px at 45% 38%, rgba(255, 200, 220, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 52% 8%, rgba(190, 210, 235, 0.5), transparent 60%),
+    radial-gradient(1.5px 1.5px at 58% 58%, rgba(255, 238, 210, 0.8), transparent 62%),
+    radial-gradient(1px 1px at 64% 26%, rgba(255, 238, 210, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 70% 74%, rgba(190, 210, 235, 0.5), transparent 60%),
+    radial-gradient(2px 2px at 76% 12%, rgba(255, 228, 190, 0.85), transparent 62%),
+    radial-gradient(1px 1px at 82% 44%, rgba(255, 200, 220, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 88% 66%, rgba(255, 238, 210, 0.6), transparent 60%),
+    radial-gradient(1.5px 1.5px at 93% 28%, rgba(255, 238, 210, 0.75), transparent 62%),
+    radial-gradient(1px 1px at 6% 48%, rgba(190, 210, 235, 0.45), transparent 60%),
+    radial-gradient(1px 1px at 16% 88%, rgba(255, 238, 210, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 28% 40%, rgba(255, 238, 210, 0.45), transparent 60%),
+    radial-gradient(1px 1px at 34% 56%, rgba(190, 210, 235, 0.4), transparent 60%),
+    radial-gradient(2px 2px at 42% 6%, rgba(255, 228, 190, 0.7), transparent 62%),
+    radial-gradient(1px 1px at 48% 90%, rgba(255, 200, 220, 0.45), transparent 60%),
+    radial-gradient(1px 1px at 55% 72%, rgba(255, 238, 210, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 61% 42%, rgba(190, 210, 235, 0.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 67% 88%, rgba(255, 238, 210, 0.7), transparent 62%),
+    radial-gradient(1px 1px at 73% 52%, rgba(255, 238, 210, 0.45), transparent 60%),
+    radial-gradient(1px 1px at 79% 80%, rgba(255, 200, 220, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 85% 6%, rgba(190, 210, 235, 0.5), transparent 60%),
+    radial-gradient(1.5px 1.5px at 90% 90%, rgba(255, 228, 190, 0.65), transparent 62%),
+    radial-gradient(1px 1px at 95% 52%, rgba(255, 238, 210, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 3% 78%, rgba(255, 238, 210, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 25% 4%, rgba(190, 210, 235, 0.45), transparent 60%),
+    radial-gradient(1px 1px at 50% 24%, rgba(255, 238, 210, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 36% 30%, rgba(255, 238, 210, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 60% 82%, rgba(190, 210, 235, 0.4), transparent 60%),
+    radial-gradient(ellipse 58% 44% at 68% 30%, rgba(120, 30, 20, 0.22), transparent 70%),
+    radial-gradient(ellipse 48% 38% at 20% 74%, rgba(64, 12, 14, 0.32), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 84% 78%, rgba(40, 10, 26, 0.28), transparent 70%);
+  animation: desktop-star-drift 150s ease-in-out infinite alternate;
+}
+.state-desktop::after {
+  z-index: 3;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+    radial-gradient(5px 5px at 70% 60%, rgba(255, 220, 190, 0.13), transparent 70%),
+    radial-gradient(4px 4px at 18% 30%, rgba(200, 215, 240, 0.10), transparent 70%),
+    radial-gradient(6px 6px at 44% 76%, rgba(255, 210, 200, 0.09), transparent 70%),
+    radial-gradient(3px 3px at 86% 22%, rgba(255, 235, 210, 0.12), transparent 70%),
+    radial-gradient(4px 4px at 58% 12%, rgba(255, 205, 225, 0.08), transparent 70%),
+    radial-gradient(5px 5px at 8% 62%, rgba(255, 220, 190, 0.08), transparent 70%),
+    radial-gradient(3px 3px at 30% 52%, rgba(200, 215, 240, 0.09), transparent 70%),
+    radial-gradient(4px 4px at 78% 86%, rgba(255, 235, 210, 0.09), transparent 70%),
+    radial-gradient(3px 3px at 94% 58%, rgba(255, 205, 225, 0.08), transparent 70%),
+    radial-gradient(6px 6px at 52% 44%, rgba(255, 220, 190, 0.05), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% 46%, rgba(0, 0, 0, 0.30) 0%, transparent 78%);
+  animation: desktop-dust-drift 95s ease-in-out infinite alternate;
+}
+@keyframes desktop-star-drift {
+  from { transform: translate3d(-8px, 5px, 0); opacity: 0.82; }
+  to   { transform: translate3d(8px, -6px, 0); opacity: 1; }
+}
+@keyframes desktop-dust-drift {
+  from { transform: translate3d(14px, -8px, 0); opacity: 0.75; }
+  to   { transform: translate3d(-14px, 9px, 0); opacity: 1; }
+}
+
+/* weaver: the desktop as instrument (riason's game) */
+.weaver-toggle {
+  position: absolute;
+  right: 18px;
+  bottom: 64px;
+  z-index: 30;
+  font-family: inherit;
+  font-variant: small-caps;
+  letter-spacing: 0.15em;
+  background: rgba(20, 12, 6, 0.85);
+  border: 1px solid #6a4a28;
+  color: #e8c890;
+  border-radius: 14px;
+  padding: 4px 18px;
+  cursor: pointer;
+}
+.weaver-toggle.on { border-color: #ffd86a; color: #fff0d0; }
+.weaver-note {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  transform: translateX(-50%);
+  z-index: 31;
+  max-width: 480px;
+  background: linear-gradient(180deg, #1c0d08 0%, #100604 100%);
+  border: 1px solid #4a2818;
+  border-radius: 3px;
+  padding: 8px 14px;
+  font-style: italic;
+  color: #e8dcc0;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.weaver-note-who { font-variant: small-caps; letter-spacing: 0.15em; color: #aa7838; }
+.weaver-note-x {
+  background: none; border: 1px solid #5a3a1a; color: #aa7838;
+  border-radius: 4px; cursor: pointer; padding: 0 7px;
+}
+
+/* Riason's weaver is a piece of drafting vellum, not a neutral UI pill. */
+.weaver-toggle{right:18px;bottom:58px;background:linear-gradient(165deg,#eee0bd,#cdb98e);border:1px solid #7d6441;border-radius:2px;color:#26384b;font-family:'RiasonDialogue','VT323',monospace;font-size:11px;letter-spacing:.13em;box-shadow:2px 3px 0 rgba(0,0,0,.28);text-transform:lowercase}
+.weaver-toggle:before{content:'∴ ';color:#9a5f45}.weaver-toggle.on{background:#d4af65;color:#24150e;border-color:#ffe4a4}
+.weaver-note{background:transparent;border:0;border-bottom:1px solid rgba(232,209,174,.35);border-radius:0;padding:4px 0;color:rgba(232,209,174,.7);font:11px 'RiasonDialogue',monospace;box-shadow:none}
+.weaver-note-who{color:#9fbac7}

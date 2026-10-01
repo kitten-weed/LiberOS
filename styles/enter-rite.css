@@ -1,0 +1,217 @@
+/* enter-rite.css — the blank-dormant desktop + name ritual.
+   Covenant palette only: VOID #070403, CREAM #eadfc6, GOLD #d4af65.
+   Flicker is authored always-on (MOTION IS PART OF THE VACUI). */
+
+#enter-rite[hidden],
+#enter-backdrop[hidden],
+#enter-popup[hidden],
+#enter-build[hidden] { display: none !important; }
+
+/* dormant: the tube holds ONLY the enter-box */
+#desktop.enter-dormant > :not(.enter-rite) { display: none !important; }
+
+/* the cutscene mounts on .screen-stage beside #desktop — veil it whole
+   while dormant so the tube stays blank (hidden, never removed: the
+   cutscene's own timers keep their nodes). */
+.screen-stage.enter-veiled > :not(#desktop) { display: none !important; }
+
+body.enter-dormant-room .crt-bay,
+body.enter-dormant-room .crt-bay-well,
+body.enter-dormant-room .crt-weave,
+body.enter-dormant-room #settings-cog,
+body.enter-dormant-room #crt-bay-status { display: none !important; }
+
+body.enter-dormant-room > :not(.room):not(script):not(.pixi-runtime-canvas) { display: none !important; }
+.room.enter-dormant-room > :not(.machine) { display: none !important; }
+
+.enter-rite {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2a0000;
+}
+
+.enter-box {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 20px;
+  margin: 0;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.enter-box svg {
+  display: block;
+  width: 96px;
+  height: auto;
+  stroke: #eadfc6;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 101, 0.55));
+  animation: enter-flicker 3.4s steps(1, end) infinite;
+}
+
+.enter-box:focus-visible {
+  outline: 2px solid #d4af65;
+  outline-offset: 6px;
+}
+
+/* the signpost: the dormant tube explains itself. Same flicker family as
+   the glyph — one authored motion, shared phase. */
+.enter-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: 64%;
+  color: #eadfc6;
+  opacity: 0.55;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  animation: enter-flicker 3.4s steps(1, end) infinite;
+  pointer-events: none;
+}
+
+@keyframes enter-flicker {
+  0%, 100% { opacity: 1; }
+  7%  { opacity: 0.45; }
+  9%  { opacity: 1; }
+  31% { opacity: 1; }
+  33% { opacity: 0.6; }
+  35% { opacity: 1; }
+  58% { opacity: 1; }
+  59% { opacity: 0.35; }
+  61% { opacity: 0.9; }
+  63% { opacity: 1; }
+  84% { opacity: 0.7; }
+  86% { opacity: 1; }
+}
+
+.enter-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 4, 3, 0.72);
+  z-index: 61;
+}
+
+.enter-popup {
+  position: absolute;
+  z-index: 62;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: min(320px, 82%);
+  background: #160b08;
+  border: 1px solid #d4af65;
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+.enter-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: #eadfc6;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.enter-prompt {
+  margin: 0 0 14px;
+  color: #eadfc6;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.enter-name {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #eadfc6;
+  color: #eadfc6;
+  font-size: 18px;
+  line-height: 1.6;
+  padding: 4px 2px;
+  margin: 0 0 18px;
+  outline: none;
+  text-align: center;
+}
+
+.enter-name:focus-visible {
+  border-bottom-color: #d4af65;
+}
+
+.enter-proceed {
+  appearance: none;
+  background: transparent;
+  border: 1px solid #6a5a3a;
+  border-radius: 8px;
+  color: #6a5a3a;
+  font-size: 16px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 28px;
+  cursor: not-allowed;
+}
+
+.enter-proceed:disabled { opacity: 0.75; }
+
+.enter-proceed:not(:disabled) {
+  border-color: #d4af65;
+  color: #d4af65;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(212, 175, 101, 0.35);
+}
+
+.enter-proceed:not(:disabled):focus-visible,
+.enter-close:focus-visible {
+  outline: 2px solid #d4af65;
+  outline-offset: 2px;
+}
+
+.enter-build {
+  position: absolute;
+  z-index: 62;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.enter-build-box {
+  display: block;
+  width: 8px;
+  min-height: 64px;
+  margin: 0 auto 12px;
+  border: 2px solid #d4af65;
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(212, 175, 101, 0.35);
+}
+
+.enter-build-name {
+  display: block;
+  min-height: 24px;
+  color: #eadfc6;
+  font-size: 18px;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.08em;
+}

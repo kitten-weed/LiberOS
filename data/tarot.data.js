@@ -1,0 +1,229 @@
+// tarot.data.js — runtime mirror of data/tarot.json (file://-safe, no fetch).
+// Generated from tarot.json — keep in sync (see AGENTS.md data conventions).
+window.LIBER_DATA = window.LIBER_DATA || {};
+window.LIBER_DATA.tarot = {
+  "_source": "extracted from LiberOS src/features/divination/divination.js DECK array (22 authored card fragments; the author's 'key' line per card). LiberReference contains no per-card upright/reversed prose — gaps are marked, nothing invented.",
+  "_note": "upright[0] is the author's own fragment. keywords left empty where the source has none — extend only from the author's future writing.",
+  "cards": [
+    {
+      "id": "fool",
+      "name": "the fool",
+      "n": 0,
+      "g": "O",
+      "keywords": [],
+      "upright": [
+        "a step taken without map"
+      ]
+    },
+    {
+      "id": "magician",
+      "name": "the magician",
+      "n": 1,
+      "g": "☽",
+      "keywords": [],
+      "upright": [
+        "will bent into form"
+      ]
+    },
+    {
+      "id": "high-priestess",
+      "name": "the high priestess",
+      "n": 2,
+      "g": "⚮",
+      "keywords": [],
+      "upright": [
+        "what is hidden, kept"
+      ]
+    },
+    {
+      "id": "empress",
+      "name": "the empress",
+      "n": 3,
+      "g": "♀",
+      "keywords": [],
+      "upright": [
+        "a body that bears"
+      ]
+    },
+    {
+      "id": "emperor",
+      "name": "the emperor",
+      "n": 4,
+      "g": "♂",
+      "keywords": [],
+      "upright": [
+        "a line drawn and held"
+      ]
+    },
+    {
+      "id": "hierophant",
+      "name": "the hierophant",
+      "n": 5,
+      "g": "⌘",
+      "keywords": [],
+      "upright": [
+        "the old teaching"
+      ]
+    },
+    {
+      "id": "lovers",
+      "name": "the lovers",
+      "n": 6,
+      "g": "⚥",
+      "keywords": [],
+      "upright": [
+        "two become a question"
+      ]
+    },
+    {
+      "id": "chariot",
+      "name": "the chariot",
+      "n": 7,
+      "g": "⚔",
+      "keywords": [],
+      "upright": [
+        "force, harnessed"
+      ]
+    },
+    {
+      "id": "strength",
+      "name": "strength",
+      "n": 8,
+      "g": "Ω",
+      "keywords": [],
+      "upright": [
+        "softness against the throat"
+      ]
+    },
+    {
+      "id": "hermit",
+      "name": "the hermit",
+      "n": 9,
+      "g": "⌬",
+      "keywords": [],
+      "upright": [
+        "the lamp, the corridor"
+      ]
+    },
+    {
+      "id": "wheel-of-fortune",
+      "name": "wheel of fortune",
+      "n": 10,
+      "g": "☸",
+      "keywords": [],
+      "upright": [
+        "it turns, indifferent"
+      ]
+    },
+    {
+      "id": "justice",
+      "name": "justice",
+      "n": 11,
+      "g": "⚖",
+      "keywords": [],
+      "upright": [
+        "the weight, returned"
+      ]
+    },
+    {
+      "id": "hanged-man",
+      "name": "the hanged man",
+      "n": 12,
+      "g": "⚓",
+      "keywords": [],
+      "upright": [
+        "let go, downward"
+      ]
+    },
+    {
+      "id": "death",
+      "name": "death",
+      "n": 13,
+      "g": "✝",
+      "keywords": [],
+      "upright": [
+        "an ending, named"
+      ]
+    },
+    {
+      "id": "temperance",
+      "name": "temperance",
+      "n": 14,
+      "g": "⚗",
+      "keywords": [],
+      "upright": [
+        "two waters, one cup"
+      ]
+    },
+    {
+      "id": "devil",
+      "name": "the devil",
+      "n": 15,
+      "g": "⌖",
+      "keywords": [],
+      "upright": [
+        "the chain you did not see"
+      ]
+    },
+    {
+      "id": "tower",
+      "name": "the tower",
+      "n": 16,
+      "g": "⚡",
+      "keywords": [],
+      "upright": [
+        "the structure, broken"
+      ]
+    },
+    {
+      "id": "star",
+      "name": "the star",
+      "n": 17,
+      "g": "★",
+      "keywords": [],
+      "upright": [
+        "small light, far"
+      ]
+    },
+    {
+      "id": "moon",
+      "name": "the moon",
+      "n": 18,
+      "g": "☾",
+      "keywords": [],
+      "upright": [
+        "things, in water"
+      ]
+    },
+    {
+      "id": "sun",
+      "name": "the sun",
+      "n": 19,
+      "g": "☀",
+      "keywords": [],
+      "upright": [
+        "open, burning"
+      ]
+    },
+    {
+      "id": "judgement",
+      "name": "judgement",
+      "n": 20,
+      "g": "♪",
+      "keywords": [],
+      "upright": [
+        "a sound, far off"
+      ]
+    },
+    {
+      "id": "world",
+      "name": "the world",
+      "n": 21,
+      "g": "O",
+      "keywords": [],
+      "upright": [
+        "a circle, closed"
+      ]
+    }
+  ]
+};

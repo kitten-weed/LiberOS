@@ -1,0 +1,772 @@
+/* divination.css — Arcana's tent. The felt table IS the screen.
+   Deep red felt, chalk rim, a deck with weight, three brass coins.
+   No imports, no shared variables (covenant: personality through material).
+   JS contract (divination.js): .divination-mode (tabs), .divination-deck,
+   .deck-card (settle transforms), .divination-reading-place, .divination-card,
+   .divination-coin-dish, .coin (toss), .divination-hexagram-row/.seg,
+   .divination-slate (reversible chalk), #divination-save-prompt.open,
+   #divination-raison.open. Dress AROUND those, never their internals. */
+
+.divination-app {
+  --felt-hi: #6b0e18;
+  --felt: #4a0810;
+  --felt-lo: #2a040a;
+  --canvas: #170509;
+  --chalk: #eee6d4;
+  --chalk-dim: rgba(238, 230, 212, 0.55);
+  --chalk-faint: rgba(238, 230, 212, 0.28);
+  --brass: #c8a850;
+  --brass-lo: #7a5c20;
+  --wood: #241108;
+  --wood-hi: #3d2416;
+  position: absolute; inset: 0;
+  color: var(--chalk);
+  font-family: 'EB Garamond', Garamond, 'Times New Roman', serif;
+  background:
+    /* tent canvas: seams and a hint of the poles at the corners */
+    linear-gradient(112deg, transparent 46%, rgba(0,0,0,0.5) 47% 48%, transparent 49%) 0 0 / 340px 340px,
+    radial-gradient(38% 30% at 0% 0%, rgba(107, 14, 24, 0.35), transparent 70%),
+    radial-gradient(38% 30% at 100% 0%, rgba(107, 14, 24, 0.35), transparent 70%),
+    linear-gradient(180deg, #1c070c 0%, var(--canvas) 55%, #0d0305 100%);
+  overflow: hidden;
+}
+
+/* ── the lantern: one warm cone from above the table ── */
+.divination-lamp {
+  position: absolute; left: 50%; top: -12%; transform: translateX(-50%);
+  width: 130%; height: 74%;
+  background: radial-gradient(46% 60% at 50% 0%, rgba(255, 214, 150, 0.16), rgba(255, 190, 120, 0.05) 45%, transparent 70%);
+  pointer-events: none;
+}
+.divination-lamp::after {
+  content: ''; position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffe8b0, #d8a850 55%, #6a4a14);
+  box-shadow: 0 0 18px 6px rgba(255, 210, 130, 0.35);
+}
+
+/* ── the felt table: edge to edge, its wooden rim at the bottom ── */
+.divination-felt {
+  position: absolute; inset: 44px 26px 0;
+  border-radius: 18px 18px 0 0;
+  background:
+    /* felt nap: crossed thread grain catching the lamp */
+    repeating-linear-gradient(48deg, rgba(255, 225, 200, 0.022) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-44deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 5px),
+    radial-gradient(60% 46% at 50% 6%, rgba(160, 40, 52, 0.34), transparent 62%),
+    radial-gradient(90% 70% at 50% 108%, rgba(0, 0, 0, 0.6), transparent 58%),
+    linear-gradient(172deg, var(--felt-hi) 0%, var(--felt) 38%, var(--felt-lo) 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 200, 0.09),
+    inset 0 0 46px rgba(0, 0, 0, 0.55),
+    0 -1px 0 rgba(0, 0, 0, 0.8);
+}
+/* the wooden rim the felt stretches over, at the foot of the table */
+.divination-felt::after {
+  content: ''; position: absolute; left: -6px; right: -6px; bottom: -12px; height: 14px;
+  border-radius: 3px; pointer-events: none;
+  background: linear-gradient(180deg, var(--wood-hi), var(--wood) 60%, #150a05);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 220, 180, 0.12);
+}
+/* a worn patch where the deck has sat for years */
+.divination-felt::before {
+  content: ''; position: absolute; left: 8.5%; top: 34%; width: 150px; height: 118px;
+  border-radius: 12px;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(0, 0, 0, 0.28), transparent 72%);
+  pointer-events: none;
+}
+
+/* ── the chalk rim: a chalked border carrying the question slate ── */
+.divination-rim {
+  position: absolute; top: 10px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 12px; align-items: center;
+  z-index: 3;
+}
+.divination-rim-note {
+  font-size: 1rem; letter-spacing: 0.22em; color: var(--chalk);
+  font-style: normal;
+}
+/* rainy nights: the sideways catch — chalk under the rim note, there for
+   six seconds, then gone. Opacity only; instant under reduced motion. */
+.divination-rim-sideways {
+  display: block;
+  font-size: 0.85rem; letter-spacing: 0.14em; font-style: italic;
+  color: var(--chalk-dim);
+  min-height: 1.2em;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.divination-rim-sideways.shown { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .divination-rim-sideways { transition: none; }
+}
+.divination-slate {
+  width: min(430px, 62%);
+  background:
+    radial-gradient(80% 100% at 22% 18%, rgba(255,255,255,0.045), transparent 60%),
+    linear-gradient(170deg, #223226, #18241c 70%, #101a14);
+  border: 1px solid rgba(238, 230, 212, 0.16);
+  border-radius: 4px;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.6), inset 0 0 16px rgba(0, 0, 0, 0.5);
+  transform: rotate(-0.6deg);
+}
+/* the question, in chalk. .turned rotates it to face the house (the reader
+   across the table) — reversibility made literal */
+.divination-input {
+  width: 100%; border: none; background: transparent; outline: none;
+  padding: 9px 14px;
+  font-family: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', cursive;
+  font-size: 1rem; font-style: normal; color: var(--chalk);
+  caret-color: var(--chalk);
+  text-overflow: clip;
+  transition: transform 0.5s ease;
+}
+.divination-input::placeholder { color: rgba(238, 230, 212, 0.8); font-style: normal; opacity: 1; }
+.divination-slate.turned .divination-input { transform: rotate(180deg); }
+
+/* ── the two ways: chalk-lettered tabs ── */
+.divination-modes {
+  position: absolute; top: 62px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 14px; z-index: 3;
+}
+.divination-mode {
+  border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 1rem; letter-spacing: 0.3em;
+  color: var(--chalk-faint);
+  min-height: 44px; padding: 10px 14px; position: relative;
+  transition: color 0.25s ease;
+}
+.divination-mode::after {
+  content: ''; position: absolute; left: 8%; right: 8%; bottom: 4px; height: 2px;
+  background: var(--chalk-dim);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+  transform-origin: left;
+}
+.divination-mode.active { color: var(--chalk); }
+.divination-mode.active::after { transform: scaleX(1); height: 3px; background: var(--chalk); box-shadow: 0 0 6px rgba(238, 230, 212, 0.35); }
+.divination-mode:hover { color: var(--chalk-dim); }
+
+/* ── the table surface ── */
+.divination-table { position: absolute; inset: 96px 30px 26px; }
+
+/* ── tarot: the deck is a stack with weight; the reading place is centre-right ── */
+.divination-tarot { position: absolute; inset: 0; }
+
+.divination-deck {
+  position: absolute; left: 7%; top: 26%;
+  width: 128px; height: 196px;
+  border: none; background: transparent; cursor: pointer; padding: 0;
+}
+.deck-card {
+  position: absolute; inset: 0; display: block;
+  border-radius: 7px;
+  background:
+    radial-gradient(58% 42% at 50% 34%, rgba(106, 10, 20, 0.16), transparent 74%),
+    linear-gradient(180deg, #f2e6cc 0%, #e2d2ac 58%, #c9b68c 100%);
+  border: 1px solid #5a0a12;
+  box-shadow:
+    inset 0 0 0 3px #5a0a12,
+    inset 0 0 0 4px rgba(244, 232, 210, 0.85),
+    0 2px 5px rgba(0, 0, 0, 0.55);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.deck-card.l3 { transform: translate(-7px, -5px) rotate(-4.2deg); filter: brightness(0.86); }
+.deck-card.l2 { transform: translate(-3px, -2px) rotate(2.1deg); filter: brightness(0.93); }
+.deck-card.l1 { transform: translate(2px, 1px) rotate(-1.2deg); filter: brightness(0.97); }
+/* the reversible back: a mirrored eye, revealed on hover */
+.deck-card.top::after {
+  content: ''; position: absolute; inset: 12px; border-radius: 4px;
+  border: 1px solid rgba(90, 10, 18, 0.55);
+  background:
+    radial-gradient(circle at 50% 44%, transparent 34%, rgba(90, 10, 18, 0.28) 35% 37%, transparent 38%),
+    radial-gradient(circle at 50% 44%, rgba(90, 10, 18, 0.30) 0 11%, transparent 12%),
+    repeating-linear-gradient(0deg, transparent 0 5px, rgba(90, 10, 18, 0.07) 5px 6px),
+    repeating-linear-gradient(90deg, transparent 0 5px, rgba(90, 10, 18, 0.07) 5px 6px);
+}
+.divination-deck:hover .deck-card.top,
+.divination-deck:focus-visible .deck-card.top {
+  transform: translateY(-7px) rotate(-1.2deg);
+  box-shadow:
+    inset 0 0 0 3px #5a0a12,
+    inset 0 0 0 4px rgba(244, 232, 210, 0.85),
+    0 9px 16px rgba(0, 0, 0, 0.55),
+    0 0 14px rgba(255, 214, 150, 0.18);
+}
+/* the draw itself: the top card lifts off, the stack relaxes onto it */
+.divination-deck.drawing .deck-card.top { transform: translateY(-26px) rotate(-6deg) scale(1.04); opacity: 0; transition-duration: 0.22s; }
+.divination-deck.drawing .deck-card.l1 { transform: none; filter: none; }
+.divination-deck.drawing .deck-card.l2 { transform: translate(2px, 1px) rotate(-1.2deg); filter: brightness(0.97); }
+.divination-deck:focus-visible { outline: 2px solid rgba(255, 214, 150, 0.5); outline-offset: 4px; border-radius: 7px; }
+.deck-band {
+  position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%) rotate(-2deg);
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.5rem; line-height: 1.5; letter-spacing: 0.08em;
+  color: var(--chalk-faint); text-align: center; white-space: nowrap;
+}
+
+/* the deck's count, chalked on the felt beside it */
+.divination-tally {
+  position: absolute; left: 8.2%; top: 20%;
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.62rem; letter-spacing: 0.14em; color: var(--chalk-faint);
+  transform: rotate(-3deg);
+}
+
+/* the reading place: where the drawn card lands, misaligned */
+.divination-reading-place {
+  position: absolute; right: 9%; top: 22%;
+  width: 220px; height: 330px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+/* the kept record's own number — the book's hand, not the deck's */
+.divination-seed {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.72rem; letter-spacing: 0.14em; color: var(--chalk-dim);
+  text-align: center; min-height: 1em; transform: rotate(-1.2deg);
+  max-width: 100%; overflow-wrap: anywhere;
+}
+.divination-chalk-eye {
+  position: absolute; inset: -8% -14%;
+  width: 128%; height: 116%; opacity: 0.5;
+}
+.divination-card-hint {
+  font-style: normal; font-size: 1rem; color: var(--chalk);
+  letter-spacing: 0.08em; transform: rotate(-2deg); text-align: center;
+  max-width: 100%;
+}
+
+/* the drawn card itself: heavy, settled a degree off true */
+.divination-card {
+  position: relative; width: 186px; height: 292px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f6ecd4 0%, #ecdfc0 62%, #d6c69e 100%);
+  border: 1px solid #4a0810;
+  box-shadow:
+    inset 0 0 0 4px #4a0810,
+    inset 0 0 0 5px rgba(244, 232, 210, 0.9),
+    0 7px 18px rgba(0, 0, 0, 0.6);
+  transform: rotate(-1.8deg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; padding: 18px 14px;
+  animation: settle 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes settle {
+  0%   { transform: translate(-160px, -30px) rotate(-14deg); box-shadow: 0 14px 24px rgba(0,0,0,0.7); }
+  70%  { transform: translate(4px, 2px) rotate(-0.6deg); }
+  100% { transform: translate(0, 0) rotate(-1.8deg); }
+}
+.divination-card-num {
+  position: absolute; top: 12px; left: 0; right: 0;
+  font-size: 0.6rem; letter-spacing: 0.34em; color: #6a1020; text-align: center;
+}
+.divination-card-glyph {
+  font-size: 3.6rem; line-height: 1; color: #3c0a14;
+  text-shadow: 0 1px 0 rgba(255, 250, 235, 0.7);
+}
+.divination-card-name {
+  font-variant: small-caps; letter-spacing: 0.2em;
+  font-size: 1.02rem; color: #38100a; text-align: center;
+}
+.divination-card-key {
+  font-style: italic; font-size: 0.78rem; color: #6a4030; text-align: center;
+}
+.divination-card-lens {
+  font-style: italic; font-size: 0.66rem; line-height: 1.5; color: #7a5a44; text-align: center;
+  padding: 0 6px;
+}
+.divination-card-stamped {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  font-size: 0.52rem; letter-spacing: 0.22em; color: rgba(90, 10, 18, 0.6);
+  text-align: center;
+}
+
+/* arcana's grief line, chalked low on the felt */
+.divination-grief {
+  position: absolute; right: 9%; bottom: 6px;
+  font-style: italic; font-size: 0.74rem; color: var(--chalk-faint);
+  letter-spacing: 0.1em; transform: rotate(-1.4deg);
+}
+.divination-grief em { color: var(--chalk-dim); font-style: normal; }
+
+/* ── i ching: the coin dish and the chalked column ── */
+.divination-iching { position: absolute; inset: 0; }
+
+.divination-coin-dish {
+  position: absolute; left: 9%; top: 24%;
+  width: 150px; height: 150px; border-radius: 50%;
+  border: none; cursor: pointer; padding: 0;
+  background:
+    radial-gradient(circle at 42% 34%, rgba(255, 235, 190, 0.06), transparent 62%),
+    radial-gradient(circle at 50% 58%, rgba(0, 0, 0, 0.4), transparent 74%),
+    #34160e;
+  box-shadow:
+    inset 0 3px 9px rgba(0, 0, 0, 0.75),
+    inset 0 -2px 4px rgba(255, 220, 180, 0.08),
+    0 5px 12px rgba(0, 0, 0, 0.55),
+    0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+.divination-coin-dish:focus-visible { outline: 2px solid rgba(255, 214, 150, 0.5); outline-offset: 4px; }
+.dish-stain {
+  position: absolute; left: 16%; bottom: 12%; width: 44px; height: 12px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(30, 12, 6, 0.6), transparent 70%);
+  transform: rotate(-8deg);
+}
+.coin {
+  position: absolute; width: 34px; height: 34px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, #ffe9a8, #d8b458 42%, #96742a 78%, #5c4214);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.65), inset 0 0 0 2px rgba(90, 62, 14, 0.7), inset 0 1px 1px rgba(255, 240, 200, 0.6);
+  transition: transform 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+.coin::after {
+  content: ''; position: absolute; inset: 9px; border-radius: 50%;
+  border: 1.5px solid rgba(90, 62, 14, 0.55);
+}
+.coin.c1 { left: 24px; top: 52px; }
+.coin.c2 { left: 66px; top: 66px; }
+.coin.c3 { left: 88px; top: 40px; }
+/* mid-toss: the coins lift and scatter (JS adds .tossing, removes after) */
+.divination-coin-dish.tossing .c1 { transform: translate(-9px, -34px) rotate(-70deg); transition-duration: 0.18s; }
+.divination-coin-dish.tossing .c2 { transform: translate(4px, -44px) rotate(84deg); transition-duration: 0.22s; }
+.divination-coin-dish.tossing .c3 { transform: translate(12px, -28px) rotate(-40deg); transition-duration: 0.16s; }
+.divination-coin-dish.tossing { cursor: wait; }
+
+/* the hexagram, chalked bottom-up in its column */
+.divination-hex-column {
+  position: absolute; left: 50%; top: 10%; transform: translateX(-58%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.divination-hexagram {
+  display: flex; flex-direction: column-reverse; gap: 9px;
+  min-height: 208px; justify-content: flex-end;
+  padding: 10px 26px;
+}
+.divination-hexagram-empty {
+  font-style: normal; color: var(--chalk); font-size: 1rem;
+  transform: rotate(-1.6deg); letter-spacing: 0.06em;
+}
+.divination-hexagram-row {
+  position: relative;
+  display: flex; gap: 10px; height: 12px; width: 148px;
+  animation: chalkline 0.4s ease both;
+}
+/* a changing line carries a small chalk ring at its end — old yang about
+   to fall, old yin about to rise */
+.divination-hexagram-row.changing::after {
+  content: ''; position: absolute; right: -20px; top: 50%;
+  width: 8px; height: 8px; margin-top: -5px;
+  border: 1.6px solid var(--chalk-dim); border-radius: 50%;
+}
+@keyframes chalkline {
+  0% { opacity: 0; transform: translateY(6px); filter: blur(1px); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+.divination-hexagram-seg {
+  flex: 1; border-radius: 3px;
+  background:
+    linear-gradient(92deg, transparent 2%, rgba(238, 230, 212, 0.1) 6%, transparent 9%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 40%),
+    repeating-linear-gradient(90deg, var(--chalk) 0 7px, rgba(238, 230, 212, 0.82) 7px 9px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.divination-hexagram-seg.left  { flex: 0 0 42%; }
+.divination-hexagram-seg.right { flex: 0 0 42%; margin-left: auto; }
+
+.divination-cast-note {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.6rem; letter-spacing: 0.16em; color: var(--chalk-faint);
+  min-height: 1em; transform: rotate(-1.2deg);
+}
+
+.divination-iching-result {
+  position: absolute; right: 7%; top: 16%; width: 250px;
+  text-align: center; transform: rotate(-1.2deg);
+  animation: chalkfade 0.6s ease both;
+}
+@keyframes chalkfade { from { opacity: 0; } to { opacity: 1; } }
+.divination-iching-name {
+  font-variant: small-caps; letter-spacing: 0.22em; font-size: 1.14rem;
+  color: var(--chalk); margin-bottom: 8px;
+}
+.divination-iching-desc {
+  font-style: normal; font-size: 1rem; line-height: 1.55; color: var(--chalk);
+}
+.divination-iching-num {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.72rem; letter-spacing: 0.18em; color: var(--chalk-dim);
+  margin-bottom: 6px;
+}
+.divination-iching-lens {
+  font-style: italic; font-size: 0.86rem; line-height: 1.55; color: var(--chalk-dim);
+  margin-top: 8px;
+}
+
+/* ── arcana's edge of the table: the tells ── */
+.divination-edge {
+  position: absolute; left: 26px; bottom: 10px; right: 26px; height: 40px;
+  display: flex; align-items: flex-end; gap: 26px; z-index: 2; pointer-events: none;
+}
+.tell { position: relative; display: block; }
+/* the cold tea, half-drunk — and a card under it that is not hers */
+.tell.teacup { width: 34px; height: 26px; margin-bottom: 8px; }
+.tell.teacup::before {
+  content: ''; position: absolute; inset: 0;
+  border-radius: 4px 4px 12px 12px;
+  background: linear-gradient(180deg, #4a3a2c, #2c2018 70%);
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5);
+}
+.tell.teacup::after {
+  content: ''; position: absolute; right: -9px; top: 5px;
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 3px solid #4a3a2c; border-top-color: transparent;
+  transform: rotate(24deg);
+}
+.tell.teacup .stain {
+  position: absolute; left: -14px; bottom: -7px; width: 52px; height: 10px;
+  border-radius: 50%; border: 2px solid rgba(60, 30, 16, 0.4);
+}
+.tell.teacup .foreign-card {
+  position: absolute; left: 26px; bottom: -4px; width: 26px; height: 38px;
+  border-radius: 2px; transform: rotate(14deg);
+  background: linear-gradient(180deg, #dce4e8, #b8c4cc);
+  border: 1px solid #5a6a72;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+.tell.chalk-stub {
+  width: 22px; height: 9px; margin-bottom: 12px;
+  border-radius: 3px; transform: rotate(-18deg);
+  background: linear-gradient(90deg, #eee6d4, #cfc4a8 78%, #b8ac90);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+}
+.tell.pin-note {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.5625rem; letter-spacing: 0.06em; color: var(--chalk-faint);
+  margin-left: auto; transform: rotate(1.6deg); text-align: right;
+  max-width: 300px; line-height: 1.5;
+}
+
+/* ── the keep prompt: parchment scrap, same for cards and hexagrams ── */
+.divination-save-prompt {
+  position: absolute; inset: 0; z-index: 8;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 2, 4, 0.72);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.divination-save-prompt.open { opacity: 1; pointer-events: auto; }
+.divination-save-prompt-inner {
+  width: min(470px, 88%);
+  background: linear-gradient(175deg, #efe3c6, #e0d0ac 68%, #cdbd96);
+  border: 1px solid #5a0a12;
+  border-radius: 3px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.75), inset 0 0 0 3px rgba(90, 10, 18, 0.22);
+  transform: rotate(-0.8deg);
+  padding: 14px 18px 16px;
+  color: #38100a;
+}
+.divination-save-prompt-head {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.divination-save-prompt-name {
+  font-variant: small-caps; letter-spacing: 0.3em; font-size: 0.86rem; color: #5a0a12;
+}
+.divination-save-prompt-close {
+  border: none; background: transparent; color: #5a0a12; font-size: 1.2rem;
+  cursor: pointer; line-height: 1; min-width: 44px; min-height: 44px; padding: 10px;
+}
+.divination-save-prompt-body {
+  min-height: 120px; display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-style: italic; font-size: 0.9rem; color: #4a2818; text-align: center;
+}
+.divination-prompt-card { display: flex; gap: 16px; align-items: center; }
+.divination-prompt-card-face {
+  width: 92px; height: 144px; flex: 0 0 auto;
+  border-radius: 5px; background: linear-gradient(180deg, #f6ecd4, #d6c69e);
+  border: 1px solid #4a0810; box-shadow: inset 0 0 0 3px #4a0810, 0 4px 10px rgba(0,0,0,0.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  transform: rotate(-2deg);
+}
+.divination-prompt-card-num { font-size: 0.5rem; letter-spacing: 0.3em; color: #6a1020; }
+.divination-prompt-card-glyph { font-size: 2rem; color: #3c0a14; }
+.divination-prompt-card-name { font-variant: small-caps; font-size: 0.72rem; letter-spacing: 0.14em; color: #38100a; text-align: center; padding: 0 6px; }
+.divination-prompt-card-read { text-align: left; max-width: 280px; }
+.divination-prompt-card-key { font-style: italic; font-size: 0.86rem; margin-bottom: 8px; color: #4a2818; }
+.divination-prompt-card-lens { font-style: italic; font-size: 0.78rem; line-height: 1.5; margin-bottom: 8px; color: #5a3a28; }
+.divination-prompt-card-q { font-size: 0.78rem; color: #6a4030; }
+.divination-prompt-card-q em { color: #38100a; font-style: normal; }
+.divination-save-prompt-actions { display: flex; gap: 12px; justify-content: center; margin-top: 12px; }
+.divination-save-prompt-keep,
+.divination-save-prompt-discard {
+  font-family: inherit; font-variant: small-caps; letter-spacing: 0.24em;
+  font-size: 0.86rem; padding: 12px 26px; min-height: 44px; cursor: pointer;
+  border-radius: 2px; transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.divination-save-prompt-keep {
+  background: #5a0a12; color: #f4e8d2; border: 1px solid #38060c;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+.divination-save-prompt-discard {
+  background: transparent; color: #5a0a12; border: 1px solid rgba(90, 10, 18, 0.55);
+}
+.divination-save-prompt-keep:hover, .divination-save-prompt-discard:hover { transform: translateY(-1px); }
+.divination-save-prompt-keep:active, .divination-save-prompt-discard:active { transform: translateY(1px); }
+
+/* ── arcana's note (the ? overlay) ── */
+.divination-raison {
+  position: absolute; inset: 0; z-index: 9;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 2, 4, 0.72);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.divination-raison.open { opacity: 1; pointer-events: auto; }
+.divination-raison-inner {
+  width: min(460px, 88%);
+  background:
+    radial-gradient(80% 100% at 22% 18%, rgba(255,255,255,0.05), transparent 60%),
+    linear-gradient(170deg, #223226, #18241c 70%, #101a14);
+  border: 1px solid rgba(238, 230, 212, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.75);
+  transform: rotate(-0.5deg);
+  padding: 16px 20px;
+  color: var(--chalk);
+}
+.divination-raison-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.divination-raison-name {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  letter-spacing: 0.2em; font-size: 0.9rem; color: var(--chalk-dim);
+}
+.divination-raison-close {
+  border: none; background: transparent; color: var(--chalk-dim); font-size: 1.2rem;
+  cursor: pointer; line-height: 1; min-width: 44px; min-height: 44px; padding: 10px;
+}
+.divination-raison-body {
+  font-family: 'Segoe Print', 'Bradley Hand', cursive;
+  font-size: 0.78rem; line-height: 1.85; color: var(--chalk-dim);
+  white-space: pre-line;
+}
+.raison-sign { display: block; text-align: right; margin-top: 6px; }
+
+/* ── the titlebar ── */
+.divination-titlebar {
+  position: absolute; top: 0; left: 0; right: 0; height: 34px; z-index: 5;
+  display: flex; align-items: center; gap: 12px; padding: 0 12px;
+  background: linear-gradient(180deg, rgba(30, 6, 12, 0.95), rgba(20, 3, 8, 0.92));
+  border-bottom: 1px solid rgba(255, 220, 200, 0.1);
+}
+.divination-titlebar-name { font-variant: small-caps; letter-spacing: 0.24em; font-size: 0.92rem; }
+.divination-titlebar-sub { font-style: italic; font-size: 0.72rem; color: var(--chalk-faint); letter-spacing: 0.1em; }
+.divination-help, .divination-exit {
+  margin-left: auto;
+  min-width: 44px; min-height: 44px; padding: 8px; border-radius: 50%;
+  border: 1px solid rgba(238, 230, 212, 0.3);
+  background: transparent; color: var(--chalk-dim);
+  font-family: inherit; font-size: 0.85rem; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.divination-exit { margin-left: 0; }
+.divination-help:hover, .divination-exit:hover { background: rgba(238, 230, 212, 0.1); color: var(--chalk); }
+.divination-help:active, .divination-exit:active { transform: translateY(1px); }
+
+/* focus, everywhere it matters */
+.divination-input:focus-visible { outline: none; box-shadow: inset 0 0 0 1px rgba(238,230,212,0.35); border-radius: 3px; }
+.divination-mode:focus-visible,
+.divination-save-prompt-close:focus-visible,
+.divination-save-prompt-keep:focus-visible,
+.divination-save-prompt-discard:focus-visible,
+.divination-raison-close:focus-visible,
+.divination-help:focus-visible, .divination-exit:focus-visible {
+  outline: 2px solid rgba(255, 214, 150, 0.55); outline-offset: 2px;
+}
+
+/* ── stillness for reduced-motion visitors: the function survives ── */
+@media (prefers-reduced-motion: reduce) {
+  .divination-lamp { display: none; }
+  .divination-card { animation: none; transform: rotate(-1.8deg); }
+  .divination-hexagram-row { animation: none; }
+  .divination-iching-result { animation: none; }
+  .divination-input, .deck-card, .coin,
+  .divination-mode, .divination-mode::after,
+  .divination-save-prompt, .divination-raison,
+  .divination-save-prompt-keep, .divination-save-prompt-discard {
+    transition: none !important;
+  }
+  .divination-coin-dish.tossing .c1, .divination-coin-dish.tossing .c2, .divination-coin-dish.tossing .c3 {
+    transform: none; transition: none;
+  }
+}
+
+/* ── the tent at 439px: the table narrows, the deck and the reading stack ── */
+@media (max-width: 700px), (max-height: 560px) {
+  /* the tent at small tables: the felt becomes a scroll of the page.
+     the table abandons absolute placement and stacks in reading order. */
+  .divination-felt { inset: 36px 10px 0; overflow-y: auto; }
+  .divination-rim { position: static; flex-direction: column; gap: 3px; padding: 8px 0 0; }
+  .divination-slate { width: 92%; }
+  .divination-rim-note { font-size: 1rem; }
+  .divination-modes { position: static; transform: none; justify-content: center; margin: 8px 0 4px; }
+  .divination-table { position: static; inset: auto; padding: 6px 14px 18px; }
+
+  /* tarot: deck beside the reading place, both centred */
+  .divination-tarot[hidden], .divination-iching[hidden] { display: none; }
+  .divination-tarot { position: relative; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: flex-start; }
+  .divination-deck { position: relative; left: auto; top: auto; width: 88px; height: 135px; }
+  .deck-band { bottom: -30px; font-size: 0.42rem; }
+  .divination-tally { position: static; order: 1; flex-basis: 100%; text-align: center; }
+  .divination-reading-place { position: relative; right: auto; top: auto; width: min(46vw, 160px); height: auto; min-height: 220px; }
+  .divination-card { width: 124px; height: 196px; }
+  .divination-card-glyph { font-size: 2.2rem; }
+  .divination-card-name { font-size: 0.78rem; }
+  .divination-card-key { font-size: 0.62rem; }
+  .divination-grief { position: static; order: 2; flex-basis: 100%; text-align: center; font-size: 0.62rem; }
+
+  /* i ching: dish above the column, reading last — flow, no collisions */
+  .divination-iching { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .divination-coin-dish { position: relative; left: auto; top: auto; width: 104px; height: 104px; }
+  .coin { width: 25px; height: 25px; }
+  .coin.c1 { left: 14px; top: 38px; }
+  .coin.c2 { left: 46px; top: 48px; }
+  .coin.c3 { left: 64px; top: 30px; }
+  .divination-hex-column { position: relative; transform: none; align-items: center; }
+  .divination-hexagram { min-height: 120px; }
+  .divination-hexagram-row { width: 100px; height: 9px; }
+  .divination-hexagram-row.changing::after { right: -15px; width: 6px; height: 6px; margin-top: -4px; }
+  .divination-cast-note { text-align: center; }
+  .divination-iching-result { position: static; width: min(340px, 92%); text-align: center; }
+  .divination-iching-name { font-size: 0.9rem; }
+  .divination-iching-desc { font-size: 1rem; }
+  .divination-iching-num { font-size: 0.66rem; }
+  .divination-iching-lens { font-size: 0.78rem; }
+  .divination-card-lens { font-size: 0.58rem; }
+  .divination-seed { font-size: 0.68rem; }
+
+  /* the edge tells clear out — the small table needs the room */
+  .divination-edge { display: none; }
+  .divination-titlebar-sub { display: none; }
+}
+
+/* Rainy Day (s.shadowOn) - the felt table's own weather.
+   The lantern goes cold: the felt blues and deepens, the brass takes the
+   light of a wet window instead of a flame, the rim wood goes black. The
+   cards still turn. A real palette shift, not an opacity wash; the machine
+   layer that dims the glass lives in styles/shadow.css. */
+.machine.shadow-on .divination-app {
+  --felt-hi: #48203a;
+  --felt: #2b0f22;
+  --felt-lo: #150612;
+  --canvas: #0b0510;
+  --chalk: #dde6ef;
+  --chalk-dim: rgba(221, 230, 239, 0.55);
+  --chalk-faint: rgba(221, 230, 239, 0.28);
+  --brass: #97aec2;
+  --brass-lo: #4e6070;
+  --wood: #120f10;
+  --wood-hi: #242022;
+}
+
+/* ── Riason's artifact-birth demo (tutorial stage 'divdemo') ──
+   Fake copy of the tent, same contract as the buddy demo in sigil.css:
+   a veil that denies, a blue wireframe bar, a burst on the felt. Writes
+   nothing; the kept prompt is unwound, not kept. */
+.divination-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: transparent;
+}
+.divination-veil.deny { background: rgba(192, 30, 30, 0.1); }
+.divination-demo {
+  position: fixed;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  width: min(82%, 480px);
+  z-index: 61;
+  background: linear-gradient(180deg, #0a1420 0%, #060a10 100%);
+  border: 2px solid #4a8aaa;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(74, 138, 170, 0.2), 0 0 22px rgba(74, 138, 170, 0.3);
+  padding: 12px 16px;
+}
+.divination-demo-voice {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  color: #4a8aaa;
+  margin-bottom: 4px;
+}
+.divination-demo-line {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 1.05rem;
+  color: #cfe2f5;
+  line-height: 1.5;
+}
+.divination-demo-next {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #4a8aaa;
+  color: #cfe2f5;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  padding: 3px 18px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.divination-demo-next:hover { background: rgba(74, 138, 170, 0.18); }
+.divination-demo-next:focus-visible { outline: 2px solid #cfe2f5; outline-offset: 2px; }
+#divination-save-prompt-keep.demo-hit {
+  border-color: #e8c890;
+  color: #e8c890;
+  box-shadow: 0 0 14px rgba(232, 200, 144, 0.6);
+}
+/* the birth burst: chalk bits thrown off the felt, transform + opacity only */
+.div-demo-burst {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+.div-demo-bit {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3da 0%, #ff6aa8 55%, transparent 75%);
+  box-shadow: 0 0 12px rgba(255, 106, 168, 0.9);
+  animation: div-demo-fly 0.95s ease-out forwards;
+}
+@keyframes div-demo-fly {
+  from { opacity: 1; transform: translate(0, 0) scale(1); }
+  to { opacity: 0; transform: translate(calc(var(--dx, 0) * 135px), calc(var(--dy, 0) * 135px)) scale(0.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .div-demo-bit { animation: none; opacity: 0; }
+}
+
+/* the tutorial's curtain (2.13.0): the tent opens from black on the side
+   the stone's curtain closed, and closes the same way for the desktop */
+.div-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.div-curtain.go { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .div-curtain { transition: none; }
+}

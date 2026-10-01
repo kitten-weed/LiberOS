@@ -1,0 +1,126 @@
+/* ============================================================================
+   bezel.css — the 12 carvings etched around the screen
+
+   Each carving is a small symbol placed at a position around the bezel.
+   They sit faintly (low opacity) and gain a soft glow when their
+   corresponding visitor's theme is active. The order is the arrival
+   order, going clockwise from top.
+
+   Carving set (in arrival order):
+     1. stone         — Mistress Physius (hermit, hermetic)
+     2. thread        — Cordelia (weaver, scholar)
+     3. candle        — Théophile (mystic, poet)
+     4. bell          — Beauregard (mountebank, charlatan)
+     5. glyph         — Xenon (linguist, cryptographer)
+     6. bulb          — Volt (electrician, light-bearer)
+     7. tower-rev     — Arcana (tarot, melancholic)
+     8. hole-punch    — Lolita (auntie, scrapbooker)
+     9. nib           — Vitreous (ink, scribe)
+    10. compass       — The Operator (cartographer)
+    11. grate         — Conseil (council, judge)
+    12. hook          — Pete (ravager, undertaker)
+
+   The carvings sit in the bezel padding, around the screen, etched in
+   a deeper brown against the beige plastic. Active = the corresponding
+   app is open OR the user has visited it most recently.
+   ============================================================================ */
+
+.bezel {
+  --carving-size: 22px;
+}
+
+/* A carving is a small inline-SVG container. We use SVG paths for each
+   glyph. The carvings are positioned around the bezel in a fixed
+   arrangement: 4 along the top, 2 on each side, 4 along the bottom. */
+.carvings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.carving {
+  position: absolute;
+  width: var(--carving-size);
+  height: var(--carving-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(80, 60, 30, 0.32);
+  transition: color 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+}
+
+.carving svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.5;
+}
+
+.carving:hover {
+  color: rgba(80, 60, 30, 0.55);
+}
+
+/* Active state — the carving lights up with a soft red glow. */
+.carving.active {
+  color: #ff4040;
+  filter: drop-shadow(0 0 4px #ff2020) drop-shadow(0 0 8px rgba(255, 32, 32, 0.6));
+  transform: scale(1.1);
+}
+
+/* WS5 patina — presence etches the carvings deeper (visits+artifacts,
+   classes set in src/shadow.js). Absence changes nothing: the tiers only
+   ever settle in. Static filters; nothing animates. `:not(.active)` keeps
+   the glow state the sole owner of the active carving's color/filter. */
+.machine.patina-1 .carving:not(.active) { color: rgba(72, 50, 20, 0.44); }
+.machine.patina-2 .carving:not(.active) { color: rgba(64, 44, 18, 0.58); filter: sepia(0.22); }
+.machine.patina-3 .carving:not(.active) { color: rgba(56, 37, 15, 0.72); filter: sepia(0.38) brightness(0.94); }
+
+/* Verdigris — the two copper-bearing carvings (the stone's inlay,
+   relation's grate ring) grow a green oxide bloom in their recesses as
+   presence settles. Verdigris is what copper does, and it is the one
+   color the bezel never uses. Static like the patina tiers; keyed to
+   the same classes so absence changes nothing. */
+.carving[data-id="stone"]::after,
+.carving[data-id="grate"]::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 38%, rgba(78, 122, 88, 0.5) 0%, rgba(78, 122, 88, 0) 34%),
+    radial-gradient(circle at 66% 62%, rgba(64, 104, 76, 0.42) 0%, rgba(64, 104, 76, 0) 30%),
+    radial-gradient(circle at 58% 24%, rgba(88, 132, 96, 0.32) 0%, rgba(88, 132, 96, 0) 24%);
+  filter: blur(0.6px);
+  opacity: 0;
+  transition: opacity 2.4s ease;
+  pointer-events: none;
+}
+
+.machine.patina-2 .carving[data-id="stone"]::after,
+.machine.patina-2 .carving[data-id="grate"]::after { opacity: 0.42; }
+
+.machine.patina-3 .carving[data-id="stone"]::after,
+.machine.patina-3 .carving[data-id="grate"]::after { opacity: 0.78; }
+
+/* Position the 12 carvings clockwise from top-center. */
+.carving[data-id="stone"]      { top: 14px; left: 50%; transform: translateX(-50%); }
+.carving[data-id="thread"]     { top: 14px; left: calc(50% + 60px); }
+.carving[data-id="candle"]     { top: 14px; right: calc(50% + 60px); }
+.carving[data-id="bell"]       { top: 32%; left: 14px; }
+.carving[data-id="glyph"]      { top: 18%; left: 14px; }
+.carving[data-id="bulb"]       { top: 50%; left: 14px; transform: translateY(-50%); }
+.carving[data-id="tower-rev"]  { top: 50%; right: 14px; transform: translateY(-50%); }
+.carving[data-id="hole-punch"] { top: 18%; right: 14px; }
+.carving[data-id="nib"]        { top: 32%; right: 14px; }
+.carving[data-id="compass"]    { bottom: 44px; left: 50%; transform: translateX(-50%); }
+.carving[data-id="grate"]      { bottom: 44px; left: calc(50% + 50px); }
+.carving[data-id="hook"]       { bottom: 44px; right: calc(50% + 50px); }
+
+/* Override the transform on active state to keep them centered. */
+.carving.active[data-id="stone"]   { transform: translateX(-50%) scale(1.1); }
+.carving.active[data-id="bell"]    { transform: translateY(-50%) scale(1.1); }
+.carving.active[data-id="bulb"]    { transform: translateY(-50%) scale(1.1); }
+.carving.active[data-id="tower-rev"]{ transform: translateY(-50%) scale(1.1); }
+.carving.active[data-id="compass"] { transform: translateX(-50%) scale(1.1); }

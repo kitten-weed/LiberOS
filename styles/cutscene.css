@@ -1,0 +1,2284 @@
+/* cutscene.css — flow fork cinematic tutorial (desktop only).
+   Ritual (summon lines, glow, shakes, black-flame close), chat window
+   beats, intruder flash, Riason wireframe box, the artifact dock and the
+   relation step, finale (flash, shake, hub burst), pink wipe, black
+   arise window. Reduced-motion gates everything.
+   2.13.0: the eclipse flame ring is removed — its rules (.crt-flames,
+   .inferno-*) are gone with the element. Nothing replaces it. */
+
+.cutscene {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  animation: cutscene-in 0.4s ease-out;
+}
+
+@keyframes cutscene-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cutscene-box {
+  width: 82%;
+  max-width: 440px;
+  background: linear-gradient(180deg, #241610 0%, #120906 100%);
+  border: 1px solid #8a6a20;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+  padding: 16px 20px;
+}
+
+.cutscene-voice {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  text-transform: lowercase;
+  color: #ff8a8a;
+  margin-bottom: 6px;
+}
+
+.cutscene-voice:empty {
+  display: none;
+}
+
+.cutscene-line {
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #f0c8c8;
+  min-height: 3em;
+}
+
+.chat-name {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.2em;
+  color: #ffd86a;
+  text-shadow: 0 0 10px rgba(255, 216, 106, 0.7);
+  opacity: 0;
+  animation: chat-name-in 0.4s ease-out forwards;
+}
+.cutscene.chatbeat .cutscene-box.flick {
+  box-shadow: 0 0 0 2px var(--flick, #ffd86a), 0 -10px 22px var(--flick, #ffd86a), 0 0 30px var(--flick, #ffd86a);
+}
+.cutscene.chatbeat .cutscene-box.flick .cutscene-voice {
+  color: var(--flick, #ff8a8a);
+  text-shadow: 0 0 10px var(--flick, #ff8a8a);
+}
+
+@keyframes chat-name-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cutscene-box.burst-in {
+  animation: cutscene-burst-in 0.5s ease-out;
+}
+
+@keyframes cutscene-burst-in {
+  0% { transform: scale(0.85); filter: brightness(2); }
+  100% { transform: scale(1); filter: none; }
+}
+
+.cutscene-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cutscene-nav button {
+  background: none;
+  border: 1px solid #8a6a20;
+  color: #d8a070;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 1.1rem;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.cutscene-nav button:hover {
+  background: rgba(216, 160, 112, 0.1);
+  border-color: #e8c890;
+}
+
+.cutscene-nav button:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+
+.cutscene-skip {
+  margin-left: auto;
+  font-size: 0.95rem !important;
+}
+
+.cutscene.docked {
+  background: none;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  animation: none;
+}
+
+.cutscene.docked .cutscene-box {
+  pointer-events: auto;
+  margin-bottom: 9%;
+  max-width: 380px;
+}
+
+.cutscene-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cutscene-option {
+  background: rgba(216, 160, 112, 0.06);
+  border: 1px solid #8a6a20;
+  color: #e8c890;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 20px;
+}
+
+.cutscene-option:hover {
+  border-color: #e8c890;
+  background: rgba(216, 160, 112, 0.14);
+}
+
+.cutscene-option:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+
+/* ritual: flames + summon lines */
+
+.cutscene.ritual {
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ritual-box {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+}
+
+.ritual-line {
+  font-size: 1.25rem;
+  min-height: 2em;
+  transition: color 0.6s ease, text-shadow 0.6s ease;
+}
+
+.cutscene.ritual .ritual-line.is-glow {
+  color: #ffd8ec;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.9), 0 0 34px rgba(255, 150, 200, 0.8);
+}
+
+.cutscene.ritual .ritual-line.is-ember {
+  color: #ffd86a;
+  text-shadow: 0 0 20px rgba(255, 200, 90, 0.95), 0 0 44px rgba(255, 120, 60, 0.8);
+}
+
+.cutscene.ritual .ritual-line.is-shake {
+  color: #d8b8ff;
+  text-shadow: 0 0 22px rgba(190, 130, 255, 1), 0 0 50px rgba(150, 80, 255, 0.85);
+}
+
+.cutscene.ritual .ritual-line.is-shake-more {
+  color: #fff0f5;
+  text-shadow: 0 0 26px rgba(255, 255, 255, 1), 0 0 60px rgba(255, 105, 180, 1);
+}
+
+/* Summon lines fall from above one at a time and stay, centered and
+   pink — the liber vacui text rain. Each keeps its summon fx tint. */
+.ritual-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ritual-line.ritual-fall {
+  animation: none;
+}
+
+/* Summon letters rain one at a time and land with a pop. Delay comes
+   from --d, set per letter in cutscene.js. Colour inherits the line. */
+.ritual-line .rl {
+  display: inline-block;
+  opacity: 0;
+  animation: ritual-letter-in 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes ritual-letter-in {
+  from { opacity: 0; transform: translateY(-72px) scale(1.3); }
+  60%  { opacity: 1; transform: translateY(6px) scale(0.96); }
+  80%  { transform: translateY(-2px) scale(1.04); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cutscene.ritual.do-shake .ritual-box {
+  animation: cutscene-shake 0.5s;
+}
+
+.cutscene.ritual.do-shake-more .ritual-box,
+.cutscene.ritual.do-shake-more {
+  animation: cutscene-shake-hard 1.1s;
+}
+
+.cutscene.ritual.blackflame {
+  background: radial-gradient(ellipse at 50% 60%, rgba(20, 4, 10, 0.95) 0%, #000 75%);
+  box-shadow: inset 0 0 120px rgba(255, 105, 180, 0.25);
+}
+
+@keyframes cutscene-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+/* Riason wireframe register */
+
+.cutscene[data-riason="1"] .cutscene-box,
+.cutscene-box.riason {
+  border: 1px solid #8acaff;
+  background:
+    repeating-linear-gradient(0deg, rgba(138, 202, 255, 0.05) 0px, rgba(138, 202, 255, 0.05) 1px, transparent 1px, transparent 14px),
+    repeating-linear-gradient(90deg, rgba(138, 202, 255, 0.05) 0px, rgba(138, 202, 255, 0.05) 1px, transparent 1px, transparent 14px),
+    linear-gradient(180deg, #0a1420 0%, #060a10 100%);
+}
+
+.cutscene-box.riason .cutscene-voice,
+.cutscene-box.riason .cutscene-line {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-style: normal;
+  color: #cce0ff;
+}
+
+/* finale: flash, shake, burst, wipe, black window */
+
+.cutscene-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  animation: cutscene-flash-out 0.5s ease-out forwards;
+}
+
+@keyframes cutscene-flash-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.machine.do-shake-hard {
+  animation: cutscene-machine-shake 1.2s linear;
+}
+
+@keyframes cutscene-machine-shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-9px) rotate(-0.4deg); }
+  25% { transform: translateX(8px) rotate(0.4deg); }
+  40% { transform: translateX(-7px); }
+  55% { transform: translateX(6px) rotate(-0.3deg); }
+  70% { transform: translateX(-4px); }
+  85% { transform: translateX(3px); }
+}
+
+.hub-burst {
+  transform-box: view-box;
+  transform-origin: center;
+  animation: hub-burst 1.1s ease-out forwards;
+}
+
+@keyframes hub-burst {
+  0% { transform: scale(1); opacity: 1; }
+  35% { transform: scale(2.4); opacity: 1; filter: brightness(2.4); }
+  100% { transform: scale(0.2); opacity: 0; }
+}
+
+.cutscene-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 110;
+  background: linear-gradient(180deg, #ff8ab8 0%, #ff5c9c 55%, #d42a72 100%);
+  transform: translateY(-101%);
+  animation: cutscene-wipe-down 1.4s ease-in forwards;
+  pointer-events: all;
+}
+
+@keyframes cutscene-wipe-down {
+  to { transform: translateY(0); }
+}
+
+.cutscene-black {
+  position: absolute;
+  inset: 0;
+  z-index: 111;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cutscene-in 0.3s ease-out;
+}
+
+.cutscene-arise {
+  font-family: 'UnifrakturCook', 'UnifrakturMaguntia', 'Cinzel', Georgia, serif;
+  font-style: italic;
+  font-size: 2.2rem;
+  color: #ff8ab8;
+  text-shadow: 0 0 16px rgba(255, 105, 180, 0.9), 0 0 60px rgba(170, 50, 100, 0.6);
+  text-align: center;
+  padding: 0 30px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cutscene { animation: none; }
+  .cutscene.ritual.do-shake .ritual-box,
+  .cutscene.ritual.do-shake-more .ritual-box,
+  .cutscene.ritual.do-shake-more { animation: none; }
+  .chat-name { animation: none; opacity: 1; }
+  .cutscene-box.burst-in { animation: none; }
+  .machine.do-shake-hard { animation: none; }
+  .hub-burst { animation: none; opacity: 0; }
+  .cutscene-wipe { animation: none; transform: none; }
+  .cutscene-flash { animation: none; opacity: 0; }
+  .fake-bit, .riason-glitch, .flare-overlay::before, .flare-alert { animation: none !important; }
+}
+
+.cutscene.chatbeat .cutscene-box {
+  max-width: 560px;
+  background: linear-gradient(180deg, #1a0a14 0%, #0a0508 100%);
+  border: 3px solid #4a1a2a;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.15), 0 -10px 22px rgba(255, 105, 180, 0.35), 0 0 18px rgba(255, 105, 180, 0.18), inset 0 0 30px rgba(0, 0, 0, 0.6);
+  padding: 22px 28px 18px 104px;
+  position: relative;
+}
+.cutscene.chatbeat .cutscene-box::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd86a 0% 30%, #ff69b4 30% 60%, #aa3a6a 100%);
+  box-shadow: 0 0 18px rgba(255, 105, 180, 0.6);
+  border: 2px solid #1a0a14;
+}
+.cutscene.chatbeat .cutscene-box::after {
+  content: '';
+  position: absolute;
+  left: 49px;
+  top: 49px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px #fff;
+  animation: wanderlust-blink 2.6s infinite;
+}
+@keyframes wanderlust-blink {
+  0%, 92%, 100% { opacity: 1; }
+  95% { opacity: 0; }
+}
+.cutscene.chatbeat .cutscene-voice {
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ff8a8a;
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.6);
+}
+.cutscene.chatbeat .cutscene-line {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #f0d8d8;
+  text-shadow: 0 0 4px rgba(255, 105, 180, 0.3);
+  min-height: 4.5em;
+}
+.cutscene.chatbeat .cutscene-box.riason {
+  border: 2px solid #4a8aaa;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0a1420 0%, #060a10 100%);
+  box-shadow: 0 0 0 2px rgba(74, 138, 170, 0.2), 0 0 18px rgba(74, 138, 170, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+.cutscene.chatbeat .cutscene-box.riason::before {
+  background: radial-gradient(circle, #cce0ff 0% 40%, #4a8aaa 60%, #1a2a3a 100%);
+  box-shadow: 0 0 18px rgba(74, 138, 170, 0.6);
+}
+.cutscene.chatbeat .cutscene-box.riason .cutscene-voice,
+.cutscene.chatbeat .cutscene-box.riason .cutscene-line {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-style: normal;
+  color: #cfe2f5;
+  text-shadow: 0 0 6px rgba(74, 138, 170, 0.5);
+}
+.cutscene-option {
+  border-width: 2px;
+  border-radius: 2px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 1.15rem;
+  font-style: normal;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 208, 224, 0.18), inset 0 -2px 0 rgba(0, 0, 0, 0.55), 0 2px 0 #1a0508, 0 3px 4px rgba(0, 0, 0, 0.5);
+}
+.cutscene-option:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+}
+.cutscene-nav button {
+  border-width: 2px;
+  border-radius: 2px;
+}
+.flare-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 75;
+  background: rgba(8, 2, 6, 0.94);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.flare-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(190, 30, 30, 0.22) 46%, rgba(255, 60, 60, 0.4) 50%, rgba(190, 30, 30, 0.22) 54%, transparent 100%);
+  animation: riason-flare 0.9s ease-in-out infinite alternate;
+}
+@keyframes riason-flare {
+  0% { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+.flare-alert {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #ff5a5a;
+  text-shadow: 0 0 10px rgba(255, 60, 60, 0.8), 0 0 26px rgba(255, 60, 60, 0.35);
+  animation: summon-flicker 0.7s ease-in-out infinite alternate;
+}
+.flare-sub {
+  margin-top: 12px;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.18em;
+  color: #4a8aaa;
+  text-shadow: 0 0 10px rgba(74, 138, 170, 0.55);
+}
+@keyframes summon-flicker {
+  0% { filter: brightness(0.92); }
+  100% { filter: brightness(1.18); }
+}
+.cutscene.riason-glitch .cutscene-box {
+  animation: riason-glitch-sweep 1.7s steps(14) 1;
+}
+@keyframes riason-glitch-sweep {
+  0% { filter: brightness(1.8) saturate(0.3); transform: translateX(-3px); }
+  20% { filter: brightness(0.55) saturate(1.3); transform: translateX(3px); }
+  40% { filter: brightness(1.4) hue-rotate(16deg); transform: translateX(-2px); }
+  60% { filter: brightness(0.5) saturate(1.4) hue-rotate(-10deg); transform: translateX(2px); }
+  80% { filter: brightness(1.25); transform: translateX(-1px); }
+  100% { filter: none; transform: translateX(0); }
+}
+.cutscene.artifactdock { flex-direction: column; gap: 16px; }
+
+/* ── the curtain: the tutorial's hand-off between rooms (2.13.0) ────────
+   The tent hands the traveller to the desktop behind this layer, and the
+   next room opens the same curtain from black. One movement, two pages. */
+.cutscene-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 120;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* ── the relation step ──────────────────────────────────────────────────
+   The card is kept, then bound: the artifact, a verb, the buddy — the
+   desktop's own relation grammar (.constellation-mini), rehearsed at the
+   size of a cutscene box. Plain labels, one action per row. */
+.demo-keep-row { margin-top: 12px; }
+.demo-keep,
+.demo-bind {
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: #f0d8a8;
+  background: linear-gradient(180deg, #3a2410 0%, #1c1108 100%);
+  border: 1px solid #8a6a20;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.demo-keep { display: block; margin: 0 auto; }
+.demo-keep:hover, .demo-keep:focus-visible,
+.demo-bind:hover:not(:disabled), .demo-bind:focus-visible {
+  border-color: #e8c890;
+  outline: none;
+}
+.demo-bind:disabled { opacity: 0.55; cursor: default; }
+.demo-artifact.kept {
+  border-color: #e8c890;
+  box-shadow: 0 0 30px rgba(232, 200, 144, 0.55);
+}
+.demo-relate {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.demo-relate[hidden] { display: none; }
+.demo-relate-me,
+.demo-relate-target {
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: #c8a878;
+}
+.demo-relate-verb {
+  width: 9.5em;
+  font-family: inherit;
+  font-size: 1rem;
+  font-style: italic;
+  color: #f0d8a8;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-bottom: 1px solid #8a6a20;
+  padding: 4px 6px;
+}
+.demo-relate-verb:focus-visible { outline: none; border-bottom-color: #e8c890; }
+.demo-relate-sigil { color: #e8c890; }
+.demo-relate.bound .demo-relate-sigil { text-shadow: 0 0 10px rgba(232, 200, 144, 0.9); }
+.demo-artifact {
+  width: 120px;
+  height: 150px;
+  border: 2px solid #4a8aaa;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #0e1a28, #060a10);
+  box-shadow: 0 0 24px rgba(74, 138, 170, 0.5);
+  animation: artifact-rise 0.9s ease-out;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.demo-artifact svg {
+  width: 84px;
+  height: 84px;
+  filter: drop-shadow(0 0 8px rgba(232, 200, 144, 0.55));
+}
+.demo-artifact:hover, .demo-artifact:focus-visible { border-color: #e8c890; outline: none; }
+@keyframes artifact-rise {
+  from { transform: translateY(60px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.cutscene.fakedock { background: rgba(0, 0, 0, 0.94); }
+.fake-burst { position: absolute; left: 50%; top: 38%; width: 0; height: 0; }
+.fake-bit {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: #4a8aaa;
+  box-shadow: 0 0 10px rgba(74, 138, 170, 0.9);
+  opacity: 0;
+}
+.fake-bit:nth-child(even) { background: #e8c890; border-radius: 50%; }
+.fakedock.go .fake-bit {
+  animation: fake-fly 0.9s ease-out forwards;
+}
+@keyframes fake-fly {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(calc(var(--dx) * 190px), calc(var(--dy) * 150px)) scale(0.3); }
+}
+.myth-speech .cutscene-line { letter-spacing: 0.15em; }
+.cutscene.chatbeat:not(.riason-glitch) .cutscene-box.riason { animation: riason-rise 0.6s ease-out; }
+@keyframes riason-rise {
+  from { transform: translateY(46px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.cutscene.chatbeat .cutscene-box.riason .cutscene-option { border-color: #4a8aaa; color: #cfe2f5; }
+.shatter-piece {
+  position: fixed;
+  z-index: 120;
+  pointer-events: none;
+  background: linear-gradient(180deg, #1a0a14 0%, #0a0508 100%);
+  border: 1px solid #4a1a2a;
+  border-radius: 8px;
+  padding: 22px 28px 18px 104px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #f0d8d8;
+  opacity: 1;
+  transition: transform 0.8s ease-in, opacity 0.8s ease-in;
+}
+.shatter-piece.go { transform: var(--out); opacity: 0; }
+.strip-piece {
+  position: fixed;
+  z-index: 120;
+  pointer-events: none;
+  background: linear-gradient(180deg, #0a1420 0%, #060a10 100%);
+  border-top: 1px solid #4a8aaa;
+  border-bottom: 1px solid #4a8aaa;
+  padding: 22px 28px 18px;
+  font-family: 'VT323', monospace;
+  color: #cfe2f5;
+  opacity: 1;
+  transition: transform 0.5s ease-in, opacity 0.5s ease-in;
+}
+.strip-piece.go { transform: translateY(70px); opacity: 0; }
+.fake-bit.blue { background: #4a8aaa; box-shadow: 0 0 10px rgba(74, 138, 170, 0.9); border-radius: 50%; }
+.fake-waves { position: absolute; left: 50%; top: 38%; width: 0; height: 0; }
+.fake-wave {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 200, 220, 0.8);
+  opacity: 0;
+}
+.fakedock.go .fake-wave { animation: fake-wave 2.0s ease-out forwards; }
+@keyframes fake-wave {
+  0% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(22); }
+}
+.fakebox { position: relative; }
+.fakebox::after {
+  content: 'REPRESENTED — NOT ACTUAL BUDDY-SIGIL-EXPLOSION CHAIN';
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'VT323', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #4a8aaa;
+  opacity: 0.9;
+}
+.cutscene-wipe.slow { animation-duration: 2s; }
+.cutscene-arise { transition: opacity 2s ease; }
+.cutscene-arise.fade { opacity: 0; }
+.cutscene-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 109;
+  background: #000;
+  pointer-events: none;
+  animation: reveal-lift 2.6s ease-out forwards;
+}
+@keyframes reveal-lift {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.flare-overlay { animation: flare-cycle 4.2s ease forwards; }
+@keyframes flare-cycle {
+  0% { opacity: 0; }
+  24% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cutscene.chatbeat:not(.riason-glitch) .cutscene-box.riason { animation: none; }
+  .shatter-piece.go, .strip-piece.go, .fakedock.go .fake-wave { animation: none; transition: none; opacity: 0; }
+  .cutscene-reveal { animation: none; opacity: 0; }
+  .flare-overlay { animation: none; }
+  .cutscene-wipe.slow { animation: none; }
+  .cutscene-arise { transition: none; }
+}
+
+.cutscene.ritual {
+  background: #000;
+}
+.machine.flame-glow {
+  filter: drop-shadow(0 0 34px rgba(255, 80, 140, 0.45));
+}
+.machine-break { animation: machine-break 0.55s linear 2; }
+.machine-break-hard { animation: machine-break 0.45s linear 5; }
+@keyframes machine-break {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-7px, 4px) rotate(-0.5deg); }
+  40% { transform: translate(6px, -5px) rotate(0.45deg); }
+  60% { transform: translate(-5px, -3px) rotate(-0.35deg); }
+  80% { transform: translate(4px, 5px) rotate(0.3deg); }
+}
+.cutscene.ritual .ritual-box {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.cutscene.ritual .ritual-line {
+  font-family: 'UnifrakturCook', 'UnifrakturMaguntia', 'Cinzel', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.4rem, 3.4vw, 2.1rem);
+  white-space: nowrap;
+  line-height: 1.3;
+  color: #ff8a8a;
+  text-shadow: 0 0 16px rgba(255, 105, 180, 0.9), 0 0 60px rgba(170, 50, 100, 0.6);
+  animation: summon-flicker 1.0s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cutscene.ritual .ritual-line { animation: none; }
+  .ritual-line.ritual-fall { animation: none; }
+  .ritual-line .rl { animation: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .machine-break, .machine-break-hard { animation: none; }
+  .cutscene-veil { transition: none; }
+}
+
+/* ── cutscene v2: haunted travelling boxes ─────────────────────────────── */
+.cutscene.ctv{position:absolute;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(1,1,2,.9);animation:ctv-in .4s ease-out}.cutscene.ctv>*{position:relative;z-index:1}@keyframes ctv-in{from{opacity:0}to{opacity:1}}
+.ctv-cast{position:relative;width:min(860px,96%);height:min(56cqh,560px);min-height:300px;margin:0 auto;isolation:isolate}.ctv-cast:before{content:'';position:absolute;inset:8% 13%;background:radial-gradient(ellipse,rgba(255,198,128,.055),transparent 64%);filter:blur(18px);pointer-events:none}
+.ctv-body{position:absolute;width:min(430px,54%);min-height:118px;padding:13px 17px 16px;border:1px solid #8a6a20;border-radius:17px 5px 20px 7px;transform-origin:50% 100%;transition:left .8s cubic-bezier(.2,1.4,.3,1),top .8s cubic-bezier(.2,1.4,.3,1),filter .4s ease,opacity .35s ease;filter:drop-shadow(0 14px 18px rgba(0,0,0,.52));z-index:2}.ctv-body:before{content:'◌';position:absolute;top:-18px;right:18px;width:28px;height:28px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font:20px 'Georgia',serif;opacity:.82;transform:rotate(12deg);background:inherit;box-shadow:0 0 16px currentColor;pointer-events:none}.ctv-body:after{content:'';position:absolute;left:28px;bottom:-10px;width:43px;height:18px;background:inherit;border-right:1px solid currentColor;border-bottom:1px solid currentColor;border-radius:0 0 0 18px;transform:skewX(-28deg) rotate(8deg);box-shadow:7px 5px 0 -5px currentColor;pointer-events:none}.ctv-head{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:8px}.ctv-eye{position:relative;flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:2px solid #0a0503;overflow:hidden;background:radial-gradient(circle at 35% 30%,#fff6d8,#8a6840 55%,#1c1108 85%);box-shadow:0 0 0 2px #8a6a20,0 0 14px rgba(232,200,144,.35)}.ctv-iris{position:absolute;inset:7px;border-radius:50%;overflow:hidden;border:2px solid rgba(0,0,0,.5);box-shadow:0 0 0 2px #e8c890}.ctv-pupil{position:absolute;left:50%;top:50%;width:8px;height:16px;border-radius:50%;background:#fff;box-shadow:0 0 8px 2px rgba(255,255,255,.8);transform:translate(-50%,-50%);animation:ctv-blink 4s infinite}@keyframes ctv-blink{0%,92%,100%{transform:translate(-50%,-50%) scaleY(1)}95%{transform:translate(-50%,-50%) scaleY(.06)}}
+.ctv-voice{font:1.25rem 'Georgia','VT323',serif;letter-spacing:.08em;text-transform:lowercase;text-shadow:2px 2px 0 rgba(0,0,0,.35),0 0 12px currentColor}.ctv-line{position:relative;z-index:1;min-height:3.2em;font:clamp(1rem,1.55vw,1.28rem)/1.42 Georgia,'Times New Roman',serif;white-space:pre-line;text-shadow:0 1px 0 rgba(0,0,0,.35)}.ctv-line:after{content:'▌';opacity:0;animation:ctv-cursor-haunt 1s steps(1,end) infinite}@keyframes ctv-cursor-haunt{0%,45%{opacity:0}46%,100%{opacity:.75}}
+.ctv-liber-vacui{left:2%;top:58%;background:radial-gradient(circle at 8% 20%,rgba(255,202,138,.10),transparent 24%),linear-gradient(165deg,#231414,#0b0605);border-left:4px solid rgba(212,175,101,.85);color:#f1c879;animation:ctv-you-hover 7s ease-in-out infinite}.ctv-liber-vacui .ctv-line{font-family:'Georgia',Georgia,serif;color:#ffe4c2}.ctv-wanderlust{right:1%;top:3%;background:radial-gradient(circle at 20% 15%,rgba(255,138,184,.22),transparent 45%),radial-gradient(circle at 85% 80%,rgba(150,80,255,.25),transparent 50%),linear-gradient(160deg,#2a0f24,#16060f);border:2px solid #ff69b4;color:#ff8ab8;box-shadow:0 0 0 5px rgba(255,105,180,.08),0 0 34px rgba(180,90,255,.36),inset 0 0 28px rgba(255,105,180,.08);animation:ctv-wander-hover 5.8s ease-in-out infinite}.ctv-wanderlust:before{content:'✦'}.ctv-wanderlust .ctv-line{font-family:'Georgia',Georgia,serif;color:#ffd7e6}.ctv-riason{left:22%;top:28%;background:repeating-linear-gradient(0deg,transparent 0 26px,rgba(58,74,106,.28) 26px 27px),linear-gradient(#e6d9b8,#d5c49a);border-color:#77b9ca;color:#2f526c;animation:ctv-riason-hover 6.5s steps(4,end) infinite}.ctv-riason:before{content:'∴';color:#4a8aaa;border-radius:2px;transform:rotate(-8deg)}.ctv-riason .ctv-line{color:#172033}.ctv-physius{left:31%;top:24%;background:#33332f;border-color:#92928a;color:#d4af65;box-shadow:0 12px 28px rgba(0,0,0,.62),inset 0 0 0 1px rgba(238,232,210,.17);animation:ctv-physius-hover 9s ease-in-out infinite}.ctv-physius:before{content:'☉';color:#d4af65;border-radius:2px 12px 2px 2px}.ctv-physius .ctv-line{color:#eee9dc}.ctv-body.is-dim{filter:saturate(.56) brightness(.66) drop-shadow(0 5px 9px rgba(0,0,0,.4));opacity:.62}.ctv-body.is-centre{left:23%;top:22%;width:min(490px,61%)}.ctv-cast.is-overlap .ctv-riason.is-creep{left:28%;top:18%;margin:0;transform:rotate(-4deg) scale(1.04);z-index:8}@keyframes ctv-you-hover{0%,100%{transform:rotate(-1deg) translate(0,0)}50%{transform:rotate(1.2deg) translate(7px,-6px)}}@keyframes ctv-wander-hover{0%,100%{transform:rotate(2deg) translate(0,0)}35%{transform:rotate(-3deg) translate(-9px,5px)}70%{transform:rotate(4deg) translate(4px,-8px)}}@keyframes ctv-riason-hover{0%,100%{transform:rotate(1deg) translate(0,0)}25%{transform:rotate(0) translate(6px,0)}50%{transform:rotate(-1deg) translate(-4px,3px)}75%{transform:rotate(1deg) translate(3px,-1px)}}@keyframes ctv-physius-hover{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(-.5deg) translateY(-4px)}}
+.ctv-ritual .ctv-gate{position:sticky;bottom:0;z-index:20;width:min(680px,92%);margin:0 auto;padding:10px 12px;background:linear-gradient(#17100a,#0b0603);border:1px solid #8a6a20;text-align:center}.ctv-response{min-width:44px;min-height:44px;padding:8px 20px;font:1.15rem 'VT323',monospace;color:#e8c890;background:rgba(30,20,12,.9);border:1px solid rgba(212,175,101,.6);cursor:pointer}.ctv-response:hover{border-color:#e8c890}.ctv-ritual{width:min(640px,92%);margin:auto;display:flex;flex-direction:column;gap:10px}.ctv-ritual-line{padding:10px 14px;color:#8a8a86;background:rgba(10,8,6,.6);outline:1px dotted #6a6a66;font:italic 1.25rem/1.5 Georgia,serif}.ctv-ritual-line.is-typing{color:#d8c8a8;outline:1px solid #e8c890}.ctv-ritual-line.is-lit{color:#ffe9c9;outline:1px solid #ff9a6a;background:linear-gradient(#3c140a,#140804);text-shadow:0 0 12px rgba(255,150,90,.9);animation:ctv-lit .6s ease-out}@keyframes ctv-lit{from{filter:brightness(2.2)}to{filter:none}}.ctv-ritual-input{width:100%;min-height:44px;padding:8px 12px;color:#e8c890;background:#0a0503;border:1px solid #8a6a20;font:1.15rem 'VT323',monospace}.ctv-ritual-input.is-possessed{color:#fff0ba;border-color:#ff69b4;box-shadow:0 0 0 2px rgba(255,105,180,.16),0 0 25px rgba(180,90,255,.62);animation:ctv-input-possession .24s steps(2,end) infinite}.ctv-ritual-line.is-possessed{color:#fff0ba;outline-color:#ff69b4;transform:translateX(4px) rotate(-.5deg);box-shadow:0 0 26px rgba(255,105,180,.36)}@keyframes ctv-input-possession{0%,100%{transform:translate(0)}50%{transform:translate(2px,-1px) rotate(.4deg)}}
+.ctv-identities{display:inline-flex;gap:.38em;flex-wrap:wrap;margin-top:.32em}.ctv-identity{display:inline-block;padding:.05em .42em .12em;border:1px solid currentColor;border-radius:999px 4px;opacity:0;transform:translateY(8px) rotate(5deg) scale(.7);filter:blur(4px)}.ctv-identity.is-revealed{animation:ctv-identity-arrive .48s cubic-bezier(.18,1.5,.35,1) forwards}.ctv-identity-0{color:#ffd86a}.ctv-identity-1{color:#9f8cff}.ctv-identity-2{color:#ff8ab8}.ctv-identity-3{color:#7ad8ff}@keyframes ctv-identity-arrive{to{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:blur(0)}}
+.ctv-artifact{position:absolute;left:68%;top:42%;z-index:75;width:112px;height:112px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer}.ctv-artifact svg{position:relative;z-index:1;width:112px;height:112px;border:2px solid #f1c879;border-radius:50%;background:radial-gradient(circle at 34% 28%,#fff0b0 0 5%,#f1c879 7% 20%,#8f3e62 44%,#160812 78%);box-shadow:0 0 0 7px rgba(212,175,101,.14),0 0 26px rgba(212,175,101,.45);animation:ctv-artifact-orbit 6s ease-in-out infinite}.ctv-artifact:before,.ctv-artifact:after{content:'';position:absolute;inset:-18px -34px;border:1px solid rgba(212,175,101,.45);border-radius:50%;transform:rotate(-18deg);pointer-events:none}.ctv-artifact:after{inset:-28px -48px;opacity:.42;transform:rotate(24deg)}@keyframes ctv-artifact-orbit{0%,100%{transform:translate3d(-10px,3px,0) rotate(-2deg)}50%{transform:translate3d(16px,-14px,0) rotate(4deg)}}.ctv-artifact.is-waiting svg{animation-play-state:running}.ctv-artifact.is-waiting.is-paused svg{animation-play-state:paused}.ctv-artifact.is-kept{pointer-events:none;z-index:35;filter:saturate(.72) brightness(.8)}.ctv-artifact.is-kept svg{animation:ctv-artifact-orbit 7s ease-in-out infinite}.ctv-relate{position:absolute;left:50%;top:68%;transform:translateX(-50%);z-index:80;width:min(560px,92%);display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 12px;color:#e8c890;background:#17100a;border:1px solid #8a6a20}.ctv-relate-verb,.ctv-relate-bind{min-height:44px;padding:8px 10px;color:#e8c890;background:#0a0503;border:1px solid #8a6a20;font:1.05rem 'VT323',monospace}.ctv-relate-bind{background:#241610;cursor:pointer}.ctv-relate.is-rejected{animation:ctv-relation-reject .42s ease-out;border-color:#d56b6b;color:#d9a3a3}@keyframes ctv-relation-reject{0%{transform:translateX(-50%) translateX(0);opacity:1}35%{transform:translateX(-50%) translateX(-8px) rotate(-1deg)}70%{transform:translateX(-50%) translateX(7px) rotate(1deg)}100%{transform:translateX(-50%) translateX(0);opacity:.5}}
+.ctv-breach,.ctv-finale{position:absolute;inset:0;z-index:30}.ctv-breach{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;overflow:hidden;background:radial-gradient(circle at 50% 38%,rgba(255,105,180,.35),transparent 45%),linear-gradient(#2a0b22,#0d0410);animation:ctv-breathe 2.4s ease-in-out infinite}.ctv-breach-line{padding:0 24px;color:#ff8ab8;text-align:center;font:clamp(2rem,7vw,4rem)/1.3 'VT323',monospace;text-shadow:0 0 18px rgba(255,105,180,.9)}.ctv-finale{display:flex;align-items:center;justify-content:center;background:#000;opacity:0;transition:opacity 1.2s ease-out}.ctv-finale.go{opacity:1}.ctv-finale.is-fade{opacity:0}.ctv-finale-line{color:#f0e2c8;text-align:center;font:italic clamp(1.6rem,5vw,2.6rem)/1.5 Georgia,serif;padding:0 32px}@keyframes ctv-breathe{0%,100%{box-shadow:0 0 12px rgba(255,105,180,.25)}50%{box-shadow:0 0 30px rgba(150,80,255,.55)}}
+.cutscene.ctv{z-index:100}
+
+/* temporal aperture */
+.ctv-montage{position:absolute;inset:0;z-index:14;overflow:hidden;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.1),transparent 32%),rgba(4,2,12,.7);mix-blend-mode:screen}.ctv-montage.go{opacity:1}.ctv-montage:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,255,255,.055) 6px 7px);animation:ctv-scan-scrub .24s linear infinite}.ctv-timewheel{position:absolute;left:50%;top:50%;width:170px;height:170px;border:1px solid rgba(255,216,106,.8);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 12px rgba(255,105,180,.06),0 0 60px rgba(180,90,255,.6);animation:ctv-wheel-spin 1.2s linear infinite;z-index:4}.ctv-timewheel:before,.ctv-timewheel:after{content:'';position:absolute;left:50%;top:50%;width:125%;height:1px;background:rgba(255,216,106,.7);transform:translate(-50%,-50%) rotate(38deg)}.ctv-timewheel:after{transform:translate(-50%,-50%) rotate(-52deg);background:rgba(255,105,180,.7)}.ctv-timewheel b{position:absolute;inset:0;display:grid;place-items:center;color:#ffe4a4;font:24px 'Georgia',serif;letter-spacing:.18em}.ctv-timewheel i{position:absolute;inset:18px;border:1px dotted rgba(255,255,255,.68);border-radius:50%}.ctv-timecode{position:absolute;left:50%;top:calc(50% + 112px);transform:translateX(-50%);z-index:5;color:#ffd86a;font:18px 'VT323',monospace;letter-spacing:.22em}.ctv-time-scrub{position:absolute;left:-10%;right:-10%;top:50%;height:3px;background:linear-gradient(90deg,transparent,#ff69b4,#ffd86a,#7ad8ff,transparent);box-shadow:0 0 18px #ff69b4;z-index:5;animation:ctv-scrub 2.1s ease-in-out infinite}.ctv-montage-room{position:absolute;inset:0;opacity:0}.ctv-montage-room.is-r1{background:linear-gradient(#1c2a1a,#0a0f08)}.ctv-montage-room.is-r2{background:linear-gradient(#1a2030,#080a10)}.ctv-montage-room.is-r3{background:linear-gradient(#2a1a20,#0f080a)}.ctv-montage-room.is-r4{background:linear-gradient(#242010,#0d0a04)}.ctv-montage.go .ctv-montage-room{animation:ctv-room .6s linear forwards}.ctv-montage.go .is-r2{animation-delay:.6s}.ctv-montage.go .is-r3{animation-delay:1.2s}.ctv-montage.go .is-r4{animation-delay:1.8s}.ctv-montage-room b{position:absolute;left:7%;bottom:9%;color:rgba(255,239,202,.86);font:22px 'Georgia',serif;letter-spacing:.1em}.ctv-montage-room i{position:absolute;inset:14%;border:1px solid rgba(255,255,255,.24);transform:rotate(7deg)}@keyframes ctv-room{0%{opacity:0}15%,85%{opacity:.85}100%{opacity:0}}@keyframes ctv-wheel-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}@keyframes ctv-scan-scrub{to{background-position:0 12px}}@keyframes ctv-scrub{0%,100%{transform:translateX(-18%) scaleX(.7);opacity:.25}50%{transform:translateX(18%) scaleX(1.1);opacity:1}}
+.ctv-poppet{position:relative;z-index:5;width:min(680px,94%);max-height:62cqh;overflow-y:auto;margin:0 auto;padding:10px;border:1px solid #8a6a20;background:linear-gradient(165deg,#191009,#0b0603);box-shadow:0 16px 42px rgba(0,0,0,.7)}.cutscene.ctv.has-poppet{justify-content:flex-start;padding-top:18px}.cutscene.ctv.has-poppet .ctv-cast{height:auto;min-height:180px}.cutscene.ctv.has-poppet .ctv-body{position:relative;left:auto;top:auto;width:min(680px,92%);margin:0 auto;min-height:0}.ctv-poppet .poppet-app{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:0;max-height:none;overflow:visible}.ctv-poppet .poppet-bench{grid-template-columns:120px minmax(0,1fr);padding:6px}.ctv-poppet .poppet-stack{max-width:150px;margin:0 auto}.ctv-poppet .poppet-rail{grid-template-columns:1fr .5fr 1.2fr}.ctv-response.ctv-act{border-color:#d4af65;box-shadow:0 0 14px rgba(212,175,101,.45)}
+@media(max-width:640px){.ctv-cast{height:min(58cqh,500px);min-height:280px}.ctv-body{width:72%}.ctv-liber-vacui{left:0;top:60%}.ctv-wanderlust{right:0;top:2%}.ctv-riason{left:12%;top:29%}.ctv-physius{left:16%;top:25%;width:78%}.ctv-poppet .poppet-bench,.ctv-poppet .poppet-rail{grid-template-columns:1fr}.ctv-body:before{display:none}}
+@media(prefers-reduced-motion:reduce){.ctv-body,.ctv-montage *,.ctv-line:after{animation:none!important}}
+.ctv-evaporating-word{position:absolute;right:12%;bottom:18%;z-index:4;color:#c7b990;font:18px 'Georgia',serif;letter-spacing:.08em;text-shadow:0 0 12px #a88b58;opacity:0;transform:translate(0,8px) scale(.8);pointer-events:none}.ctv-evaporating-word.is-sucked{animation:ctv-word-suction 1.5s cubic-bezier(.2,.8,.1,1) forwards}@keyframes ctv-word-suction{0%{opacity:0;transform:translate(0,8px) scale(.8)}18%{opacity:1}100%{opacity:0;transform:translate(160px,-180px) scale(.05) rotate(35deg);filter:blur(5px)}}
+.ctv-ritual-seal.is-sucked{animation:ctv-seal-suction 1.5s cubic-bezier(.2,.8,.1,1) forwards}@keyframes ctv-seal-suction{to{opacity:0;transform:translate(-50%,-50%) translate(270px,-190px) scale(.04) rotate(130deg);filter:blur(8px)}}
+.ctv-window-breath .ctv-cast{animation:ctv-window-inhale .9s ease-out}.ctv-window-breath .ctv-body{filter:brightness(1.16) saturate(1.15)}@keyframes ctv-window-inhale{0%{transform:scale(1)}45%{transform:scale(.985)}100%{transform:scale(1)}}
+.ctv-poppet.is-physius-lock{position:relative}.ctv-poppet.is-physius-lock:before{content:'PHYSIUS HAS THE HANDS';position:absolute;right:16px;top:13px;z-index:30;padding:3px 7px;color:#d4af65;border:1px solid rgba(212,175,101,.55);background:rgba(16,13,10,.9);font:11px 'VT323',monospace;letter-spacing:.15em;pointer-events:none;animation:ctv-lock-blink 2.8s steps(2,end) infinite}.ctv-poppet.is-physius-lock .poppet-door,.ctv-poppet.is-physius-lock .poppet-tool,.ctv-poppet.is-physius-lock .poppet-swatch,.ctv-poppet.is-physius-lock .poppet-keep,.ctv-poppet.is-physius-lock .poppet-save-desktop{cursor:not-allowed;filter:grayscale(.65) brightness(.72);pointer-events:none}.ctv-poppet.is-physius-lock .poppet-draw{cursor:wait}@keyframes ctv-lock-blink{0%,78%,100%{opacity:.5}82%{opacity:1}}
+
+/* ── authored dialogue type map + invisible responsive stage ───────────── */
+@font-face{font-family:'YouDialogue';src:url('../assets/fonts/cutscene/you.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'WanderlustDialogue';src:url('../assets/fonts/cutscene/wanderlust.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'RiasonDialogue';src:url('../assets/fonts/cutscene/Riason.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'PhysiusDialogue';src:url('../assets/fonts/cutscene/SisterPhysius.TTF') format('truetype');font-display:swap}
+@font-face{font-family:'SummonDialogue';src:url('../assets/fonts/cutscene/SummonTyping.ttf') format('truetype');font-display:swap}
+.cutscene.ctv{pointer-events:none;background:rgba(0,0,0,.76)}
+.ctv-stage{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ctv-cast{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;pointer-events:none}
+.ctv-body{pointer-events:none}
+.ctv-liber-vacui .ctv-line,.ctv-traveller .ctv-line{font-family:'YouDialogue','Georgia',Georgia,serif;font-size:clamp(1.05rem,1.7vw,1.42rem);letter-spacing:.015em}
+.ctv-wanderlust .ctv-line{font-family:'WanderlustDialogue','Georgia',Georgia,serif;font-size:clamp(1.05rem,1.7vw,1.45rem)}
+.ctv-riason .ctv-line{font-family:'RiasonDialogue','VT323',monospace;font-size:clamp(1rem,1.55vw,1.34rem)}
+.ctv-physius .ctv-line{font-family:'PhysiusDialogue','Georgia',Georgia,serif;font-size:clamp(1.02rem,1.6vw,1.38rem)}
+.ctv-voice{font-family:'YouDialogue','Georgia',serif}
+.ctv-wanderlust .ctv-voice{font-family:'WanderlustDialogue','Georgia',serif}
+.ctv-riason .ctv-voice{font-family:'RiasonDialogue','VT323',monospace}
+.ctv-physius .ctv-voice{font-family:'PhysiusDialogue','Georgia',serif}
+.ctv-gate{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:auto;min-width:88px;max-width:calc(100% - 40px);min-height:0;margin:0;padding:6px 8px;z-index:220;pointer-events:auto;background:rgba(14,9,6,.92);border:1px solid rgba(212,175,101,.55);box-shadow:0 8px 26px rgba(0,0,0,.6);border-radius:3px}
+.ctv-response{display:block;width:100%;min-width:0;min-height:38px;padding:6px 12px;pointer-events:auto;font-family:'YouDialogue','VT323',monospace;font-size:1.04rem;letter-spacing:.04em}
+.ctv-gate .ctv-response{cursor:pointer}
+.ctv-relate{pointer-events:auto;z-index:240}.ctv-relate-verb,.ctv-relate-bind{pointer-events:auto}.cutscene.ctv .ctv-artifact{pointer-events:auto}
+.ctv-ritual{position:absolute;inset:0;width:100%;height:100%;z-index:150;display:flex;align-items:center;justify-content:center;gap:clamp(6px,1vh,10px);padding:clamp(10px,2vh,22px) clamp(10px,3vw,32px);pointer-events:auto;background:radial-gradient(circle at 50% 48%,rgba(74,18,68,.28),transparent 46%),rgba(0,0,0,.18)}
+.ctv-ritual-line{width:min(920px,88vw,100%);max-width:100%;box-sizing:border-box;padding:clamp(4px,.8vh,9px) clamp(10px,2vw,24px);font-family:'SummonDialogue','Georgia',serif;font-size:clamp(1rem,1.8vw,1.3rem);line-height:1.22;letter-spacing:.03em;text-align:center}
+.ctv-ritual-input{width:min(680px,75vw,100%);max-width:100%;min-width:0;min-height:52px;margin-top:0;font-family:'SummonDialogue','VT323',monospace;font-size:clamp(1.2rem,2vw,1.8rem);text-align:center;background:rgba(4,2,10,.78);box-sizing:border-box}
+.ctv-ritual-seal{width:min(52vw,460px);height:min(52vw,460px);z-index:-1}
+.ctv-poppet{position:absolute;inset:0;width:100%;max-height:none;overflow:hidden;margin:0;padding:clamp(18px,4vw,56px);z-index:130;border:0;background:radial-gradient(circle at 50% 45%,rgba(212,175,101,.12),transparent 40%),linear-gradient(145deg,#19130d,#070606 72%);box-shadow:none;pointer-events:auto}
+.cutscene.ctv.has-poppet{display:block;padding:0;background:transparent}
+.cutscene.ctv.has-poppet .ctv-stage{display:block}
+.cutscene.ctv.has-poppet .ctv-cast{z-index:160;pointer-events:none}
+.cutscene.ctv.has-poppet .ctv-body{position:absolute;left:4%;top:5%;width:min(400px,38vw);z-index:161}
+.ctv-poppet .poppet-app{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:20px}
+.ctv-poppet .poppet-worktable{width:min(1080px,94vw);max-height:calc(100vh - 100px);margin:0 auto;transform:scale(1.02);transform-origin:center}
+.ctv-poppet .poppet-bench{grid-template-columns:minmax(160px,22%) minmax(0,1fr);padding:clamp(12px,2vw,28px)}
+.ctv-poppet .poppet-stack{max-width:min(360px,25vw);width:100%;margin:0 auto}
+.ctv-poppet .poppet-rail{grid-template-columns:1fr .7fr 1.4fr}
+.ctv-poppet-montage{position:absolute;inset:0;z-index:210;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(255,232,170,.22),transparent 16%),linear-gradient(120deg,#09060c,#32102b 48%,#060708);animation:ctv-poppet-montage-out 1.6s ease-in forwards;pointer-events:none}
+.ctv-poppet-montage:before,.ctv-poppet-montage:after{content:'';position:absolute;width:150vmax;height:1px;background:linear-gradient(90deg,transparent,#ffd86a,#ff69b4,transparent);box-shadow:0 0 24px #ff69b4;transform:rotate(37deg);animation:ctv-montage-sweep 1.6s ease-out}
+.ctv-poppet-montage:after{transform:rotate(-37deg);animation-delay:.18s}
+.ctv-poppet-montage i{position:absolute;width:72vmin;height:72vmin;border:1px dotted rgba(255,216,106,.8);border-radius:50%;animation:ctv-montage-wheel 1.6s linear}
+.ctv-poppet-montage i:nth-child(2){width:52vmin;height:52vmin;border-color:#ff69b4;animation-direction:reverse}.ctv-poppet-montage i:nth-child(3){width:32vmin;height:32vmin;border-color:#a99bff}
+.ctv-poppet-montage b{color:#ffe4a4;font:clamp(1rem,2vw,1.6rem) 'PhysiusDialogue',serif;letter-spacing:.2em;text-align:center;animation:ctv-montage-word 1.6s ease-out forwards}
+@keyframes ctv-poppet-montage-out{0%,62%{opacity:1}100%{opacity:0;visibility:hidden}}@keyframes ctv-montage-sweep{from{transform:rotate(37deg) translateX(-60%)}to{transform:rotate(37deg) translateX(60%)}}@keyframes ctv-montage-wheel{to{transform:rotate(360deg) scale(1.4);opacity:0}}@keyframes ctv-montage-word{0%{opacity:0;letter-spacing:.7em;filter:blur(8px)}30%{opacity:1}100%{opacity:0;letter-spacing:.2em;filter:blur(0)}}
+.cutscene.ctv.desktop-reveal{background:transparent;pointer-events:none}
+.cutscene.ctv.desktop-reveal .ctv-gate{pointer-events:auto}
+.ctv-buddy-anchor{position:absolute;left:68%;top:42%;z-index:115;width:112px;height:112px;border:1px dashed rgba(232,200,144,.72);border-radius:50%;opacity:.78;pointer-events:none;animation:ctv-anchor-breathe 2.4s ease-in-out infinite}
+.ctv-buddy-anchor:before,.ctv-buddy-anchor:after{content:'';position:absolute;inset:-22px -38px;border:1px solid rgba(255,143,184,.4);border-radius:50%;transform:rotate(24deg)}.ctv-buddy-anchor:after{inset:-35px -54px;transform:rotate(-32deg);opacity:.5}
+.ctv-buddy-anchor i{position:absolute;inset:38%;border:1px solid #e8c890;transform:rotate(45deg)}.ctv-buddy-anchor span{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);width:180px;color:#e8c890;font:12px 'YouDialogue',serif;letter-spacing:.08em;text-align:center;text-transform:lowercase}
+@keyframes ctv-anchor-breathe{50%{transform:scale(1.12);opacity:.42}}
+.ctv-physius{left:58%;top:48%;width:min(410px,35%)}
+.ctv-physius.is-stone{animation:ctv-physius-arrive 1.25s cubic-bezier(.18,1.35,.32,1) both,ctv-physius-hover 9s ease-in-out 1.25s infinite}
+@keyframes ctv-physius-arrive{from{opacity:0;transform:translate(42vw,18vh) rotate(18deg) scale(.55);filter:blur(14px) brightness(2)}45%{opacity:1;transform:translate(-18px,-14px) rotate(-5deg) scale(1.05);filter:blur(0) brightness(1.4)}to{opacity:1;transform:translate(0) rotate(0) scale(1);filter:none}}
+.ctv-physius.is-withdrawing{animation:ctv-physius-withdraw .9s cubic-bezier(.65,0,.95,.25) forwards!important;pointer-events:none}
+@keyframes ctv-physius-withdraw{to{opacity:0;transform:translate(38vw,-12vh) rotate(-14deg) scale(.45);filter:blur(9px)}}
+.ctv-breach-line{width:min(94%,1040px);max-height:52vh;overflow:visible;white-space:normal;overflow-wrap:anywhere;text-align:center;font-family:'WanderlustDialogue','VT323',monospace;font-size:clamp(2rem,6vw,4.8rem);line-height:1.18;z-index:40}
+.ctv-breach-glitch{position:absolute;top:12%;left:50%;transform:translateX(-50%);width:100%;color:rgba(255,216,106,.75);font:clamp(.7rem,1.2vw,1rem) 'RiasonDialogue',monospace;letter-spacing:.3em;text-align:center;animation:ctv-glitch-label .22s steps(2,end) infinite;z-index:42}
+@keyframes ctv-glitch-label{50%{transform:translateX(-48%) skewX(-10deg);opacity:.35}}
+.ctv-time-hijack-machine{animation:ctv-machine-hijack .38s steps(2,end) infinite!important;filter:saturate(1.35) contrast(1.12)}
+.ctv-time-hijack-stage{filter:hue-rotate(18deg) saturate(1.4);transition:filter .3s}
+@keyframes ctv-machine-hijack{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(-12px,4px) rotate(-.5deg)}40%{transform:translate(9px,-6px) rotate(.7deg)}60%{transform:translate(-6px,7px) rotate(-.3deg)}80%{transform:translate(11px,-2px) rotate(.4deg)}}
+.ctv-traveller-stream{position:absolute;inset:0;z-index:28;overflow:hidden;pointer-events:none}.ctv-traveller-stream span{position:absolute;left:calc(8% + (var(--stream-i) * 14%));top:-12%;color:#ff9fc8;text-shadow:0 0 16px currentColor;font:clamp(1rem,2.4vw,2.2rem) 'WanderlustDialogue',serif;letter-spacing:.14em;opacity:0;animation:ctv-stream-pour 3.2s cubic-bezier(.2,.7,.15,1) calc(var(--stream-i) * .22s) forwards}.ctv-traveller-stream span:nth-child(2n){color:#bba7ff}.ctv-traveller-stream span:nth-child(3n){color:#ffe09a}@keyframes ctv-stream-pour{0%{opacity:0;transform:translate(0,-20vh) rotate(-12deg) scale(.5);filter:blur(8px)}18%{opacity:1}72%{opacity:.9;transform:translate(calc((50vw - 8vw) * .5),58vh) rotate(18deg) scale(1.15);filter:none}100%{opacity:0;transform:translate(50vw,76vh) rotate(45deg) scale(.12);filter:blur(9px)}}
+/* Late authored behavior: the stage changes its rules at each major handoff. */
+.ctv-stage.riason-order .ctv-riason{left:12%;top:18%;width:min(480px,42%);box-shadow:12px 16px 0 rgba(42,65,91,.18),0 16px 28px rgba(0,0,0,.55)}
+.ctv-stage.riason-order .ctv-physius{left:62%;top:52%}
+.ctv-identity-0{box-shadow:0 0 18px #ffd86a;transform-origin:left center}.ctv-identity-1{box-shadow:0 0 18px #9f8cff;animation-delay:.08s}.ctv-identity-2{box-shadow:0 0 18px #ff8ab8;transform-origin:right center}.ctv-identity-3{box-shadow:0 0 18px #7ad8ff;letter-spacing:.18em}
+.ctv-logic-slip{position:absolute;right:-18px;bottom:-35px;display:flex;align-items:center;gap:7px;padding:4px 8px;color:#ffd86a;background:rgba(12,7,8,.88);border:1px solid rgba(255,216,106,.5);font:11px 'RiasonDialogue',monospace;letter-spacing:.12em;animation:ctv-slip-flicker 2.1s steps(2,end) forwards;pointer-events:none}.ctv-logic-slip i{color:#ff8ab8;font-style:normal}@keyframes ctv-slip-flicker{0%,100%{opacity:0;transform:translateY(6px)}16%,78%{opacity:.9;transform:translateY(0)}88%{opacity:.25;transform:translate(8px,-3px) skewX(-15deg)}}
+.ctv-finale-memory{position:absolute;left:50%;top:50%;width:min(38vmin,280px);height:min(38vmin,280px);transform:translate(-50%,-50%);border:1px solid rgba(255,143,184,.75);border-radius:50%;box-shadow:0 0 0 12px rgba(255,143,184,.08),0 0 70px rgba(180,90,255,.36);animation:ctv-memory-breathe 4s ease-in-out infinite}.ctv-finale-memory:before,.ctv-finale-memory:after{content:'';position:absolute;inset:12%;border:1px dashed rgba(255,216,106,.65);transform:rotate(45deg)}.ctv-finale-memory:after{transform:rotate(-45deg);border-color:rgba(122,216,255,.5)}.ctv-finale-memory i{position:absolute;left:50%;top:50%;width:38%;height:38%;border:1px solid #ff8ab8;transform:translate(-50%,-50%) rotate(45deg)}.ctv-finale-memory b{position:absolute;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);border-radius:50%;background:#ffe4a4;box-shadow:0 0 20px 5px #ff69b4}.ctv-finale-memory em{position:absolute;left:50%;top:calc(100% + 12px);transform:translateX(-50%);color:#ffb9d3;font:clamp(.75rem,1.2vw,1rem) 'YouDialogue',serif;letter-spacing:.14em;font-style:normal;text-transform:lowercase;white-space:nowrap}.ctv-finale-traces{position:absolute;inset:8%;z-index:2;pointer-events:none}.ctv-finale-traces i{position:absolute;display:block;opacity:0;font-style:normal;animation:ctv-trace-arrive .85s ease-out forwards}.ctv-finale-traces i b{display:block;font:clamp(.55rem,1vw,.82rem) 'Georgia',serif;letter-spacing:.16em;font-weight:normal;text-transform:uppercase}.ctv-trace-outline{left:4%;top:18%;width:28%;height:42%;border-left:2px solid #9aa8b5;border-top:1px solid #d9e1e4;transform:skewY(-8deg)}.ctv-trace-outline b{color:#b9c6ce;transform:translate(-2px,-1.6em)}.ctv-trace-clothes{right:4%;top:12%;width:28%;height:36%;border-right:2px solid #d4af65;border-top:1px solid #f0df9a;transform:rotate(9deg)}.ctv-trace-clothes b{color:#f0df9a;transform:translate(0,-1.6em);text-align:right}.ctv-trace-traits{left:8%;bottom:8%;width:34%;height:25%;border-bottom:4px solid #6eaa7a;border-radius:0 0 50% 25%;transform:rotate(-5deg)}.ctv-trace-traits b{color:#91c797;transform:translate(0,1.4em)}.ctv-trace-others{right:7%;bottom:13%;width:30%;height:33%;border-right:2px dotted #aa94ed;border-bottom:2px solid #aa94ed;border-radius:0 0 48% 0;transform:rotate(8deg)}.ctv-trace-others b{color:#c1b2ff;transform:translate(0,1.4em);text-align:right}.ctv-finale.go .ctv-finale-traces i:nth-child(1){animation-delay:.35s}.ctv-finale.go .ctv-finale-traces i:nth-child(2){animation-delay:.55s}.ctv-finale.go .ctv-finale-traces i:nth-child(3){animation-delay:.75s}.ctv-finale.go .ctv-finale-traces i:nth-child(4){animation-delay:.95s}@keyframes ctv-trace-arrive{from{opacity:0;transform:scale(.7) rotate(-8deg);filter:blur(5px)}to{opacity:.86;transform:scale(1) rotate(0);filter:none}}.ctv-finale-after{position:absolute;left:50%;top:calc(50% + min(24vmin,180px));transform:translateX(-50%);color:rgba(232,200,144,.72);font:clamp(.7rem,1.15vw,.95rem) 'YouDialogue',serif;letter-spacing:.14em;text-transform:lowercase;white-space:nowrap;opacity:0;animation:ctv-after-memory 2s ease-out 1.3s forwards}@keyframes ctv-memory-breathe{50%{transform:translate(-50%,-50%) rotate(8deg) scale(1.07);filter:hue-rotate(25deg)}}@keyframes ctv-after-memory{to{opacity:1;letter-spacing:.22em}}
+@media(max-width:900px){.ctv-stage.riason-order .ctv-riason{left:5%;top:14%;width:48%}.ctv-stage.riason-order .ctv-physius{left:48%;top:52%;width:48%}.ctv-logic-slip{right:0}.ctv-finale-after{white-space:normal;width:90%;text-align:center}.ctv-poppet{padding:10px}.ctv-poppet .poppet-worktable{width:98%;max-height:calc(100% - 20px);transform:scale(.92)}.ctv-poppet .poppet-bench{grid-template-columns:120px minmax(0,1fr);padding:8px}.ctv-ritual-line{font-size:clamp(1.2rem,3.5vw,2rem)}.ctv-breach-line{font-size:clamp(1.7rem,7vw,3.3rem)}}
+
+/* Hard stage geometry: the dialogue controls must never enter document flow. */
+.cutscene.ctv .ctv-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;overflow:visible!important}
+.cutscene.ctv.has-poppet .ctv-poppet.is-physius-lock{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important}
+.cutscene.ctv .ctv-gate{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:20px!important;transform:translateX(-50%)!important}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   V3 sweep: the authored stage directions, made material
+
+   The controller has always emitted one class or overlay per authored beat
+   (`fxV3Effect` in src/cutscene.js), but a critical pass found that most of
+   those names had no rule anywhere in the project: the ritual's cracks and
+   stars, the divination table, Vanir's aperture and puddle, AS ABOVE SO BELOW,
+   the stamped words, the Rainy Day card and the post-tutorial desktop residue
+   were all being announced to a DOM that never painted them. The beats below
+   are the ones the script writes stage directions for, restored and kept
+   inside `.screen-stage` — nothing here touches the case around the tube.
+
+   Two rules govern the whole block:
+     · every effect reads as a MATERIAL in the room (soot, pigment, vellum,
+       slate, wet paper, gold thread), never as a UI overlay;
+     · no effect invents dialogue. Where a caption already existed in the
+       controller it is kept, quiet, as an annotation rather than a title.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── the one caption voice ────────────────────────────────────────────────
+   Production annotations ('the mark continues beyond the light', 'the room
+   warms around the fear') sit at the temperature of the room's own whispers:
+   small, letterspaced, never competing with a speaker. */
+.cutscene.ctv .ctv-stage-caption,
+.ctv-floor-inscription span,
+.ctv-wander-weather b,
+.ctv-void-aperture b,
+.ctv-physius-summon b,
+.ctv-arcana-summon b,
+.ctv-vanir-summon b,
+.ctv-stone-seam b,
+.ctv-poppet-montage b {
+  color: rgba(232, 200, 144, 0.72);
+  font: 600 clamp(9px, 0.72vw, 11px)/1.6 'VT323', 'Courier New', monospace;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+}
+
+/* ── the overlays are planes, not flow ────────────────────────────────────
+   cutscene.css has `.cutscene.ctv>*{position:relative;z-index:1}` at (0,2,0),
+   which silently outranks every bare `.ctv-*` overlay rule at (0,1,0) and
+   drops the whole stage plane back into normal flow — the Rainy Day card
+   measured as `left:17px` OFF ITS STATIC POSITION rather than 17px from the
+   glass, and the finale's black plane shrank to the height of its own text.
+
+   One grouped rule at (0,2,0), later in the cascade, restores every full-stage
+   plane in this block. Individual rules below still own their own geometry. */
+.cutscene.ctv > .ctv-cracks,
+.cutscene.ctv > .ctv-stars,
+.cutscene.ctv > .ctv-sheen,
+.cutscene.ctv > .ctv-floor-inscription,
+.cutscene.ctv > .ctv-wander-weather,
+.cutscene.ctv > .ctv-as-above-copy,
+.cutscene.ctv > .ctv-physius-summon,
+.cutscene.ctv > .ctv-arcana-summon,
+.cutscene.ctv > .ctv-vanir-summon,
+.cutscene.ctv > .ctv-arcana-table-shift,
+.cutscene.ctv > .ctv-void-aperture,
+.cutscene.ctv > .ctv-stone-seam,
+.cutscene.ctv > .ctv-rainy-card,
+.cutscene.ctv > .ctv-divination-table,
+.cutscene.ctv > .ctv-vanir-puddle,
+.cutscene.ctv > .ctv-self-figure,
+.cutscene.ctv > .ctv-breach,
+.cutscene.ctv > .ctv-finale,
+.cutscene.ctv > .ctv-breach-ring,
+.cutscene.ctv > .ctv-finale-orbit,
+.cutscene.ctv > .ctv-ritual-seal,
+.ctv-body > .ctv-self-figure,
+.ctv-body > .ctv-evaporating-word {
+  position: absolute;
+}
+
+/* `--ctv-rail` is owned by the stage sheet; the puddle needs it even when the
+   stage layer is missing, so give the block a local default. */
+.cutscene.ctv { --ctv-rail: 96px; }
+
+/* ── Beat 01–03: the room has already changed ─────────────────────────────
+   "Y's box appears low and slightly off-register... placed on the screen
+   after the event rather than authored into it." One slow settle at the top
+   of the tutorial, then it is never used again. */
+.cutscene.ctv.ctv-opening-displaced .ctv-liber-vacui {
+  animation: ctv-off-register 1.9s cubic-bezier(0.22, 1, 0.3, 1) both, ctv-you-hover 7s ease-in-out 1.9s infinite;
+}
+
+@keyframes ctv-off-register {
+  from { opacity: 0; transform: translate(-14px, 16px) rotate(-1.6deg) scale(0.985); filter: saturate(0.7) brightness(1.12); }
+  to { opacity: 1; transform: translate(0, 0) rotate(-0.6deg); filter: none; }
+}
+
+/* Beat 02. "A small incomplete figure is visible inside the box: not a full
+   avatar, only a head shape, one seam, and a blank region." The three
+   candidate readings collapse back into the one incomplete body. */
+.ctv-self-figure {
+  position: absolute;
+  left: 14px;
+  bottom: -34px;
+  z-index: 3;
+  width: 66px;
+  height: 92px;
+  pointer-events: none;
+  border: 1px solid rgba(241, 200, 121, 0.5);
+  border-radius: 50% 50% 44% 44% / 58% 58% 42% 42%;
+  background: linear-gradient(180deg, rgba(255, 228, 194, 0.16), rgba(0, 0, 0, 0) 62%);
+  box-shadow: 0 0 20px rgba(212, 175, 101, 0.16);
+  opacity: 0.9;
+}
+
+.ctv-self-figure::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  bottom: -14%;
+  width: 1px;
+  background: rgba(241, 200, 121, 0.6);
+}
+
+.ctv-self-figure i {
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  transform: translateX(-50%);
+  font: 10px 'VT323', monospace;
+  letter-spacing: 0.16em;
+  color: rgba(232, 200, 144, 0.85);
+  opacity: 0;
+  animation: ctv-reading-try 1.5s ease-out forwards;
+}
+
+.ctv-self-figure i:nth-child(2) { animation-delay: 0.18s; }
+.ctv-self-figure i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes ctv-reading-try {
+  0% { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.86); }
+  42% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(0.96); }
+}
+
+/* Beat 03. The name is sewn into Y's body, so a denial pulls it loose: the
+   label tears off its stitches and the plate shifts a few pixels. */
+.cutscene.ctv .ctv-liber-vacui.is-name-loose .ctv-voice {
+  animation: ctv-name-loose 1.1s cubic-bezier(0.3, 0.9, 0.4, 1.4) both;
+}
+
+@keyframes ctv-name-loose {
+  0% { transform: none; }
+  38% { transform: translate(7px, -3px) rotate(-2.6deg); opacity: 0.72; }
+  100% { transform: translate(1px, 0) rotate(-0.6deg); opacity: 1; }
+}
+
+/* Beat 05. "The stage subtly expands beyond the desktop." The room is already
+   there; this is the moment the player is allowed to notice it. */
+.cutscene.ctv.ctv-inside-screen > .ctv-world {
+  animation: ctv-room-notice 2.4s ease-out both;
+}
+
+@keyframes ctv-room-notice {
+  0% { filter: brightness(0.72) blur(3px); transform: scale(1.035); }
+  60% { filter: brightness(1.06) blur(0); }
+  100% { filter: none; transform: none; }
+}
+
+/* Beat 06. "A line of writing becomes visible only where reflected monitor
+   light touches it... it continues outside the visible stage." */
+.cutscene.ctv.ctv-floor-revealed > .ctv-world > .ctv-world-floor::after {
+  opacity: 1;
+  filter: brightness(1.5);
+  transition: opacity 0.7s ease, filter 0.7s ease;
+}
+
+.ctv-floor-inscription {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 63%;
+  height: 14%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255, 226, 180, 0.5) 0 1px,
+      rgba(0, 0, 0, 0) 1px 4px,
+      rgba(255, 226, 180, 0.32) 4px 5px,
+      rgba(0, 0, 0, 0) 5px 13px,
+      rgba(255, 226, 180, 0.44) 13px 14px,
+      rgba(0, 0, 0, 0) 14px 21px);
+  mask-image: radial-gradient(ellipse 58% 160% at 50% 42%, #000 0%, rgba(0, 0, 0, 0.3) 56%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 58% 160% at 50% 42%, #000 0%, rgba(0, 0, 0, 0.3) 56%, transparent 82%);
+  transform: perspective(200px) rotateX(54deg);
+  transform-origin: 50% 0;
+  animation: ctv-inscription-breathe 4.6s ease-in-out infinite;
+}
+
+.ctv-floor-inscription i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 236, 200, 0.22), transparent);
+  animation: ctv-inscription-read 3.4s ease-in-out infinite;
+}
+
+.ctv-floor-inscription span {
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+}
+
+@keyframes ctv-inscription-breathe {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 0.92; }
+}
+
+@keyframes ctv-inscription-read {
+  0% { transform: translateX(-42%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(42%); opacity: 0; }
+}
+
+/* ── Beat 07: the four lines, typed to light ──────────────────────────────
+   The ritual escalates as four screen changes: hairline cracks in the bezel,
+   stars populating the monitor, a distant warm colour entering the CRT, then
+   a new chatbox building itself out of the fractures. The first three are
+   drawn on the cast's own GPU layer (see src/pixi-cast.js, LiberCast.weather);
+   these are the DOM fallbacks for a browser that never mounted Pixi. */
+.ctv-cracks {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  animation: ctv-cracks-in 0.6s ease-out forwards;
+  background:
+    linear-gradient(71deg, transparent 49.72%, rgba(255, 236, 214, 0.5) 49.86%, transparent 50%),
+    linear-gradient(-63deg, transparent 30.4%, rgba(255, 214, 236, 0.42) 30.52%, transparent 30.66%),
+    linear-gradient(104deg, transparent 71.2%, rgba(255, 240, 226, 0.34) 71.32%, transparent 71.44%),
+    linear-gradient(24deg, transparent 18.6%, rgba(255, 208, 232, 0.3) 18.72%, transparent 18.84%);
+  mask-image: radial-gradient(ellipse 78% 66% at 50% 52%, transparent 6%, #000 62%, transparent 96%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 66% at 50% 52%, transparent 6%, #000 62%, transparent 96%);
+}
+
+.ctv-cracks-wild {
+  background:
+    linear-gradient(71deg, transparent 49.7%, rgba(255, 236, 214, 0.62) 49.86%, transparent 50%),
+    linear-gradient(-63deg, transparent 30.35%, rgba(255, 214, 236, 0.56) 30.52%, transparent 30.7%),
+    linear-gradient(104deg, transparent 71.15%, rgba(255, 240, 226, 0.5) 71.32%, transparent 71.5%),
+    linear-gradient(24deg, transparent 18.55%, rgba(255, 208, 232, 0.44) 18.72%, transparent 18.9%),
+    linear-gradient(-141deg, transparent 60.4%, rgba(255, 246, 232, 0.5) 60.55%, transparent 60.7%);
+}
+
+.ctv-cracks.is-fade { opacity: 0; transition: opacity 2.4s ease; }
+@keyframes ctv-cracks-in { to { opacity: 1; } }
+
+.ctv-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  opacity: 0;
+  animation: ctv-stars-in 2.6s ease-out forwards;
+}
+
+.ctv-stars span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff2d6;
+  box-shadow: 0 0 6px rgba(255, 226, 170, 0.9);
+  animation: ctv-star-twinkle 3.4s ease-in-out infinite;
+}
+
+.ctv-stars span:nth-child(3n) { background: #ffe4b8; box-shadow: 0 0 7px rgba(212, 175, 101, 0.8); }
+.ctv-stars span:nth-child(5n) { background: #eadfc6; box-shadow: 0 0 7px rgba(232, 200, 144, 0.8); }
+.ctv-stars span:nth-child(2n) { animation-duration: 4.6s; animation-delay: -1.2s; }
+@keyframes ctv-stars-in { to { opacity: 1; } }
+@keyframes ctv-star-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+/* ── ACT III: "her care is invasive" ─────────────────────────────────────
+   "The darkness is not deleted; it is pushed toward the edges. Pink, violet
+   and gold weather enter the screen. Stars become visible." */
+.cutscene.ctv.ctv-wander-care { background: rgba(24, 6, 20, 0.72); }
+
+.ctv-wander-weather {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  overflow: hidden;
+  animation: ctv-weather-in 1.4s ease-out both;
+  background:
+    radial-gradient(ellipse 60% 44% at 18% 22%, rgba(255, 138, 184, 0.3), transparent 62%),
+    radial-gradient(ellipse 52% 40% at 82% 74%, rgba(150, 80, 255, 0.26), transparent 64%),
+    radial-gradient(ellipse 74% 30% at 50% 96%, rgba(255, 216, 106, 0.2), transparent 70%),
+    radial-gradient(ellipse 120% 92% at 50% 50%, transparent 42%, rgba(2, 1, 3, 0.92) 96%);
+}
+
+.ctv-wander-weather i {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 226, 176, 0.6), transparent);
+  animation: ctv-weather-drift 7s linear infinite;
+}
+
+.ctv-wander-weather i:nth-child(1) { top: 26%; }
+.ctv-wander-weather i:nth-child(2) { top: 48%; animation-duration: 9.5s; animation-delay: -3s; }
+.ctv-wander-weather i:nth-child(3) { top: 71%; animation-duration: 11s; animation-delay: -6s; }
+.ctv-wander-weather b {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 9px;
+}
+
+@keyframes ctv-weather-in { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: none; } }
+@keyframes ctv-weather-drift {
+  from { transform: translateX(-14%); opacity: 0; }
+  40% { opacity: 0.8; }
+  to { transform: translateX(14%); opacity: 0; }
+}
+
+/* Wanderlust's arrival was authored as light, bouncy and uncontainable, and
+   had no entrance at all: ENTER_FX pointed at a class no stylesheet defined. */
+.ctv-wanderlust.is-infect {
+  animation: ctv-wander-arrive 1.1s cubic-bezier(0.18, 1.5, 0.32, 1) both, ctv-wander-hover 5.8s ease-in-out 1.1s infinite;
+}
+
+@keyframes ctv-wander-arrive {
+  from { opacity: 0; transform: translate(-26vw, -10vh) rotate(-14deg) scale(0.42); filter: blur(12px) brightness(2.1); }
+  55% { opacity: 1; transform: translate(0, 0) rotate(3deg) scale(1.06); filter: blur(0) brightness(1.25); }
+  72% { transform: translate(-6px, 3px) rotate(1deg) scale(0.99); }
+  to { opacity: 1; transform: rotate(2deg) scale(1); filter: none; }
+}
+
+/* Wanderlust's box is "physically impossible to contain" — it pushes against
+   the edges of the room rather than simply appearing above it. */
+.cutscene.ctv .ctv-wanderlust {
+  max-width: min(520px, 62%);
+}
+
+/* ── the ritual's fourth line: a chatbox built out of the fractures ─────── */
+.ctv-wanderlust.is-construct {
+  animation: ctv-construct 1.5s cubic-bezier(0.2, 1, 0.3, 1) both, ctv-wander-hover 5.8s ease-in-out 1.5s infinite;
+}
+
+@keyframes ctv-construct {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 46%, 52% 46%, 52% 54%, 0 54%);
+    filter: brightness(2.6) saturate(0.2);
+  }
+  34% { opacity: 1; clip-path: polygon(0 12%, 100% 12%, 100% 46%, 0 46%, 0 54%, 100% 54%, 100% 88%, 0 88%); }
+  62% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); filter: brightness(1.5); }
+  100% { opacity: 1; clip-path: none; filter: none; }
+}
+
+/* ── Riason's infodump: overflow, not a loading bar ───────────────────────
+   "A joke made of overflowing vellum, index cards, and diagram fragments." */
+.cutscene.ctv.ctv-riason-overload .ctv-riason {
+  animation: ctv-overload-press 0.5s ease-out 2 alternate;
+}
+
+.cutscene.ctv.ctv-riason-overload .ctv-riason::before {
+  content: '∴ ∴ ∴';
+  transform: rotate(-14deg) scale(1.1);
+}
+
+@keyframes ctv-overload-press {
+  from { transform: rotate(1deg) scale(1); }
+  to { transform: rotate(-1.6deg) scale(1.035); }
+}
+
+/* "Preparing infodump" is the concept cards arriving before the sentence
+   needs them — the joke is that they cannot be held at once. */
+.cutscene.ctv .ctv-concept-cards i {
+  box-shadow: 4px 5px 0 rgba(36, 63, 85, 0.24), 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ── "take over": the phrase the interface briefly obeys ───────────────────
+   "Borders bend, labels shift, and one cartridge icon changes allegiance." */
+.cutscene.ctv.ctv-interface-breach .ctv-cast {
+  animation: ctv-breach-bend 1.5s ease-in-out both;
+}
+
+@keyframes ctv-breach-bend {
+  0%, 100% { transform: none; }
+  18% { transform: skewX(-1.6deg) translateX(6px); }
+  42% { transform: skewX(1.2deg) translateX(-5px); }
+  70% { transform: skewX(-0.5deg) translateX(2px); }
+}
+
+.ctv-spooky-word {
+  position: relative;
+  display: inline-block;
+  padding: 0 0.22em;
+  color: #12060c;
+  background: linear-gradient(180deg, #ffd9ec, #ff8ab8 55%, #b8457e);
+  font-family: 'WanderlustDialogue', Georgia, serif;
+  transform: rotate(-1.2deg);
+  box-shadow: 0 0 18px rgba(255, 105, 180, 0.55);
+  animation: ctv-spooky-flicker 1.4s steps(2, end) infinite;
+}
+
+@keyframes ctv-spooky-flicker {
+  0%, 100% { filter: none; transform: rotate(-1.2deg); }
+  50% { filter: brightness(1.3) hue-rotate(-14deg); transform: rotate(0.8deg) translateY(-1px); }
+}
+
+/* ── ACT VII: AS ABOVE SO BELOW ───────────────────────────────────────────
+   "The phrase appears twice: once in the upper reflection and once in the
+   lower machine surface. The two versions approach each other until the
+   screen folds vertically." */
+.cutscene.ctv.ctv-inversion .ctv-world {
+  transform: rotate(180deg);
+  transform-origin: 50% 50%;
+  transition: transform 2.2s cubic-bezier(0.6, 0, 0.4, 1);
+}
+
+.ctv-as-above-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 6px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(6, 3, 8, 0.5), transparent 34%, transparent 66%, rgba(6, 3, 8, 0.5));
+}
+
+.ctv-as-above-copy span {
+  color: #ffe6c4;
+  font: italic clamp(1.3rem, 3.6vw, 2.6rem)/1 'SummonDialogue', Georgia, serif;
+  letter-spacing: 0.34em;
+  text-shadow: 0 0 22px rgba(255, 200, 140, 0.8), 0 0 60px rgba(180, 90, 255, 0.5);
+  animation: ctv-approach-above 2.4s cubic-bezier(0.6, 0, 0.4, 1) both;
+}
+
+.ctv-as-above-copy span:nth-child(2) {
+  transform: scaleY(-1);
+  animation-name: ctv-approach-below;
+}
+
+@keyframes ctv-approach-above {
+  0% { opacity: 0; transform: translateY(-16%) scale(1.12); filter: blur(7px); }
+  55% { opacity: 1; filter: blur(0); }
+  100% { opacity: 0.9; transform: translateY(-2%) scale(1); }
+}
+
+@keyframes ctv-approach-below {
+  0% { opacity: 0; transform: scaleY(-1) translateY(-16%) scale(1.12); filter: blur(7px); }
+  55% { opacity: 1; filter: blur(0); }
+  100% { opacity: 0.9; transform: scaleY(-1) translateY(-2%) scale(1); }
+}
+
+/* the fold itself: one seam, top to bottom, when the two halves meet */
+.cutscene.ctv.ctv-inversion .ctv-stage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 240, 214, 0.9), transparent);
+  box-shadow: 0 0 26px rgba(255, 226, 180, 0.8);
+  animation: ctv-fold-seam 2.4s ease-in-out both;
+}
+
+@keyframes ctv-fold-seam {
+  0%, 42% { opacity: 0; }
+  70% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+/* ── stamped words: material, never a floating caption ────────────────────
+   "an alchemist" is stamped into the table in gold; LEARN is a physical door
+   in the Games cartridge; the Noble Shadow's gold appears at tears. */
+.ctv-gold-stamp {
+  display: inline-block;
+  padding: 0.04em 0.42em 0.1em;
+  color: #2a1c07;
+  background: linear-gradient(176deg, #ffe9a8, #d4af65 52%, #8a6a20);
+  border-radius: 2px;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  box-shadow: inset 0 1px 0 rgba(255, 249, 224, 0.8), inset 0 -2px 0 rgba(74, 48, 6, 0.5), 0 0 19px rgba(212, 175, 101, 0.45);
+  transform: rotate(-0.8deg);
+  animation: ctv-stamp-in 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes ctv-stamp-in {
+  0% { opacity: 0; transform: rotate(-0.8deg) scale(1.5); filter: brightness(2.4); }
+  62% { opacity: 1; transform: rotate(-0.8deg) scale(0.94); }
+  100% { opacity: 1; transform: rotate(-0.8deg) scale(1); }
+}
+
+.ctv-learn-door {
+  display: inline-block;
+  padding: 0.02em 0.36em 0.08em;
+  color: #ffe6b4;
+  background: linear-gradient(180deg, #3a2410 0%, #17100a 58%, #090604 100%);
+  border: 1px solid #8a6a20;
+  border-radius: 1px 1px 4px 4px;
+  letter-spacing: 0.2em;
+  box-shadow: inset 0 0 12px rgba(255, 216, 106, 0.28), 0 2px 0 #070403;
+}
+
+.ctv-learn-door::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: 0.16em;
+  background: linear-gradient(90deg, transparent, rgba(255, 216, 106, 0.9), transparent);
+}
+
+.ctv-noble-word {
+  color: #d9b76a;
+  text-shadow: 0 0 1px rgba(217, 183, 106, 0.9);
+  letter-spacing: 0.05em;
+  /* the gold is deliberately hard to read: it is only legible at the tear */
+  -webkit-text-stroke: 0.3px rgba(255, 233, 168, 0.5);
+}
+
+/* ── ACT XIII: Arcana's own table ─────────────────────────────────────────
+   "The desktop peels into Arcana's personal table: card piles, embedded
+   coins, a candle, thread, bones, tea stain, and a question surface...
+   personal, handled, and imperfect." */
+.ctv-divination-table {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%) rotate(-0.6deg);
+  z-index: 26;
+  width: min(600px, 82%);
+  padding: 16px clamp(14px, 2.4vw, 26px) clamp(14px, 2.4vw, 22px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label deck'
+    'question deck'
+    'status status';
+  align-items: center;
+  gap: 8px clamp(12px, 2vw, 22px);
+  color: #f4e8d2;
+  background:
+    radial-gradient(ellipse 46% 38% at 16% 10%, rgba(255, 200, 120, 0.16), transparent 60%),
+    radial-gradient(circle at 88% 88%, rgba(255, 105, 180, 0.12), transparent 42%),
+    radial-gradient(circle at 72% 26%, rgba(212, 175, 101, 0.09), transparent 34%),
+    repeating-linear-gradient(112deg, rgba(0, 0, 0, 0.34) 0 2px, rgba(0, 0, 0, 0) 2px 7px),
+    linear-gradient(158deg, #201317, #0a070b 74%);
+  border: 1px solid rgba(212, 175, 101, 0.52);
+  border-radius: 3px 26px 4px 30px;
+  box-shadow: 0 26px 62px rgba(0, 0, 0, 0.74), inset 0 0 56px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(255, 105, 180, 0.08);
+  animation: ctv-table-peel 1.2s cubic-bezier(0.2, 1, 0.3, 1) both;
+}
+
+@keyframes ctv-table-peel {
+  from { opacity: 0; transform: translate(-50%, -44%) rotate(-0.6deg) scale(0.94); filter: blur(6px); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(-0.6deg) scale(1); filter: none; }
+}
+
+/* embedded coin and a candle at the far edge of the felt */
+.ctv-divination-table::before {
+  content: '';
+  position: absolute;
+  inset: -14px -10px auto auto;
+  width: 92px;
+  height: 92px;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 226, 176, 0.9) 0 6%, rgba(212, 175, 101, 0.55) 6% 9%, transparent 9%),
+    radial-gradient(circle at 50% 46%, rgba(255, 200, 120, 0.34), transparent 62%),
+    conic-gradient(from 20deg, rgba(212, 175, 101, 0.5) 0 3%, transparent 3% 12%, rgba(212, 175, 101, 0.42) 12% 15%, transparent 15% 100%);
+  filter: drop-shadow(0 0 16px rgba(255, 190, 110, 0.4));
+}
+
+/* thread, bones and the tea stain, drawn into the felt */
+.ctv-divination-table::after {
+  content: '';
+  position: absolute;
+  inset: auto -8px -16px 6%;
+  height: 78px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 26% 46% at 12% 68%, rgba(120, 60, 30, 0.5), transparent 68%),
+    radial-gradient(ellipse 14% 26% at 46% 52%, rgba(232, 226, 208, 0.5), transparent 70%),
+    radial-gradient(ellipse 10% 18% at 58% 64%, rgba(232, 226, 208, 0.4), transparent 70%),
+    linear-gradient(84deg, transparent 22%, rgba(196, 60, 72, 0.55) 22.4%, transparent 22.9%, transparent 62%, rgba(196, 60, 72, 0.4) 62.4%, transparent 63%);
+}
+
+.ctv-divination-table label {
+  grid-area: label;
+  color: rgba(232, 200, 144, 0.66);
+  font: 600 10px/1 'VT323', monospace;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.ctv-divination-table input {
+  grid-area: question;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  color: #2a1c12;
+  background: linear-gradient(168deg, #f3e6c4, #cdb787);
+  border: 0;
+  border-radius: 2px 10px 2px 10px;
+  font: italic 1.06rem/1.3 'WanderlustDialogue', Georgia, serif;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4), inset 0 0 18px rgba(120, 90, 40, 0.2);
+}
+
+.ctv-divination-table input:disabled {
+  opacity: 1;
+  -webkit-text-fill-color: #2a1c12;
+  cursor: default;
+}
+
+.ctv-divination-deck {
+  grid-area: deck;
+  position: relative;
+  width: 74px;
+  height: 106px;
+  perspective: 320px;
+}
+
+.ctv-divination-deck i {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(212, 175, 101, 0.7);
+  background:
+    linear-gradient(150deg, #1d1016, #090609 70%),
+    repeating-linear-gradient(24deg, transparent 0 9px, rgba(244, 232, 210, 0.1) 9px 10px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
+  transform-origin: 50% 100%;
+  transition: transform 0.42s cubic-bezier(0.2, 1.4, 0.3, 1), opacity 0.3s ease;
+}
+
+.ctv-divination-deck i:nth-child(1) { transform: rotate(-7deg) translate(-4px, 2px); }
+.ctv-divination-deck i:nth-child(2) { transform: rotate(3deg) translate(3px, -1px); }
+.ctv-divination-deck i:nth-child(3) { transform: rotate(-1deg); }
+.ctv-divination-deck b {
+  position: absolute;
+  left: 50%;
+  bottom: -20px;
+  transform: translateX(-50%);
+  color: rgba(232, 200, 144, 0.7);
+  font: 600 9px/1 'VT323', monospace;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+/* "One card is slightly out of alignment" — she draws it before she finishes
+   explaining what a draw is. */
+.ctv-divination-table.is-drawing .ctv-divination-deck i:nth-child(3) {
+  transform: translateY(-16px) rotate(-6deg) scale(1.04);
+  box-shadow: 0 0 26px rgba(255, 216, 106, 0.5);
+}
+
+.ctv-divination-table.is-drawing {
+  animation: ctv-table-draw 0.5s ease-out;
+}
+
+@keyframes ctv-table-draw {
+  35% { transform: translate(-50%, -50%) rotate(1.1deg); }
+}
+
+.ctv-divination-table.has-drawn .ctv-divination-deck i:nth-child(3) {
+  transform: translate(-30px, -34px) rotate(-13deg) scale(1.06);
+}
+
+.ctv-divination-table.has-drawn .ctv-divination-deck i:nth-child(1) { transform: rotate(-9deg) translate(-5px, 3px); }
+
+.ctv-divination-table.has-drawn .ctv-divination-deck i:nth-child(2) { transform: rotate(5deg) translate(4px, -1px); }
+
+.ctv-divination-table.has-drawn .ctv-divination-status { color: #ffd9ec; }
+
+.ctv-divination-status {
+  grid-area: status;
+  margin-top: 6px;
+  color: rgba(244, 232, 210, 0.6);
+  font: italic 0.98rem/1.4 'WanderlustDialogue', Georgia, serif;
+  transition: color 0.4s ease;
+}
+
+/* the artifact leaving the table: card stock, gold edge, reversal state */
+.ctv-divination-table.is-orbiting ~ .ctv-artifact,
+.cutscene.ctv .ctv-artifact {
+  transform-origin: 50% 50%;
+}
+
+/* ── the artifacts of arrival and departure ───────────────────────────────
+   Physius arrives as a stone slab; Arcana assembles her spread from rules
+   and measured corners; the desktop keeps the vanir wound and the final four
+   material doors. */
+.ctv-physius-summon,
+.ctv-arcana-summon,
+.ctv-vanir-summon,
+.ctv-arcana-table-shift {
+  position: absolute;
+  inset: 0;
+  z-index: 13;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ctv-physius-summon i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(103deg, transparent 22%, rgba(150, 148, 138, 0.5) 38%, rgba(238, 233, 220, 0.32) 50%, rgba(60, 58, 52, 0.6) 62%, transparent 78%);
+  animation: ctv-slab-overtake 2.1s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+
+.ctv-physius-summon b {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  color: rgba(238, 233, 220, 0.8);
+  font-size: 11px;
+  animation: ctv-annotation-pass 2.1s ease-out both;
+}
+
+@keyframes ctv-slab-overtake {
+  0% { transform: translateX(-52%); opacity: 0; }
+  35% { opacity: 1; }
+  70% { transform: translateX(0); }
+  100% { transform: translateX(0); opacity: 0.24; }
+}
+
+@keyframes ctv-annotation-pass {
+  0%, 44% { opacity: 0; letter-spacing: 0.6em; }
+  62% { opacity: 0.9; letter-spacing: 0.28em; }
+  100% { opacity: 0; }
+}
+
+.ctv-arcana-summon i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(420px, 62%);
+  height: min(280px, 46%);
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(212, 175, 101, 0.6);
+  background: linear-gradient(150deg, rgba(29, 16, 22, 0.9), rgba(9, 6, 9, 0.86));
+  box-shadow: 0 0 0 1px rgba(255, 105, 180, 0.2), 0 20px 50px rgba(0, 0, 0, 0.7);
+  animation: ctv-spread-assemble 1.3s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+
+.ctv-arcana-summon i:nth-child(2) { animation-delay: 0.12s; transform: translate(-50%, -50%) rotate(7deg) scale(0.94); }
+.ctv-arcana-summon i:nth-child(3) { animation-delay: 0.24s; transform: translate(-50%, -50%) rotate(-6deg) scale(0.88); }
+.ctv-arcana-summon b {
+  position: absolute;
+  left: 50%;
+  top: 78%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  animation: ctv-annotation-pass 1.8s ease-out both;
+}
+
+@keyframes ctv-spread-assemble {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(-22deg) scale(0.4); filter: blur(9px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 0.9; }
+}
+
+/* "the screen does not fill with smoke. A region of the CRT fails to render.
+   Stars disappear. A wet black mark develops at the edge." */
+.ctv-void-aperture {
+  position: absolute;
+  inset: 0;
+  z-index: 24;
+  pointer-events: none;
+  filter: blur(0.4px);
+  animation: ctv-void-open 2.4s ease-out both;
+}
+
+.ctv-void-aperture i {
+  position: absolute;
+  right: -6%;
+  top: -8%;
+  width: 62%;
+  height: 78%;
+  border-radius: 47% 53% 38% 62% / 56% 41% 59% 44%;
+  background: radial-gradient(ellipse at 62% 34%, rgba(169, 155, 255, 0.09), rgba(0, 0, 0, 0.94) 52%, #000 78%);
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 1), 0 0 40px rgba(0, 0, 0, 0.9);
+  animation: ctv-void-breathe 9s ease-in-out infinite;
+}
+
+.ctv-void-aperture b {
+  position: absolute;
+  left: 12%;
+  bottom: 7%;
+  white-space: nowrap;
+  color: rgba(212, 175, 101, 0.6);
+  font-size: 9px;
+  animation: ctv-annotation-pass 2.4s ease-out both;
+}
+
+@keyframes ctv-void-open {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes ctv-void-breathe {
+  0%, 100% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.035) rotate(2deg); }
+}
+
+.ctv-vanir-summon i {
+  position: absolute;
+  left: 6%;
+  bottom: 4%;
+  width: 46%;
+  height: 34%;
+  border-radius: 42% 58% 52% 48% / 60% 46% 54% 40%;
+  background: radial-gradient(ellipse at 40% 30%, rgba(0, 0, 0, 0.86), #000 72%);
+  box-shadow: 0 0 44px 12px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(169, 155, 255, 0.16);
+  animation: ctv-wet-mark-spread 2.3s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+}
+
+.ctv-vanir-summon b {
+  position: absolute;
+  left: 8%;
+  bottom: 2%;
+  color: rgba(169, 155, 255, 0.72);
+  font-size: 9px;
+  animation: ctv-annotation-pass 2.3s ease-out both;
+}
+
+@keyframes ctv-wet-mark-spread {
+  0% { opacity: 0; transform: scale(0.2) rotate(-14deg); filter: blur(12px); }
+  55% { opacity: 0.95; filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.ctv-arcana-table-shift i {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 66% 50% at 30% 26%, rgba(212, 175, 101, 0.16), transparent 62%),
+    radial-gradient(ellipse 60% 46% at 76% 70%, rgba(255, 105, 180, 0.12), transparent 64%);
+  animation: ctv-table-shift-in 1.3s ease-out both;
+}
+
+.ctv-arcana-table-shift i:nth-child(2) { inset: 6%; border: 1px dotted rgba(212, 175, 101, 0.28); transform: rotate(3deg); animation-delay: 0.08s; }
+.ctv-arcana-table-shift i:nth-child(3) { inset: 12%; border: 1px dotted rgba(255, 105, 180, 0.22); transform: rotate(-4deg); animation-delay: 0.16s; }
+@keyframes ctv-table-shift-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* the stone seam that carries the traveller from the desktop into the lab */
+.ctv-stone-seam,
+.ctv-poppet-threshold > .ctv-stone-seam {
+  position: absolute;
+  inset: 0;
+  z-index: 140;
+  pointer-events: none;
+  overflow: hidden;
+  animation: ctv-stone-overtake 1.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.ctv-stone-seam i {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(212, 175, 101, 0.16), transparent 66%),
+    repeating-linear-gradient(94deg, rgba(0, 0, 0, 0.5) 0 2px, rgba(0, 0, 0, 0) 2px 16px),
+    linear-gradient(148deg, #22323f, #17242d 46%, #0b1216 78%);
+}
+
+.ctv-stone-seam b {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(238, 233, 220, 0.78);
+  font-size: 11px;
+}
+
+@keyframes ctv-stone-overtake {
+  0% { opacity: 0; clip-path: inset(48% 46% 48% 46%); }
+  22% { opacity: 1; }
+  58% { clip-path: inset(24% 8% 24% 8%); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* ── ACT X: the fourth layer turns the table's back ───────────────────────
+   "The doll rotates away, the lamp moves behind the player's viewpoint, and
+   the cursor becomes a needle glint." */
+.cutscene.ctv.ctv-others-turn .ctv-cast {
+  animation: ctv-table-turn 1.9s cubic-bezier(0.5, 0, 0.3, 1) both;
+  transform-origin: 50% 88%;
+}
+
+@keyframes ctv-table-turn {
+  0% { transform: none; filter: brightness(1); }
+  40% { transform: perspective(700px) rotateY(-8deg) translateX(-3%); filter: brightness(0.55); }
+  100% { transform: perspective(700px) rotateY(0) translateX(0); filter: brightness(1); }
+}
+
+/* Y is carried: the plate nestles against Physius rather than standing alone */
+.cutscene.ctv.ctv-traveller-nestle .ctv-liber-vacui {
+  animation: ctv-nestle 1.3s cubic-bezier(0.2, 1.2, 0.3, 1) both, ctv-you-hover 7s ease-in-out 1.3s infinite;
+}
+
+@keyframes ctv-nestle {
+  0% { transform: translate(-18px, 8px) rotate(-3deg) scale(0.96); }
+  60% { transform: translate(4px, -4px) rotate(-0.4deg) scale(1.01); }
+  100% { transform: none; }
+}
+
+/* ── the attempted relation leaves a seam in Y ────────────────────────────
+   "Y's box briefly gains a visible seam, as if the attempted relation has
+   affected them." */
+.cutscene.ctv .ctv-liber-vacui.is-seamed::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  bottom: 4px;
+  width: 0;
+  border-left: 1px dashed rgba(255, 143, 184, 0.85);
+  transform: none;
+  background: none;
+  box-shadow: 0 0 14px rgba(255, 143, 184, 0.6);
+  border-radius: 0;
+  opacity: 1;
+  animation: ctv-seam-close 1.4s ease-in-out both;
+}
+
+@keyframes ctv-seam-close {
+  0% { opacity: 0; }
+  30%, 70% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+/* ── Vanir's dissolution ─────────────────────────────────────────────────
+   "Vanir's box loses tension and becomes a dark reflective puddle. It is not
+   defeated. The puddle remains long enough to be noticed... and the puddle
+   leaves a gold thread behind." */
+.cutscene.ctv .ctv-body.is-vanir-dissolving {
+  animation: ctv-vanir-collapse 1.25s cubic-bezier(0.6, 0, 0.7, 0.2) both !important;
+  transform-origin: 50% 100%;
+}
+
+@keyframes ctv-vanir-collapse {
+  0% { opacity: 1; transform: none; filter: none; }
+  35% { opacity: 0.9; transform: translate(var(--tx, 0), 6px) scaleY(0.72) skewX(-4deg); filter: blur(1px) brightness(0.7); }
+  70% { opacity: 0.55; transform: translate(var(--tx, 0), 18px) scaleY(0.28) scaleX(1.18); filter: blur(5px) brightness(0.4); }
+  100% { opacity: 0; transform: translate(var(--tx, 0), var(--ty, 34px)) scaleY(0.04) scaleX(1.5); filter: blur(9px) brightness(0.2); }
+}
+
+.ctv-vanir-puddle {
+  position: absolute;
+  left: 8%;
+  bottom: calc(var(--ctv-rail, 96px) + 18px);
+  z-index: 5;
+  width: min(300px, 34%);
+  height: 54px;
+  pointer-events: none;
+  border-radius: 46% 54% 60% 40% / 62% 48% 52% 38%;
+  background: radial-gradient(ellipse at 42% 34%, rgba(232, 200, 144, 0.07), rgba(20, 12, 9, 0.62) 58%, rgba(12, 7, 6, 0.5) 84%);
+  /* A residue mark lies flat in the floor's material: an inner darkening, not
+     the old lifted black blob whose drop shadow read as a hole cut in the room. */
+  box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.55), inset 0 0 26px rgba(212, 175, 101, 0.08);
+  opacity: 0;
+  animation: ctv-puddle-settle 1.1s ease-out 0.9s both;
+}
+
+.ctv-vanir-puddle.is-settled { opacity: 1; animation: ctv-puddle-breathe 7s ease-in-out infinite; }
+
+.ctv-vanir-puddle b {
+  position: absolute;
+  inset: 18% 14%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 34% 40%, rgba(255, 255, 255, 0.1), transparent 62%);
+}
+
+/* "the puddle leaves a gold thread behind. Wanderlust's color does not erase
+   it." — the thread is a separate object so it survives the wipe. */
+.ctv-vanir-gold-thread {
+  position: absolute;
+  left: 34%;
+  top: -12px;
+  width: 1px;
+  height: 74px;
+  background: linear-gradient(rgba(212, 175, 101, 0), #d4af65 42%, rgba(212, 175, 101, 0.15));
+  box-shadow: 0 0 12px rgba(212, 175, 101, 0.6);
+  transform: rotate(9deg);
+  animation: ctv-thread-tremble 6s ease-in-out infinite;
+}
+
+@keyframes ctv-puddle-settle {
+  0% { opacity: 0; transform: scaleY(0.1) scaleX(0.4); }
+  60% { opacity: 1; transform: scaleY(1.06) scaleX(1.02); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes ctv-puddle-breathe {
+  0%, 100% { transform: scale(1) rotate(0); opacity: 0.96; }
+  50% { transform: scale(1.04) rotate(1.5deg); opacity: 1; }
+}
+
+@keyframes ctv-thread-tremble {
+  0%, 100% { transform: rotate(9deg); }
+  50% { transform: rotate(6deg) translateY(-2px); }
+}
+
+/* the wound Wanderlust does not erase: her apology happens beside it */
+.cutscene.ctv.ctv-breach-residue .ctv-world { filter: saturate(0.82) brightness(0.92); }
+
+/* ── the desktop keeps what the tutorial cost ─────────────────────────────
+   These live INSIDE the glass, anchored to the stage, so they read as
+   residue on the tube rather than as furniture around it. */
+/* They are an after-image on the glass, not a second desktop: quiet enough to
+   live under the app's own orbit forever without becoming furniture. */
+/* (.ctv-desktop-final-materials retired: on the live desktop its four door
+   outlines + dashed absence circle read as a lattice, and Y's stable box
+   read as a mystery textbox. The styles are gone with the renderer.) */
+.ctv-desktop-vanir-residue,
+.ctv-desktop-demo {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.72;
+}
+
+.ctv-desktop-vanir-residue i {
+  position: absolute;
+  left: 6%;
+  bottom: 12%;
+  width: 34%;
+  height: 7%;
+  border-radius: 46% 54% 60% 40% / 62% 48% 52% 38%;
+  background: radial-gradient(ellipse at 42% 34%, rgba(169, 155, 255, 0.16), rgba(0, 0, 0, 0.9) 58%, #000 84%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+}
+
+.ctv-desktop-vanir-residue::after {
+  content: '';
+  position: absolute;
+  left: 22%;
+  bottom: 14%;
+  width: 1px;
+  height: 16%;
+  background: linear-gradient(rgba(212, 175, 101, 0), #d4af65);
+  box-shadow: 0 0 12px rgba(212, 175, 101, 0.55);
+  transform: rotate(8deg);
+}
+
+/* the desktop's own scratch pad after the demonstration, still residue-free */
+.ctv-desktop-demo .ctv-demo-notepad {
+  position: absolute;
+  left: 6%;
+  top: 6%;
+  padding: 5px 9px;
+  color: #3a2c1a;
+  background: linear-gradient(168deg, #e8dcb8, #cbb787);
+  font: 11px 'VT323', monospace;
+  letter-spacing: 0.14em;
+  transform: rotate(-2deg);
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.ctv-desktop-demo .ctv-demo-galaxy {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: rgba(232, 200, 144, 0.6);
+  font: 10px 'VT323', monospace;
+  letter-spacing: 0.22em;
+}
+
+.ctv-desktop-demo .ctv-demo-galaxy i {
+  display: block;
+  width: 96px;
+  height: 1px;
+  margin: 0 auto 10px;
+  background: linear-gradient(90deg, transparent, rgba(232, 200, 144, 0.5), transparent);
+}
+
+.ctv-desktop-demo .ctv-demo-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(232, 200, 144, 0.45);
+  font: 9px 'VT323', monospace;
+  letter-spacing: 0.2em;
+}
+
+.ctv-desktop-demo .ctv-demo-dock i {
+  width: 12px;
+  height: 9px;
+  border: 1px solid rgba(232, 200, 144, 0.35);
+}
+
+/* ── ACT XVI: the Rainy Day card ─────────────────────────────────────────
+   "Rainy Day appears as a wet black-and-gold card. It is optional,
+   reversible, and clearly distinct from the main path." The controller built
+   it with role=button and pointerEvents:auto but no styles at all, so it was
+   an invisible click target sitting on top of Vanir's line. */
+.ctv-rainy-card {
+  position: absolute;
+  left: 2%;
+  top: 3%;
+  z-index: 120;
+  width: min(250px, 42%);
+  padding: 11px 13px 12px;
+  cursor: pointer;
+  color: #f0df9a;
+  background:
+    radial-gradient(ellipse 60% 44% at 24% 18%, rgba(122, 216, 255, 0.14), transparent 62%),
+    linear-gradient(163deg, #0c0b10, #17121a 56%, #08070a);
+  border: 1px solid rgba(212, 175, 101, 0.6);
+  border-radius: 2px 20px 2px 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 0 26px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(169, 155, 255, 0.12);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: ctv-rainy-in 0.9s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+
+.ctv-rainy-card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 1px 18px 1px 18px;
+  background: repeating-linear-gradient(96deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 7px);
+  pointer-events: none;
+}
+
+.ctv-rainy-card b {
+  display: block;
+  color: #e8d9a0;
+  font: 600 1.02rem/1.2 'VT323', monospace;
+  letter-spacing: 0.2em;
+}
+
+.ctv-rainy-card span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(169, 155, 255, 0.78);
+  font: 600 9px/1.5 'VT323', monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.ctv-rainy-card:hover,
+.ctv-rainy-card:focus-visible {
+  outline: none;
+  border-color: #e8d9a0;
+}
+
+.ctv-rainy-card.is-selected {
+  border-color: #7ad8ff;
+  color: #d7f2ff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 0 26px rgba(122, 216, 255, 0.14), 0 0 26px rgba(122, 216, 255, 0.34);
+}
+
+.ctv-rainy-card.is-selected span { color: #7ad8ff; }
+
+@keyframes ctv-rainy-in {
+  from { opacity: 0; transform: translateY(-16px) rotate(-3deg) scale(0.94); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* ── the stage's own pulse ────────────────────────────────────────────────
+   beatPulse() has always published a tone per authored beat; give the tones
+   different light so the room changes temperature even with no spectacle. */
+.cutscene.ctv.ctv-pulse-jovial { background: rgba(26, 6, 18, 0.74); }
+.cutscene.ctv.ctv-pulse-suspicious { background: rgba(4, 3, 8, 0.86); }
+.cutscene.ctv.ctv-pulse-alarmed { background: rgba(30, 4, 10, 0.8); }
+.cutscene.ctv.ctv-pulse-dry { background: rgba(9, 10, 8, 0.78); }
+.cutscene.ctv.ctv-pulse-ritual { background: rgba(12, 2, 14, 0.8); }
+
+.cutscene.ctv[data-scene-authority='wanderlust'] > .ctv-world > .ctv-world-glow {
+  filter: saturate(1.3) brightness(1.1) hue-rotate(-8deg);
+}
+
+.cutscene.ctv[data-scene-authority='vanir'] > .ctv-world > .ctv-world-glow {
+  filter: saturate(0.4) brightness(0.55);
+}
+
+.cutscene.ctv[data-scene-authority='physius'] > .ctv-world > .ctv-world-glow {
+  filter: brightness(0.9) sepia(0.12);
+}
+
+.screen.ctv-screen-pulse {
+  animation: ctv-screen-pulse 0.9s ease-out;
+}
+
+@keyframes ctv-screen-pulse {
+  0% { filter: brightness(1); }
+  32% { filter: brightness(1.14) contrast(1.04); }
+  100% { filter: none; }
+}
+
+.ctv-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 130;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(104deg, transparent 34%, rgba(255, 246, 232, 0.24) 48%, rgba(232, 200, 144, 0.15) 56%, transparent 70%);
+  transform: translateX(-30%);
+}
+
+.ctv-sheen.go { animation: ctv-sheen-sweep 1.6s ease-out both; }
+@keyframes ctv-sheen-sweep {
+  0% { opacity: 0; transform: translateX(-38%); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(38%); }
+}
+
+/* ── five-plus ideas per resident, made physical ─────────────────────────
+   Wanderlust: star freckles, colour bleed, orbiting plaque, petal smoke,
+   and a body that refuses to stay in its lane.
+   Riason: paper grid, calibration square, dry cursor, ruled shadow, and
+   collision-first entrance.
+   Physius: brass seal, still-water breathing, stone-grey plate, hermetic
+   orbit, and the one deliberate X.
+   Traveller: warm material, name as plate, cream ink, visible type-cursor,
+   and the body that remains when the others move on. */
+.ctv-aura{position:absolute;inset:-24px;pointer-events:none;z-index:-1;opacity:.8}.ctv-aura i{position:absolute;display:block;width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor;animation:ctv-aura-drift 4s ease-in-out infinite}.ctv-aura i:nth-child(1){left:12%;top:22%;animation-delay:-.7s}.ctv-aura i:nth-child(2){right:18%;top:58%;animation-delay:-2.2s}.ctv-aura i:nth-child(3){left:61%;bottom:3%;animation-delay:-3.4s}@keyframes ctv-aura-drift{0%,100%{transform:translate(0,0) scale(.6);opacity:.2}50%{transform:translate(12px,-15px) scale(1.5);opacity:1}}
+.ctv-ink-trail{position:absolute;right:8px;bottom:8px;width:54px;height:3px;background:linear-gradient(90deg,transparent,currentColor);opacity:.42;transform:rotate(-8deg);box-shadow:0 6px 0 -1px currentColor,0 12px 0 -2px currentColor}.ctv-wanderlust .ctv-ink-trail{height:8px;border-radius:50%;background:radial-gradient(ellipse,currentColor,transparent 70%);filter:blur(2px);animation:ctv-wander-ooze 2.4s ease-in-out infinite}.ctv-riason .ctv-ink-trail{width:76px;background:repeating-linear-gradient(90deg,currentColor 0 8px,transparent 8px 14px);transform:rotate(0)}.ctv-physius .ctv-ink-trail{width:34px;background:#d4af65;box-shadow:0 5px 0 -1px #d4af65,0 10px 0 -2px #d4af65}.ctv-liber-vacui .ctv-ink-trail{background:linear-gradient(90deg,transparent,#f1c879);box-shadow:0 5px 0 -1px #ff8fb8}@keyframes ctv-wander-ooze{50%{transform:scaleX(1.8) translateX(-8px);opacity:.8}}
+.ctv-wanderlust .ctv-aura i{width:7px;height:7px;background:#ff8ab8}.ctv-wanderlust .ctv-aura i:first-child{clip-path:polygon(50% 0,61% 37%,100% 50%,61% 63%,50% 100%,39% 63%,0 50%,39% 37%)}.ctv-riason .ctv-aura i{width:4px;height:4px;border-radius:0;background:#4a8aaa;box-shadow:none}.ctv-physius .ctv-aura{inset:-10px;border:1px dotted rgba(212,175,101,.35);border-radius:50%;animation:ctv-hermetic-turn 18s linear infinite}.ctv-physius .ctv-aura i{background:#d4af65}.ctv-liber-vacui .ctv-aura{inset:-8px;border:1px solid rgba(255,143,184,.16);border-radius:3px 20px 3px 20px}@keyframes ctv-hermetic-turn{to{transform:rotate(360deg)}}
+.ctv-pulse-geometry{position:absolute;inset:8%;z-index:0;pointer-events:none;border:1px solid rgba(255,216,106,.25);border-radius:50%;animation:ctv-geometry-bloom 1.1s ease-out forwards}.ctv-pulse-geometry:before,.ctv-pulse-geometry:after{content:'';position:absolute;inset:12%;border:1px dotted rgba(255,105,180,.3);transform:rotate(45deg)}.ctv-pulse-geometry:after{transform:rotate(-45deg)}@keyframes ctv-geometry-bloom{from{opacity:0;transform:scale(.2) rotate(-30deg)}30%{opacity:1}to{opacity:0;transform:scale(1.15) rotate(25deg)}}
+.ctv-ritual-seal{position:absolute;left:50%;top:50%;z-index:0;width:min(300px,45vw);height:min(300px,45vw);transform:translate(-50%,-50%);border:1px solid rgba(255,105,180,.28);border-radius:50%;pointer-events:none;opacity:.45;animation:ctv-seal-breathe 4s ease-in-out infinite}.ctv-ritual-seal:before,.ctv-ritual-seal:after{content:'';position:absolute;inset:10%;border:1px dotted rgba(212,175,101,.42);transform:rotate(30deg)}.ctv-ritual-seal:after{transform:rotate(-30deg)}.ctv-ritual-seal i{position:absolute;inset:22%;border:1px solid rgba(180,90,255,.3);border-radius:50%;transform:rotate(45deg)}.ctv-ritual-seal b{position:absolute;inset:0;display:grid;place-items:center;color:#ff8ab8;font:50px 'Georgia',serif}.ctv-ritual-seal span{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);white-space:nowrap;color:#d4af65;font:11px 'VT323',monospace;letter-spacing:.2em}@keyframes ctv-seal-breathe{50%{transform:translate(-50%,-50%) scale(1.08) rotate(12deg);opacity:.75}}
+.ctv-breach-ring{position:absolute;left:50%;top:50%;width:75vmin;height:75vmin;transform:translate(-50%,-50%);z-index:31;pointer-events:none;border:1px solid rgba(255,105,180,.42);border-radius:50%;animation:ctv-breach-spin 6s linear infinite}.ctv-breach-ring i{position:absolute;inset:12%;border:1px dashed rgba(180,90,255,.55);border-radius:50%}.ctv-breach-ring i:nth-child(2){inset:24%;border-color:rgba(255,216,106,.6);transform:rotate(60deg)}.ctv-breach-ring i:nth-child(3){inset:36%;transform:rotate(-40deg)}@keyframes ctv-breach-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.ctv-finale-orbit{position:absolute;left:50%;top:50%;width:64vmin;height:24vmin;transform:translate(-50%,-50%) rotate(-15deg);border:1px solid rgba(255,216,106,.4);border-radius:50%;pointer-events:none}.ctv-finale-orbit i{position:absolute;width:8px;height:8px;left:50%;top:-4px;border-radius:50%;background:#ff8ab8;box-shadow:0 0 18px #ff8ab8}.ctv-finale-orbit i:nth-child(2){left:12%;top:47%;background:#7ad8ff}.ctv-finale-orbit i:nth-child(3){left:86%;top:40%;background:#d4af65}
+
+/* V3 arrivals: Arcana is a card spread; Vanir is an aperture with no edge. */
+.ctv-arcana{right:4%;top:17%;width:min(430px,44%);min-height:132px;background:linear-gradient(135deg,#211018,#0d070c 66%),repeating-linear-gradient(18deg,transparent 0 24px,rgba(244,232,210,.12) 25px 26px);border:1px solid #d4af65;color:#f4e8d2;transform:rotate(2deg);box-shadow:9px 13px 0 rgba(56,12,25,.35),0 0 24px rgba(244,232,210,.22);animation:ctv-arcana-fan 5.2s ease-in-out infinite}.ctv-arcana:before{content:'✦';border-radius:1px 12px 1px 1px;color:#ff8ab8;background:#211018;transform:rotate(14deg);box-shadow:0 0 14px #ff8ab8}.ctv-arcana .ctv-line{font-family:'WanderlustDialogue','Georgia',serif;color:#f4e8d2}.ctv-arcana .ctv-aura i{background:#f4e8d2;border-radius:0;transform:rotate(45deg)}.ctv-arcana .ctv-ink-trail{width:80px;background:repeating-linear-gradient(90deg,#d4af65 0 5px,transparent 5px 13px);transform:rotate(8deg)}
+.ctv-vanir{left:6%;top:22%;width:min(410px,40%);min-height:160px;background:radial-gradient(circle at 68% 28%,rgba(212,175,101,.16),transparent 22%),linear-gradient(160deg,#0a0812,#030207 78%);border:0;border-left:1px solid rgba(169,155,255,.7);border-bottom:1px solid rgba(212,175,101,.48);border-radius:0 0 0 42px;color:#d5caff;box-shadow:-18px 16px 34px rgba(0,0,0,.72),inset 0 0 34px rgba(169,155,255,.08);animation:ctv-vanir-still 8s ease-in-out infinite}.ctv-vanir:before{content:'∅';border:0;border-radius:0;color:#d4af65;background:transparent;box-shadow:none;font:32px 'Georgia',serif}.ctv-vanir:after{content:'';left:auto;right:28px;bottom:-36px;width:1px;height:72px;background:linear-gradient(#d4af65,transparent);border:0;box-shadow:none;transform:rotate(11deg)}.ctv-vanir .ctv-line{font-family:'RiasonDialogue','Georgia',serif;color:#d9d1ef;letter-spacing:.04em}.ctv-vanir .ctv-aura{inset:-20px;border:1px solid rgba(169,155,255,.14);border-radius:50%;opacity:.35}.ctv-vanir .ctv-aura i{background:#d4af65;box-shadow:0 0 14px #d4af65}.ctv-vanir .ctv-ink-trail{width:28px;height:38px;right:26px;bottom:-22px;background:linear-gradient(#d4af65,transparent);box-shadow:none;transform:rotate(12deg)}
+@keyframes ctv-arcana-fan{0%,100%{transform:rotate(2deg) translate(0,0)}35%{transform:rotate(-2deg) translate(-9px,5px)}68%{transform:rotate(4deg) translate(7px,-5px)}}@keyframes ctv-vanir-still{0%,100%{transform:translate(0,0)}50%{transform:translate(1px,-2px);filter:brightness(1.12)}}
+.ctv-arcana.is-creep{animation:ctv-arcana-arrive .9s cubic-bezier(.18,1.4,.3,1) both,ctv-arcana-fan 5.2s ease-in-out .9s infinite}.ctv-vanir.is-stone{animation:ctv-vanir-arrive 1.6s cubic-bezier(.2,.8,.2,1) both,ctv-vanir-still 8s ease-in-out 1.6s infinite}@keyframes ctv-arcana-arrive{from{opacity:0;transform:translate(25vw,-16vh) rotate(35deg) scale(.5);filter:blur(10px)}to{opacity:1;transform:rotate(2deg) scale(1);filter:none}}@keyframes ctv-vanir-arrive{from{opacity:0;transform:translate(-18vw,8vh) scale(.78);filter:blur(18px) brightness(0)}to{opacity:1;transform:none;filter:none}}
+.ctv-v3-runes{position:absolute;inset:-10px;pointer-events:none;border:1px dotted rgba(255,105,180,.48);clip-path:polygon(8% 0,100% 9%,91% 100%,0 84%);animation:ctv-runes-turn 11s linear infinite}.ctv-v3-runes:before,.ctv-v3-runes:after{content:'✶  ∴  ◇  ∴  ✶';position:absolute;left:8%;right:8%;color:#d4af65;font:14px 'Georgia',serif;letter-spacing:.42em}.ctv-v3-runes:before{top:-14px}.ctv-v3-runes:after{bottom:-14px;transform:rotate(180deg)}@keyframes ctv-runes-turn{to{transform:rotate(360deg)}}
+.ctv-v3-noble-shadow{position:absolute;inset:14%;pointer-events:none;border:1px solid rgba(212,175,101,.6);box-shadow:0 0 22px rgba(212,175,101,.22);opacity:0;animation:ctv-noble-reveal 2.4s ease-out forwards}.ctv-v3-noble-shadow:before{content:'✦';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#f1c879;font-size:32px;text-shadow:0 0 16px #d4af65}@keyframes ctv-noble-reveal{0%,35%{opacity:0;transform:scale(.6) rotate(-12deg)}58%,82%{opacity:.75;transform:scale(1) rotate(2deg)}100%{opacity:.22;transform:scale(1.08) rotate(8deg)}}
+
+@media(max-width:900px){.ctv-arcana,.ctv-vanir{width:70%;left:15%;right:auto}.ctv-arcana{top:10%}.ctv-vanir{top:34%}}
+
+/* Interaction and containment pass: cast bodies are visual layers, but
+   Riason's definitions are authored controls inside his paper. Keep every
+   box inside the stage instead of letting a long explanation become a crop. */
+.cutscene.ctv .ctv-body{box-sizing:border-box;max-width:calc(100% - 24px);max-height:calc(100% - 76px);overflow:visible}
+.cutscene.ctv .ctv-riason .ctv-line{pointer-events:auto;overflow:visible}
+.ctv-hover-term{position:relative;display:inline-block;color:#214d69;border-bottom:1px dotted currentColor;cursor:help;outline:none;transition:color .18s ease,background .18s ease}
+.ctv-hover-term:hover,.ctv-hover-term:focus-visible,.ctv-hover-term.is-hover-open{color:#111827;background:rgba(255,250,218,.72);border-bottom-style:solid}
+.ctv-hover-term::after{content:attr(data-definition);position:absolute;left:50%;bottom:calc(100% + 9px);z-index:80;width:min(290px,70vw);padding:9px 11px;color:#f7efd8;background:#172432;border:1px solid #76b5c9;box-shadow:4px 5px 0 rgba(31,66,91,.28),0 10px 22px rgba(0,0,0,.35);font:14px/1.35 Georgia,serif;letter-spacing:0;white-space:normal;opacity:0;visibility:hidden;transform:translate(-50%,5px);transition:opacity .16s ease,transform .16s ease,visibility .16s ease;pointer-events:none}
+.ctv-hover-term:hover::after,.ctv-hover-term:focus-visible::after,.ctv-hover-term.is-hover-open::after{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.ctv-concept-cards{position:absolute;left:clamp(12%,calc(50% - 245px),46%);top:clamp(8%,calc(50% - 185px),34%);z-index:90;width:300px;height:210px;pointer-events:none}
+.ctv-concept-cards i{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:128px;min-height:58px;padding:8px 10px;color:#243f55;background:linear-gradient(145deg,#f2e4bd,#cbb584);border:1px solid #78a9bd;box-shadow:4px 5px 0 rgba(36,63,85,.24),0 8px 15px rgba(0,0,0,.3);font:14px/1.1 'RiasonDialogue','VT323',monospace;font-style:normal;text-transform:lowercase;opacity:0;transform:translate(-50%,-50%) rotate(calc((var(--card-i) - 2) * 7deg)) scale(.35);animation:ctv-index-card-in .55s cubic-bezier(.2,1.5,.3,1) calc(var(--card-i) * 80ms) forwards,ctv-index-card-out .45s ease-in 3.9s calc(var(--card-i) * 50ms) forwards}
+@keyframes ctv-index-card-in{to{opacity:1;transform:translate(calc(-50% + (var(--card-i) - 2) * 42px),calc(-50% + (var(--card-i) - 2) * 25px)) rotate(calc((var(--card-i) - 2) * 7deg)) scale(1)}}
+@keyframes ctv-index-card-out{to{opacity:0;transform:translate(-50%,-50%) rotate(16deg) scale(.72);filter:blur(3px)}}
+.ctv-arcana{z-index:1}.ctv-arcana .ctv-line{pointer-events:none}.ctv-arcana::before{z-index:2}
+.ctv-wanderlust.is-shrink{animation:ctv-wander-collapse .9s cubic-bezier(.7,0,.95,.35) forwards!important;transform-origin:88% 82%;filter:saturate(1.8)}
+@keyframes ctv-wander-collapse{0%{opacity:1;transform:rotate(2deg) scale(1)}45%{opacity:.95;transform:rotate(-10deg) scale(.72) skewX(-9deg)}100%{opacity:0;transform:translate(24vw,-18vh) rotate(45deg) scale(.04);filter:blur(10px)}}
+/* The tear is confined to the plate's top-right corner. The earlier polygon
+   cut up to 22% off the bottom edge as well, which is exactly where the last
+   line of a six-line speech sits — so Vanir's dialogue visibly left its own
+   material. "No complete border" is carried by the missing left/top edges and
+   the thread, not by eating the copy. */
+.ctv-vanir{overflow:visible!important;background:radial-gradient(ellipse at 72% 24%,rgba(208,187,255,.12),transparent 18%),radial-gradient(ellipse at 38% 86%,rgba(0,0,0,.95),transparent 58%),linear-gradient(157deg,#11101a,#030207 76%);clip-path:polygon(0 0,84% 0,100% 8%,100% 100%,0 100%)}
+.ctv-vanir::after{height:86px;width:3px;right:22px;bottom:-60px;background:linear-gradient(#d4af65,rgba(212,175,101,0));filter:blur(.4px)}
+.ctv-vanir .ctv-line{max-height:9em;overflow-wrap:anywhere}
+.ctv-physius{top:clamp(25%,48%,calc(100% - 260px));max-height:42%;overflow:visible}
+@media(max-width:900px){.cutscene.ctv .ctv-body{max-width:calc(100% - 16px)}.ctv-hover-term::after{left:0;transform:translateY(5px)}.ctv-hover-term:hover::after,.ctv-hover-term:focus-visible:hover::after,.ctv-hover-term.is-hover-open::after{transform:translateY(0)}.ctv-physius{left:52%;top:43%;width:44%;max-height:40%}.ctv-concept-cards{left:28%;top:24%;transform:scale(.82);transform-origin:top left}}
+
+/* Final readable Poppet sidecars. Keep this fallback beside the base cast
+   stylesheet so an exported/static surface cannot resurrect the lower-left
+   traveller collision if the optional stage layer is stale or absent. */
+.cutscene.ctv.has-poppet .ctv-body.ctv-physius {
+  left:auto !important; right:2% !important; top:3% !important;
+  width:33% !important; max-width:33% !important; max-height:28% !important;
+  opacity:.98 !important; filter:none !important; z-index:1000 !important;
+  color:#fff4d1 !important; background:linear-gradient(145deg,#5b5b51,#2e302b) !important;
+  border-color:#f0c878 !important; overflow:visible !important;
+}
+.cutscene.ctv.has-poppet .ctv-body.ctv-physius .ctv-line {
+  color:#fff4d1 !important; font-size:clamp(.82rem,1.2vw,1.1rem) !important;
+  line-height:1.32 !important; max-height:9em !important; overflow:visible !important;
+  overflow-wrap:anywhere !important; text-shadow:0 1px 2px rgba(0,0,0,.9);
+}
+.cutscene.ctv.has-poppet .ctv-body.ctv-liber-vacui,
+.cutscene.ctv.has-poppet .ctv-body.ctv-traveller {
+  left:auto !important; right:2% !important;
+  top:calc(3% + 28% + 10px) !important; bottom:auto !important;
+  width:27% !important; max-width:27% !important; max-height:17% !important;
+  transform:none !important; z-index:999 !important; opacity:.96 !important;
+  filter:none !important; background:linear-gradient(145deg,#4b2b32,#21181d) !important;
+  border-color:#ff9fbe !important; overflow:visible !important;
+}
+
+/* The cutscene has a real exit; it never sits over the ritual input or cast. */
+/* (.ctv-skip retired with the no-skip ruling) */
+
+.ctv-ritual-status {
+  max-width: 100%;
+  min-height: 1.4em;
+  margin: 0;
+  padding: 0 8px;
+  color: #e8c890;
+  font: 600 clamp(.9rem, 1.1vw, 1rem)/1.35 'VT323', 'Courier New', monospace;
+  letter-spacing: .04em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ── Wanderlust's hand: the hijacked response (types itself, then waits) ── */
+.ctv-response.ctv-response-auto { cursor: default; opacity: 0.75; }
+.ctv-response.ctv-response-auto.is-armed {
+  cursor: pointer; opacity: 1;
+  border-color: #ff69b4;
+  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.14), 0 0 22px rgba(180, 90, 255, 0.45);
+  animation: ctv-armed-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ctv-armed-pulse { 50% { box-shadow: 0 0 0 4px rgba(255,105,180,0.10), 0 0 34px rgba(180,90,255,0.62); } }
+.ctv-response.ctv-response-auto.is-armed::after {
+  content: '\25B8';
+  margin-left: 8px; color: #ff69b4;
+}
+.ctv-relate-verb.is-possessed {
+  color: #fff0ba; border-color: #ff69b4;
+  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.16), 0 0 25px rgba(180, 90, 255, 0.62);
+}
+
+/* ── the new-opening / desktop-finale stage directions (release pass) ── */
+/* the handoff: the whole machine dims but the poppet cartridge glows */
+body.ctv-poppet-glow .machine { filter: brightness(0.72) saturate(0.8); transition: filter 0.6s ease; }
+body.ctv-poppet-glow #crt-cartridge-sigil,
+html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-glow 1.5s ease-in-out infinite; }
+@keyframes ctv-cart-glow {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255, 214, 130, 0.55), 0 0 22px rgba(255, 190, 100, 0.5); filter: brightness(1.25); }
+  50% { box-shadow: 0 0 0 3px rgba(255, 226, 160, 0.9), 0 0 44px rgba(255, 205, 120, 0.85); filter: brightness(1.6); }
+}
+/* the summon: four lines lighting in sequence, Wanderlust's pink */
+.ctv-summon .ctv-ritual-line .ctv-ritual-text { opacity: 0.12; transition: opacity 0.7s ease, text-shadow 0.7s ease; }
+.ctv-summon .ctv-ritual-line.is-lit .ctv-ritual-text {
+  opacity: 1; color: #ffd7e6;
+  text-shadow: 0 0 18px rgba(255, 105, 180, 0.75), 0 0 42px rgba(255, 105, 180, 0.35);
+}
+.ctv-summon .ctv-ritual-input, .ctv-summon + .ctv-ritual-seal { display: none; }
+/* the RAT: a glitchy foreign textbox */
+.ctv-rat { background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(120, 220, 140, 0.05) 3px 4px), linear-gradient(160deg, #10200f, #050a05); border: 2px solid #78dc8c; color: #b8f0c2; }
+.ctv-rat .ctv-line { color: #b8f0c2; font-family: 'VT323', 'Courier New', monospace; }
+.ctv-rat-glitch { animation: ctv-rat-glitch 0.32s steps(2, end) infinite; }
+@keyframes ctv-rat-glitch {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px) skewX(1.5deg); }
+  75% { transform: translate(-1px, -2px); }
+  100% { transform: translate(1px, 1px); }
+}
+.ctv-rat-die { animation: ctv-rat-die 0.9s steps(6, end) forwards; }
+@keyframes ctv-rat-die {
+  0% { filter: brightness(1); }
+  30% { filter: brightness(2.4) hue-rotate(60deg); transform: scale(1.06) skewX(6deg); }
+  60% { filter: brightness(3) invert(1); transform: scale(1.14); }
+  100% { opacity: 0; transform: scale(0.1) rotate(24deg); filter: brightness(4); }
+}
+/* the desktop finale: the room envelopes in pink while Wanderlust speaks */
+.ctv-pink-envelope { position: relative; }
+.ctv-pink-envelope::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 40;
+  background: radial-gradient(circle at 68% 30%, rgba(255, 105, 180, 0.34), rgba(150, 60, 220, 0.18) 45%, transparent 72%);
+  animation: ctv-envelope 4s ease forwards;
+}
+@keyframes ctv-envelope {
+  0% { opacity: 0; } 18% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; }
+}
+
+/* ── Wanderlust's grand entrance (first arrival only) ─────────────────
+   The room performs before her chatbox exists at all: two knocks land on
+   the seated boxes from somewhere outside the glass, a warm bloom gathers
+   behind the cast, and only then does she arrive — deliberately too large
+   for the space she is given — and settle into her seat while her first
+   line is already typing. Wordless: all pantomime, no copy. */
+.ctv-grand-enter .ctv-body {
+  animation: ctv-knock 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+.ctv-grand-enter .ctv-body:nth-child(1) { animation-delay: 0.15s; }
+.ctv-grand-enter .ctv-body:nth-child(2) { animation-delay: 2.15s; }
+@keyframes ctv-knock {
+  0%, 100% { transform: none; }
+  22% { transform: translate(-5px, 0) rotate(-1.1deg); filter: brightness(1.55); }
+  46% { transform: translate(3px, 0) rotate(0.7deg); }
+}
+/* the glow out of which she materialises — DOM-ordered below the cast */
+.ctv-grand-enter-bloom {
+  position: absolute; inset: -12%; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 58% 46% at 76% 22%,
+    rgba(255, 138, 184, 0.36), rgba(160, 92, 255, 0.17) 46%, transparent 72%);
+  filter: blur(10px);
+  animation: ctv-bloom 2.7s ease-in-out forwards;
+}
+@keyframes ctv-bloom {
+  0% { opacity: 0; transform: scale(0.6); }
+  42% { opacity: 0.9; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.12); }
+}
+/* arrives too large: scale 1.85 hangs far past the cast's overflow bounds,
+   then she compresses into her seat as her first line types itself */
+@keyframes ctv-grand-arrive {
+  0% { opacity: 0; transform: translate(8vw, -12vh) rotate(-17deg) scale(1.85); filter: blur(14px) brightness(2.3); }
+  34% { opacity: 1; transform: translate(-2vw, 2vh) rotate(-8deg) scale(1.42); filter: blur(5px) brightness(1.8); }
+  62% { transform: translate(0.5vw, 0.5vh) rotate(2deg) scale(1.08); filter: blur(0) brightness(1.3); }
+  84% { transform: translate(-5px, 3px) rotate(-0.5deg) scale(0.985); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+.ctv-wanderlust.is-grand-arrive {
+  z-index: 30;
+  animation: ctv-grand-arrive 1.7s cubic-bezier(0.2, 1, 0.3, 1) both,
+    ctv-wander-hover 5.8s ease-in-out 1.7s infinite;
+}
+/* the warm cast tint during her finale return after the poppet is kept */
+.ctv-finale-warm .ctv-cast {
+  animation: ctv-cast-warm 3.2s ease-out both;
+}
+@keyframes ctv-cast-warm {
+  0% { filter: brightness(1.14) saturate(1.1); }
+  100% { filter: none; }
+}

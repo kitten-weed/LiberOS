@@ -1,0 +1,1246 @@
+/* sigil.css — Mistress Physius's stone tablet. Hermetic grey, slate, ash.
+   The tablet is a die-cut emerald-style stone slab. Chiseled, not lit. */
+
+.sigil-app {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(140, 140, 140, 0.06) 0%, rgba(0, 0, 0, 0) 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(40, 40, 40, 0.12) 0%, rgba(0, 0, 0, 0) 50%),
+    linear-gradient(180deg, #0a0a0c 0%, #050506 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Times New Roman', Times, serif;
+  color: #c0c0c8;
+  overflow: hidden;
+}
+
+.sigil-app::before {
+  /* scattered grey fragments around the tablet, like a workbench */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 6% 18%, rgba(120, 120, 130, 0.4) 0%, rgba(0, 0, 0, 0) 3%),
+    radial-gradient(circle at 94% 22%, rgba(80, 80, 90, 0.35) 0%, rgba(0, 0, 0, 0) 2.5%),
+    radial-gradient(circle at 4% 86%, rgba(100, 100, 110, 0.3) 0%, rgba(0, 0, 0, 0) 2%),
+    radial-gradient(circle at 96% 92%, rgba(90, 90, 100, 0.35) 0%, rgba(0, 0, 0, 0) 3%);
+  z-index: 0;
+}
+
+.sigil-frame {
+  width: 88%;
+  height: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.04) 0px, rgba(0, 0, 0, 0.04) 2px, rgba(255, 255, 255, 0.012) 2px, rgba(255, 255, 255, 0.012) 4px),
+    linear-gradient(180deg, #4a4a52 0%, #2a2a30 50%, #1a1a20 100%);
+  /* Jagged die-cut stone-tablet outline. */
+  clip-path: polygon(
+    2% 1%, 18% 0%, 34% 3%, 52% 1%, 68% 4%, 84% 0%, 98% 3%,
+    99% 22%, 100% 38%, 98% 56%, 100% 72%, 99% 88%,
+    92% 99%, 76% 100%, 60% 97%, 44% 100%, 28% 98%, 12% 100%,
+    2% 96%, 0% 78%, 2% 60%, 0% 42%, 3% 22%);
+  box-shadow:
+    0 0 0 2px #1a1a20,
+    0 0 0 4px #6a6a72,
+    0 0 0 5px #1a1a20,
+    inset 0 0 40px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  z-index: 1;
+}
+
+.sigil-frame::before,
+.sigil-frame::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, transparent 0%, transparent 48%, rgba(180, 180, 190, 0.4) 50%, transparent 52%);
+}
+.sigil-frame::before { top: 0; left: 0; }
+.sigil-frame::after { bottom: 0; right: 0; transform: rotate(180deg); }
+
+.sigil-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #1a1a20 0%, #2a2a30 100%);
+  border-bottom: 1px solid #6a6a72;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.sigil-title {
+  font-size: 0.875rem;
+  color: #d8d8e0;
+  font-weight: 900;
+  text-shadow: 0 0 4px rgba(180, 180, 200, 0.3);
+}
+
+.sigil-subtitle {
+  font-size: 1rem;
+  color: #eadfc6;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  flex: 1;
+}
+
+/* D0003: the ghost hint is a working instruction — 16px, ≥ 4.5:1 on the tablet. */
+.sigil-ghost-hint {
+  display: none;
+  font-size: 1rem;
+  color: #a8a8b2;
+  font-style: italic;
+  text-align: center;
+  letter-spacing: 0.15em;
+  padding: 2px 6px 0;
+  margin-bottom: -2px;
+  text-transform: lowercase;
+  opacity: 0.85;
+}
+
+.sigil-ghost-hint.visible {
+  display: block;
+}
+
+/* the bench plate — the keyboard path, in the room's own register:
+   upright cream at size, never faint, never italic. */
+.sigil-keys {
+  font-size: 1rem;
+  font-style: normal;
+  color: #eadfc6;
+  text-align: center;
+  letter-spacing: 0.12em;
+  padding: 2px 6px 0;
+}
+
+.sigil-back {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 5;
+  background: none;
+  border: 1px solid #5a3a20;
+  color: #806040;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  width: 32px;
+  height: 32px;
+  line-height: 30px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.sigil-back:hover {
+  background: rgba(120, 60, 30, 0.2);
+  color: #c89060;
+  border-color: #8a5a30;
+}
+
+.sigil-tablet {
+  flex: 1;
+  min-height: 0;
+  margin: 8px 0;
+  position: relative;
+  background:
+    repeating-linear-gradient(110deg, transparent 0px, transparent 8px, rgba(255,255,255,0.015) 8px, rgba(255,255,255,0.015) 9px),
+    radial-gradient(ellipse at 50% 40%, #1a1a20 0%, #0a0a10 60%, #050508 100%);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px #000,
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sigil-cracks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.sigil-cracks svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sigil-cracks path {
+  fill: none;
+  stroke: rgba(40, 30, 25, 0.5);
+  stroke-width: 0.4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 1px rgba(200, 144, 96, 0.2));
+}
+
+.sigil-intention {
+  padding: 12px 16px 6px;
+  position: relative;
+  z-index: 2;
+}
+
+.sigil-label {
+  font-size: 1rem;
+  color: #eadfc6;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-style: normal;
+}
+
+.sigil-input {
+  min-height: 1.2em;
+  font-size: 1rem;
+  font-style: normal;
+  color: #eadfc6;
+  outline: none;
+  border-bottom: 1px dashed rgba(120, 80, 40, 0.5);
+  padding: 2px 0;
+  letter-spacing: 0.04em;
+}
+
+.sigil-input:focus {
+  border-bottom-color: #c89060;
+  color: #e8d4a8;
+}
+
+.sigil-input:empty::before {
+  content: attr(data-placeholder);
+  color: #9a7a55;
+  font-style: italic;
+}
+
+.sigil-canvas-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+  margin: 6px 16px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #1a0a05;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.sigil-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: none;
+}
+
+.sigil-cursor {
+  position: absolute;
+  top: 0; left: 0;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+  opacity: 0;
+}
+
+.sigil-cursor.visible {
+  opacity: 1;
+}
+
+.sigil-cursor svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sigil-cursor[data-element="air"]    { color: #a8c8d8; filter: drop-shadow(0 0 6px rgba(168, 200, 216, 0.6)); }
+.sigil-cursor[data-element="water"]  { color: #6890b0; filter: drop-shadow(0 0 6px rgba(104, 144, 176, 0.6)); }
+.sigil-cursor[data-element="fire"]   { color: #d89060; filter: drop-shadow(0 0 6px rgba(216, 144, 96, 0.6)); }
+.sigil-cursor[data-element="earth"]  { color: #8a7050; filter: drop-shadow(0 0 6px rgba(138, 112, 80, 0.6)); }
+.sigil-cursor[data-element="spirit"] { color: #e8c8a0; filter: drop-shadow(0 0 12px rgba(232, 200, 160, 0.9)); }
+
+.sigil-palette,
+.sigil-tools,
+.sigil-parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: linear-gradient(180deg, #141007 0%, #1e1508 100%);
+  border-top: 1px solid #6a5228;
+  overflow-x: auto;
+}
+
+.sigil-tray-label {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-variant: small-caps;
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  color: #eadfc6;
+  white-space: nowrap;
+}
+
+.sigil-ink-name {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: normal;
+  font-size: 1rem;
+  color: #eadfc6;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.sigil-palette-tray {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 44px);
+  gap: 6px;
+  justify-content: start;
+  overflow: visible;
+  padding: 2px;
+  flex: 1 1 100%;
+  min-width: 0;
+  align-content: flex-start;
+}
+
+.sigil-swatch {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  outline: 1px solid #5a4a28;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sigil-swatch.active {
+  outline: 2px solid #e8c890;
+  box-shadow: 0 0 8px rgba(232, 200, 144, 0.6);
+}
+
+.sigil-swatch:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 1px;
+}
+
+.sigil-tool,
+.sigil-part {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #241a0c 0%, #120c04 100%);
+  border: 1px solid #6a5228;
+  border-radius: 2px;
+  color: #c8a878;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.sigil-tool svg,
+.sigil-part svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sigil-tool:hover,
+.sigil-part:hover {
+  border-color: #c8a878;
+  color: #e8c890;
+}
+
+.sigil-tool.active,
+.sigil-part.armed {
+  border-color: #e8c890;
+  color: #ffe8b8;
+  box-shadow: 0 0 10px rgba(232, 200, 144, 0.45), inset 0 0 6px rgba(232, 200, 144, 0.15);
+}
+
+.sigil-tool:focus-visible,
+.sigil-part:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+
+.sigil-canvas-wrap.armed {
+  cursor: crosshair;
+}
+
+.sigil-canvas-wrap:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+
+.sigil-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #1a1a20 0%, #2a2a30 100%);
+  border-top: 1px solid #4a4a52;
+}
+
+.sigil-save, .sigil-discard {
+  flex: 1;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  font-style: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+
+.sigil-save {
+  background: linear-gradient(180deg, #3a3a44 0%, #2a2a30 100%);
+  border: 1px solid #5a5a66;
+  color: #a0a0b0;
+  box-shadow: inset 0 1px 0 rgba(160, 160, 176, 0.25), 0 1px 0 rgba(0,0,0,0.5);
+}
+
+.sigil-save:hover {
+  background: linear-gradient(180deg, #4a4a54 0%, #383840 100%);
+  border-color: #8a8a98;
+  box-shadow: inset 0 1px 0 rgba(160, 160, 176, 0.35), 0 0 12px rgba(160, 160, 176, 0.35), 0 1px 0 rgba(0,0,0,0.5);
+}
+
+.sigil-save:active {
+  background: linear-gradient(180deg, #22222a 0%, #2e2e36 100%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+  animation: sigil-hammer 0.3s ease;
+}
+
+@keyframes sigil-hammer {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.94) translateY(1px); }
+  100% { transform: scale(1); }
+}
+
+.sigil-discard {
+  background: none;
+  border: 1px solid #3a3a44;
+  color: #6a6a78;
+  font-style: normal;
+}
+
+.sigil-discard:hover {
+  border-color: #55555f;
+  color: #a0a0b0;
+  background: rgba(160, 160, 176, 0.1);
+}
+
+.sigil-todesktop {
+  flex: 1;
+  font-family: 'Times New Roman', Times, serif;
+  background: linear-gradient(180deg, #3a3a44 0%, #2a2a30 100%);
+  border: 1px solid #8a8a98;
+  color: #e8e8f0;
+  box-shadow: inset 0 1px 0 rgba(160, 160, 176, 0.25), 0 0 12px rgba(160, 160, 176, 0.35), 0 1px 0 rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+
+.sigil-todesktop[hidden] {
+  display: none;
+}
+
+.sigil-todesktop:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+
+.sigil-app.saved .sigil-frame {
+  filter: grayscale(0.4) brightness(0.85);
+  transition: filter 1.5s ease;
+}
+
+.sigil-app.saved .sigil-input,
+.sigil-app.saved .sigil-canvas-wrap,
+.sigil-app.saved .sigil-save,
+.sigil-app.saved .sigil-discard {
+  pointer-events: none;
+  opacity: 0.4;
+  transition: opacity 1.5s ease;
+}
+
+.sigil-app.saved .sigil-todesktop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.sigil-app.saved::after {
+  content: '— etched —';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  font-size: 1.2rem;
+  color: rgba(200, 144, 96, 0.5);
+  font-style: italic;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+/* sigil help + raison (per-persona, sigil colors only) */
+
+.sigil-help {
+  position: absolute;
+  top: 14px;
+  right: 50px;
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.6) 0%, rgba(0, 0, 0, 0.7) 100%);
+  border: 1px solid #5a3a20;
+  color: #806040;
+  font-family: 'VT323', Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 30px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 2px;
+  transition: all 0.15s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  transition: transform 0.08s, filter 0.15s, box-shadow 0.08s;
+}
+.sigil-help:hover {
+  filter: brightness(1.25);
+}
+.sigil-help:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 rgba(0, 0, 0, 0.5);
+}
+
+
+.sigil-help:hover {
+  background: rgba(120, 60, 30, 0.2);
+  color: #c89060;
+  border-color: #8a5a30;
+}
+
+.sigil-raison {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 2, 2, 0.85);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.sigil-raison.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sigil-raison-inner {
+  width: 78%;
+  max-width: 420px;
+  background: linear-gradient(180deg, #1a0a05 0%, #0a0503 100%);
+  border: 1px solid #5a3a20;
+  box-shadow:
+    inset 0 0 0 1px #1a0a05,
+    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    0 0 30px rgba(0, 0, 0, 0.6);
+  padding: 18px 22px;
+  font-style: italic;
+  color: #c8b890;
+  letter-spacing: 0.03em;
+  position: relative;
+}
+
+.sigil-raison-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(120, 80, 40, 0.5);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.sigil-raison-name {
+  font-size: 0.875rem;
+  color: #c89060;
+  text-transform: lowercase;
+  letter-spacing: 0.25em;
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(200, 144, 96, 0.4);
+}
+
+.sigil-raison-close {
+  background: none;
+  border: 1px solid #5a3a20;
+  color: #806040;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 42px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.sigil-raison-close:hover {
+  background: rgba(120, 60, 30, 0.2);
+  color: #c89060;
+}
+
+.sigil-raison-body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #d8c8a0;
+}
+
+.sigil-raison-body em {
+  color: #e8c8a0;
+  font-style: normal;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.sigil-raison-foot {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(120, 80, 40, 0.5);
+  font-size: 0.875rem;
+  color: #806040;
+  text-align: right;
+  letter-spacing: 0.1em;
+}
+
+/* sigil save prompt (per-persona, sigil colors only) */
+
+.sigil-save-prompt {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 2, 2, 0.85);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.sigil-save-prompt.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sigil-save-prompt-inner {
+  width: 78%;
+  max-width: 420px;
+  background: linear-gradient(180deg, #1a0a05 0%, #0a0503 100%);
+  border: 1px solid #5a3a20;
+  box-shadow:
+    inset 0 0 0 1px #1a0a05,
+    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    0 0 30px rgba(0, 0, 0, 0.6);
+  padding: 18px 22px;
+  font-style: italic;
+  color: #c8b890;
+  letter-spacing: 0.03em;
+  position: relative;
+}
+
+.sigil-save-prompt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(120, 80, 40, 0.5);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.sigil-save-prompt-name {
+  font-size: 0.875rem;
+  color: #c89060;
+  text-transform: lowercase;
+  letter-spacing: 0.25em;
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(200, 144, 96, 0.4);
+}
+
+.sigil-save-prompt-close {
+  background: none;
+  border: 1px solid #5a3a20;
+  color: #806040;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 42px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.sigil-save-prompt-close:hover {
+  background: rgba(120, 60, 30, 0.2);
+  color: #c89060;
+}
+
+.sigil-save-prompt-body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #d8c8a0;
+  margin: 8px 0 14px;
+}
+
+.sigil-save-prompt-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px dashed rgba(120, 80, 40, 0.5);
+  padding-top: 10px;
+}
+
+.sigil-save-prompt-keep,
+.sigil-save-prompt-discard {
+  background: none;
+  border: 1px solid #5a3a20;
+  color: #c8b890;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  font-style: normal;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  padding: 6px 14px;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.sigil-save-prompt-keep {
+  color: #e8c8a0;
+  border-color: #8a5a30;
+  text-shadow: 0 0 4px rgba(200, 144, 96, 0.4);
+}
+
+.sigil-save-prompt-keep:hover {
+  background: rgba(120, 60, 30, 0.25);
+  color: #f8d8b0;
+  border-color: #c89060;
+}
+
+.sigil-save-prompt-discard {
+  color: #806040;
+  font-style: normal;
+}
+
+.sigil-save-prompt-discard:hover {
+  background: rgba(80, 30, 20, 0.3);
+  color: #c88060;
+  border-color: #8a3a20;
+}
+
+/* ─── window titlebar (WS3, plan 2026-09-04 §4.3) — the stonecutter's lintel ─── */
+
+.sigil-titlebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 142px 0 14px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(48deg, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 1px, rgba(255, 255, 255, 0.02) 1px, rgba(255, 255, 255, 0.02) 3px),
+    linear-gradient(180deg, #4a4a52 0%, #2a2a30 60%, #1c1c22 100%);
+  border-bottom: 2px solid #101014;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -3px 0 rgba(170, 90, 24, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  font-family: 'Times New Roman', Times, serif;
+  color: #e8d8b8;
+}
+
+.sigil-titlebar-name {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.sigil-titlebar-sub {
+  font-size: 1rem;
+  font-style: italic;
+  color: #b8a888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.sigil-titlebar .sigil-help,
+.sigil-titlebar .sigil-back {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+.sigil-titlebar .sigil-help { right: 36px; }
+.sigil-titlebar .sigil-back { right: 8px; }
+.sigil-titlebar .sigil-help, .sigil-titlebar .sigil-back {
+  min-width: 44px;
+  height: 44px;
+  line-height: 42px;
+  text-align: center;
+  font-size: 1.15rem;
+  top: 50%;
+  filter: brightness(1.4);
+}
+.sigil-titlebar .sigil-help { right: 90px; width: 44px; }
+.sigil-titlebar .sigil-back {
+  right: 8px;
+  width: auto;
+  padding: 0 12px;
+  font-size: 1rem;
+  font-style: normal;
+  letter-spacing: 0.12em;
+}
+.sigil-help:focus-visible, .sigil-back:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 2px;
+}
+.sigil-titlebar .sigil-help:active,
+.sigil-titlebar .sigil-back:active {
+  transform: translateY(calc(-50% + 1px));
+}
+
+/* open room for the lintel (machine.css sets [data-state] inset: 0) */
+.sigil-app { top: 36px; }
+
+/* ─── WS4: the stonecutter's cursor (register: data/personas.data.js).
+   Chisel + copper chip; falls back to the standard arrow. Buttons keep
+   her cursor (hover bevels carry the affordance); the drawing canvas
+   keeps its own drawn cursor (cursor: none, .sigil-canvas above). ─── */
+.sigil-app,
+.sigil-titlebar {
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2 2l9 2-7 7z' fill='%23c8c8d0' stroke='%232a2a30'/><path d='M11 10l3 3 7-7-3-3z' fill='%23aa5a18' stroke='%235a2a08'/></svg>") 2 2, auto;
+}
+.sigil-app button,
+.sigil-titlebar button { cursor: inherit; }
+
+/* ─── WS4: pressed-bevel + focus (D0004 recipe, sigil palette) ─── */
+.sigil-raison-close,
+.sigil-save-prompt-close,
+.sigil-save-prompt-keep,
+.sigil-save-prompt-discard {
+  box-shadow:
+    inset 0 1px 0 rgba(232, 200, 160, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+    0 2px 0 #0a0503,
+    0 3px 4px rgba(0, 0, 0, 0.5);
+}
+/* audit minor 5: the action bar is monochrome stone slate, not bronze. */
+.sigil-discard {
+  box-shadow:
+    inset 0 1px 0 rgba(160, 160, 176, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+    0 2px 0 #0a0a0e,
+    0 3px 4px rgba(0, 0, 0, 0.5);
+}
+.sigil-raison-close:active,
+.sigil-save-prompt-close:active,
+.sigil-save-prompt-keep:active,
+.sigil-save-prompt-discard:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 200, 160, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 0 0 #0a0503,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.sigil-discard:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(160, 160, 176, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 0 0 #0a0a0e,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.sigil-save:focus-visible,
+.sigil-discard:focus-visible,
+.sigil-back:focus-visible,
+.sigil-help:focus-visible,
+.sigil-raison-close:focus-visible,
+.sigil-save-prompt-close:focus-visible,
+.sigil-save-prompt-keep:focus-visible,
+.sigil-save-prompt-discard:focus-visible {
+  outline: 2px solid #c89060;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sigil-save:active { animation: none; }
+  .sigil-app.saved .sigil-frame,
+  .sigil-app.saved .sigil-input,
+  .sigil-app.saved .sigil-canvas-wrap,
+  .sigil-app.saved .sigil-save,
+  .sigil-app.saved .sigil-discard { transition: none; }
+}
+
+/* ─── WS4: hover-revelation — stone dust gathers in the cracks
+   when the tablet is attended to. ─── */
+.sigil-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  background:
+    radial-gradient(circle 2px at 24% 34%, rgba(200, 200, 208, 0.85) 0%, rgba(200, 200, 208, 0) 100%),
+    radial-gradient(circle 1.5px at 33% 46%, rgba(180, 180, 190, 0.75) 0%, rgba(180, 180, 190, 0) 100%),
+    radial-gradient(circle 2px at 38% 62%, rgba(200, 200, 208, 0.7) 0%, rgba(200, 200, 208, 0) 100%),
+    radial-gradient(circle 1.5px at 48% 72%, rgba(170, 170, 180, 0.75) 0%, rgba(170, 170, 180, 0) 100%),
+    radial-gradient(circle 2px at 62% 48%, rgba(200, 200, 208, 0.75) 0%, rgba(200, 200, 208, 0) 100%),
+    radial-gradient(circle 1.5px at 67% 40%, rgba(180, 180, 190, 0.7) 0%, rgba(180, 180, 190, 0) 100%),
+    radial-gradient(circle 2px at 76% 50%, rgba(190, 190, 200, 0.7) 0%, rgba(190, 190, 200, 0) 100%),
+    radial-gradient(circle 1.5px at 44% 82%, rgba(190, 190, 200, 0.7) 0%, rgba(190, 190, 200, 0) 100%),
+    radial-gradient(circle 1.5px at 57% 76%, rgba(200, 200, 208, 0.6) 0%, rgba(200, 200, 208, 0) 100%);
+}
+.sigil-tablet:hover .sigil-dust { opacity: 1; }
+.sigil-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+.sigil-stage {
+  flex: 2 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sigil-rail {
+  flex: 0 0 242px;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: 1px solid #6a5228;
+  background: linear-gradient(180deg, rgba(20, 14, 6, 0.6) 0%, rgba(10, 7, 3, 0.6) 100%);
+}
+.sigil-left {
+  flex: 0 0 128px;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid #6a5228;
+  background: linear-gradient(180deg, rgba(20, 14, 6, 0.6) 0%, rgba(10, 7, 3, 0.6) 100%);
+  padding: 10px 8px 6px;
+}
+.sigil-left .sigil-label { margin-bottom: 6px; }
+.sigil-left .sigil-palette {
+  display: flex;
+  flex-direction: column;
+  border-top: none;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+  min-height: 0;
+}
+.sigil-left .sigil-palette-tray {
+  display: grid;
+  grid-template-columns: repeat(2, 44px);
+  justify-content: center;
+  gap: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  align-content: flex-start;
+}
+.sigil-left .sigil-ink-name {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  font-style: normal;
+  color: #eadfc6;
+  line-height: 1.3;
+  min-height: 2em;
+  text-align: center;
+  white-space: normal;
+}
+.sigil-tags {
+  padding: 6px 12px 2px;
+}
+.sigil-tags-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+.sigil-tags-select {
+  flex: none;
+  max-width: 118px;
+  min-height: 44px;
+  background: linear-gradient(180deg, #241a0c 0%, #120c04 100%);
+  border: 1px solid #6a5228;
+  border-radius: 2px;
+  color: #eadfc6;
+  font-family: Georgia, serif;
+  font-style: normal;
+  font-size: 1rem;
+  padding: 3px 4px;
+  cursor: pointer;
+}
+.sigil-tags-select:focus-visible { outline: 2px solid #e8c890; outline-offset: 1px; }
+.sigil-tags-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+.sigil-tag-chip {
+  background: linear-gradient(180deg, #241a0c 0%, #120c04 100%);
+  border: 1px solid #e8c890;
+  border-radius: 2px;
+  color: #ffe8b8;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 2px 7px;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(232, 200, 144, 0.35);
+}
+.sigil-tag-chip:hover { border-color: #ff9a8a; color: #ffc8b8; }
+.sigil-tag-chip:focus-visible { outline: 2px solid #e8c890; outline-offset: 1px; }
+.sigil-rail .sigil-intention {
+  padding: 10px 12px 4px;
+}
+.sigil-rail .sigil-actions {
+  margin-top: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sigil-dust { transition: none; }
+}
+.sigil-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: transparent;
+}
+.sigil-veil.deny { background: rgba(192, 30, 30, 0.1); }
+.sigil-demo {
+  position: fixed;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  width: min(82%, 480px);
+  z-index: 61;
+  background: linear-gradient(180deg, #0a1420 0%, #060a10 100%);
+  border: 2px solid #4a8aaa;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(74, 138, 170, 0.2), 0 0 22px rgba(74, 138, 170, 0.3);
+  padding: 12px 16px;
+}
+.sigil-demo-voice {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+  color: #4a8aaa;
+  margin-bottom: 4px;
+}
+.sigil-demo-line {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 1.05rem;
+  color: #cfe2f5;
+  line-height: 1.5;
+}
+.sigil-demo-next {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #4a8aaa;
+  color: #cfe2f5;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  padding: 3px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.sigil-demo-next:hover { background: rgba(74, 138, 170, 0.18); }
+.sigil-demo-next:focus-visible { outline: 2px solid #cfe2f5; outline-offset: 2px; }
+.sigil-input.demo-blue {
+  color: #4a8aaa;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+#sigil-save.demo-hit {
+  border-color: #e8c890;
+  color: #e8c890;
+  box-shadow: 0 0 14px rgba(232, 200, 144, 0.6);
+}
+.demo-blue-preview {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  margin: 10px auto;
+  background: radial-gradient(circle, #4a8aaa 0%, #1a2a3a 70%);
+  box-shadow: 0 0 16px rgba(74, 138, 170, 0.9);
+}
+.sigil-app ::-webkit-scrollbar, .sigil-app::-webkit-scrollbar { width: 10px; height: 10px; }
+.sigil-app ::-webkit-scrollbar-track, .sigil-app::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); border-radius: 6px; }
+.sigil-app ::-webkit-scrollbar-thumb, .sigil-app::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #8a8a98 0%, #1a1a20 100%); border-radius: 6px; border: 2px solid rgba(0, 0, 0, 0.45); }
+.sigil-app ::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
+.sigil-app, .sigil-app * { scrollbar-width: thin; scrollbar-color: #8a8a98 rgba(0, 0, 0, 0.35); }
+
+/* CRT — the tube's bloom as THIS room would make it: chisel-dust hanging in
+   the bench light, over everything and touching nothing. Additive light only
+   (screen blend), so the stone stays readable; intensity comes from the
+   machine's one CRT control (--crt moves, --crt-still is texture at rest)
+   and both are 0 when it is off. */
+body[data-crt="sigil"] .crt-weave {
+  mix-blend-mode: screen;
+  opacity: var(--crt-still, 0);
+  background-image:
+    radial-gradient(60% 55% at 50% 6%, rgba(255, 217, 138, 0.30), transparent 72%),
+    radial-gradient(1.6px 1.6px at 21% 19%, rgba(236, 200, 138, 0.55), transparent 62%),
+    radial-gradient(1px 1px at 63% 33%, rgba(236, 200, 138, 0.45), transparent 62%),
+    radial-gradient(2px 2px at 82% 61%, rgba(236, 200, 138, 0.38), transparent 62%),
+    radial-gradient(1px 1px at 37% 76%, rgba(236, 200, 138, 0.42), transparent 62%),
+    radial-gradient(1.4px 1.4px at 12% 58%, rgba(236, 200, 138, 0.34), transparent 62%);
+}
+body[data-crt="sigil"] .crt-weave::after {
+  content: ''; position: absolute; inset: -6%;
+  opacity: var(--crt, 0);
+  background-image:
+    radial-gradient(1.2px 1.2px at 30% 40%, rgba(255, 240, 200, 0.6), transparent 62%),
+    radial-gradient(1px 1px at 72% 52%, rgba(255, 240, 200, 0.5), transparent 62%),
+    radial-gradient(1.4px 1.4px at 48% 82%, rgba(255, 240, 200, 0.45), transparent 62%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  body[data-crt="sigil"]:not(.crt-off) .crt-weave::after {
+    animation: sigil-dust-drift 17s ease-in-out infinite alternate;
+  }
+}
+@keyframes sigil-dust-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(5px, -9px, 0); }
+}
+
+/* ─── ROOM 01 · the dust tray ───────────────────────────────────────────
+   The tray already held a fixed scatter revealed on hover (WS4). Now the
+   room also sheds real grit as you work: one grain per mark, gathered for
+   the length of the sitting and never persisted — the tray is swept when
+   you leave the bench. `--grit` is the tray's own gauge (grains / max),
+   so the baseline density of the scatter climbs with the work even before
+   you hover, and hover still reveals it fully. */
+.sigil-dust-grain {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%,
+    rgba(240, 236, 232, 0.95) 0%,
+    rgba(150, 150, 160, 0.55) 62%,
+    rgba(150, 150, 160, 0) 100%);
+  transform: rotate(var(--tilt, 0deg)) scale(var(--grain, 1));
+  opacity: 0.85;
+  animation: sigil-dust-settle 0.9s cubic-bezier(0.2, 0, 0.3, 1) both;
+}
+@keyframes sigil-dust-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) rotate(var(--tilt, 0deg)) scale(calc(var(--grain, 1) * 1.5));
+  }
+  to {
+    opacity: 0.85;
+    transform: translateY(0) rotate(var(--tilt, 0deg)) scale(var(--grain, 1));
+  }
+}
+
+/* the tray's density gauge — the scatter thickens as the sitting goes on */
+.sigil-dust { opacity: calc(var(--grit, 0) * 0.34); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sigil-dust-grain { animation: none; }
+}
+
+/* ─── Rainy Day (s.shadowOn) — the stone room's own weather.
+   The workbench light goes cold and the grey takes a blue cast, so the
+   stone is harder to read by — which is the point of the room. A real
+   palette shift, not an opacity wash. The machine layer that dims the
+   glass lives in styles/shadow.css; the room never touches it. ─── */
+.machine.shadow-on .sigil-app {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(120, 152, 184, 0.09) 0%, rgba(0, 0, 0, 0) 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(24, 40, 58, 0.2) 0%, rgba(0, 0, 0, 0) 50%),
+    linear-gradient(180deg, #080b11 0%, #04060a 100%);
+}
+.machine.shadow-on .sigil-app::before {
+  filter: saturate(0.5) brightness(0.8);
+}
+
+/* the tutorial's curtain to the tent (2.13.0): the stone's demo closes
+   over the room, and divination.html opens the same layer from black */
+.sigil-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.sigil-curtain.go { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .sigil-curtain { transition: none; }
+}

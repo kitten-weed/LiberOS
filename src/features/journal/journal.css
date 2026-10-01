@@ -1,0 +1,1091 @@
+/* journal.css — riason's folio, open on a lived-in writing desk.
+   Ported 1:1 from the approved feature study (journal-folio-study.html).
+
+   The redesign brief (§5, Journal / riason): an open folio on a desk —
+   verso index page, leather bound edge, full paper leaf for the active
+   note, page rules, ink tools lying at the page foot. Reading, edit,
+   mirror attribution and annotations are states of this same book.
+   No chrome: the ribbon bookmark is the exit; the brass bell summons
+   riason; his chat box and recall ritual are part of the room.
+
+   THE TWO TYPEWRITERS. Oceanside Typewriter speaks for the machine: every
+   system surface — tab-cards, find, spine, stamp, buttons, labels. Shine
+   Typewriter is the hand: everything a person (or riason) writes ON the
+   paper — the leaf, the intention, the marginalia, the pen murmur, the
+   chat box. No imports, no shared variables (covenant Q.1). */
+
+@font-face {
+  font-family: 'Oceanside Typewriter';
+  src: url('../../../fonts/OceansideTypewriter.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Shine Typewriter';
+  src: url('../../../fonts/ShineTypewriter.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* ── the desk the folio lies on ──────────────────────────────────────── */
+
+.journal-app {
+  position: absolute;
+  inset: 0;
+  /* oaked boards, lamp pool above */
+  background:
+    radial-gradient(ellipse 60% 42% at 50% 12%, rgba(255, 214, 150, 0.11) 0%, rgba(0,0,0,0) 70%),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.22) 0 1px,
+      rgba(0,0,0,0) 1px 46px,
+      rgba(255,255,255,0.02) 46px 47px,
+      rgba(0,0,0,0) 47px 90px),
+    linear-gradient(180deg, #33220f 0%, #241708 55%, #1a1006 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oceanside Typewriter', 'VT323', 'Courier New', monospace;
+  color: #3a2010;
+  overflow: hidden;
+}
+
+/* ── desk dressing: sheets slipped under the folio ───────────────────── */
+
+.desk-sheets {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.desk-sheets .sheet {
+  position: absolute;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+.sheet-a {
+  width: 380px;
+  height: 250px;
+  left: 4%;
+  top: 14%;
+  transform: rotate(-7deg);
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 25px, rgba(106, 58, 24, 0.12) 25px 26px),
+    linear-gradient(180deg, #d8c8a0 0%, #c4b288 100%);
+}
+.sheet-b {
+  width: 300px;
+  height: 210px;
+  right: 6%;
+  top: 20%;
+  transform: rotate(5deg);
+  background:
+    linear-gradient(180deg, #cfc09a 0%, #bcac84 100%);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.5);
+}
+.sheet-c {
+  width: 260px;
+  height: 180px;
+  left: 12%;
+  bottom: 6%;
+  transform: rotate(3deg);
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 23px, rgba(106, 58, 24, 0.1) 23px 24px),
+    linear-gradient(180deg, #d2c298 0%, #bfae86 100%);
+}
+
+/* ── the open folio: verso · bound edge · recto ──────────────────────── */
+
+.journal-binding {
+  /* sized against the stage — inside the CRT that is the tube — so the
+     desk keeps a visible margin around the book */
+  width: min(1080px, 88%);
+  height: min(640px, 84%);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) auto minmax(0, 7fr);
+  padding: 0;
+  border-radius: 6px;
+  box-shadow:
+    0 22px 50px rgba(0, 0, 0, 0.66),
+    0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* the cabinet is arrangement only; its children seat onto the folio grid */
+.journal-cabinet { display: contents; }
+
+/* verso — the index page, dimmer toward the gutter */
+.journal-drawers {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-right: none;
+  border-radius: 6px 2px 2px 6px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0) 78%, rgba(48, 30, 12, 0.28) 96%, rgba(30, 18, 8, 0.44) 100%),
+    radial-gradient(circle 16px at 20% 12%, rgba(140, 90, 40, 0.12) 0%, rgba(0,0,0,0) 70%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.018) 0 1px, rgba(0,0,0,0) 1px 4px),
+    linear-gradient(180deg, #e2d2ae 0%, #d4c29a 100%);
+  padding: 20px 12px 14px 18px;
+  box-shadow: inset -2px 0 3px rgba(48, 28, 10, 0.25), inset 0 1px 0 rgba(255, 250, 232, 0.55);
+}
+
+/* recto — the full leaf the reader writes on, with page rules */
+.journal-note {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px 6px 6px 2px;
+  background:
+    linear-gradient(90deg, rgba(30, 18, 8, 0.42) 0%, rgba(48, 30, 12, 0.26) 3%, rgba(0,0,0,0) 9%),
+    linear-gradient(90deg, rgba(0,0,0,0) 0 46px, rgba(178, 74, 58, 0.42) 46px calc(46px + 1px), rgba(0,0,0,0) calc(46px + 1px)),
+    repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 29px, rgba(106, 58, 24, 0.16) 29px 30px),
+    radial-gradient(circle 14px at 82% 10%, rgba(140, 90, 40, 0.13) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #eee1bd 0%, #e0d0a8 100%);
+  padding: 18px 20px 14px 62px;
+  /* not clipped: the 3D canvas overhangs the foot so the instruments can
+     lie half off the page, onto the desk boards */
+  overflow: visible;
+  box-shadow: inset 2px 0 3px rgba(48, 28, 10, 0.2), inset 0 1px 0 rgba(255, 250, 232, 0.6);
+}
+
+/* the bound edge — fixed leather, stitching, the tally. Its width does
+   not grow with the collection; the tally carries the count. */
+.journal-spine {
+  grid-column: 2;
+  grid-row: 1;
+  width: 26px;
+  min-width: 26px;
+  background:
+    repeating-linear-gradient(180deg,
+      rgba(216, 184, 144, 0.4) 0 2px,
+      rgba(0,0,0,0) 2px 12px) left 3px / 1px 100% no-repeat,
+    repeating-linear-gradient(180deg,
+      rgba(216, 184, 144, 0.4) 0 2px,
+      rgba(0,0,0,0) 2px 12px) right 3px / 1px 100% no-repeat,
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px,
+      rgba(0,0,0,0) 1px, rgba(0,0,0,0) 4px),
+    linear-gradient(90deg, #1c1006 0%, #4a2c12 18%, #38200c 50%, #4a2c12 82%, #1c1006 100%);
+  box-shadow:
+    inset 2px 0 4px rgba(0,0,0,0.65),
+    inset -2px 0 4px rgba(0,0,0,0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 3;
+}
+
+.journal-spine-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.68rem;
+  letter-spacing: 0.4em;
+  color: #c89060;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow: 0 0 3px rgba(200, 144, 96, 0.3);
+}
+
+/* ── verso: index tab-cards at the bound edge ────────────────────────── */
+
+.journal-tabcards {
+  display: flex;
+  /* seated on the page and sized to the page: the row starts at the
+     entries' left edge (18px page pad + 6px) and ends 12px short of the
+     gutter, and each card flexes to an equal third so the three always
+     read as one aligned row. Above the corner clasps (z 6). */
+  margin: -12px 12px 12px 6px;
+  position: relative;
+  z-index: 7;
+}
+
+.journal-tab {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  text-align: center;
+  white-space: nowrap;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 4px 6px;
+  min-height: 44px;
+  margin-right: -6px;
+  background: linear-gradient(180deg, #cdba90 0%, #b8a276 100%);
+  color: #5a3a18;
+  border: 1px solid rgba(80, 50, 20, 0.45);
+  border-bottom: none;
+  border-radius: 7px 7px 0 0;
+  cursor: pointer;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+
+.journal-tab[aria-selected="true"] {
+  background: linear-gradient(180deg, #f2e4c2 0%, #e4d2aa 100%);
+  color: #2a1004;
+  font-weight: 700;
+  z-index: 4;
+  transform: translateY(-4px);
+  box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.22);
+}
+
+.journal-tab:hover { color: #2a1004; }
+.journal-tab:focus-visible { outline: 2px solid #6a3010; outline-offset: 2px; }
+
+/* the index itself: entries written on the page */
+.journal-list {
+  flex: 1;
+  overflow-y: auto;
+  background: rgba(0,0,0,0);
+  border: none;
+  padding: 2px 6px 8px 2px;
+  z-index: 2;
+}
+
+.journal-list-item {
+  padding: 10px 4px 9px;
+  margin: 0;
+  min-height: 48px;
+  border-bottom: 1px dotted rgba(80, 50, 20, 0.38);
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: #3a1a08;
+}
+
+.journal-list-item:hover { background: rgba(106, 58, 24, 0.08); }
+
+.journal-list-item.current {
+  background: rgba(106, 58, 24, 0.13);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 #aa7838;
+}
+
+.journal-list-item .meta {
+  font-size: 1.05rem;
+  color: #6a4a20;
+  letter-spacing: 0.05em;
+  margin-top: 1px;
+}
+
+.journal-empty {
+  font-size: 1.25rem;
+  font-style: italic;
+  color: #6a4a20;
+  text-align: center;
+  margin-top: 30px;
+  line-height: 1.6;
+}
+
+/* the empty drawer's way out — same plate grammar as the room's buttons */
+.journal-empty-cta {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 10px 20px;
+  font: 700 0.72rem/1 "Courier New", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid #aa7838;
+  color: #c89058;
+  cursor: pointer;
+  min-height: 44px;
+}
+.journal-empty-cta:hover { background: rgba(170, 120, 56, 0.14); color: #e8b878; }
+.journal-empty-cta:focus-visible { outline: 2px solid #d4af65; outline-offset: 2px; }
+
+.journal-netline {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #6a4a20;
+  text-align: center;
+  letter-spacing: 0.06em;
+  border-bottom: 1px dotted rgba(80, 50, 20, 0.3);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.journal-ann-dot { color: #6a3010; margin-right: 4px; }
+
+/* find: a pencil line at the page foot */
+.journal-find {
+  font-family: inherit;
+  font-size: 1.25rem;
+  color: #2a1004;
+  background: rgba(255, 250, 235, 0.35);
+  border: none;
+  border-bottom: 1px dotted rgba(80, 50, 20, 0.55);
+  border-radius: 0;
+  padding: 6px 4px;
+  min-height: 44px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.journal-find::placeholder { color: rgba(106, 48, 16, 0.7); font-style: italic; }
+.journal-find:focus { outline: none; background: rgba(255, 250, 235, 0.6); box-shadow: inset 0 -1px 0 #6a3010; }
+/* The find field is a real drawer tool: keep it above the page layers. */
+.journal-find { position: relative; z-index: 40; }
+
+/* ── recto: the leaf ─────────────────────────────────────────────────── */
+
+.journal-note-head {
+  border-bottom: 1px solid rgba(80, 50, 20, 0.32);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.journal-note-title {
+  font-size: 1.4rem;
+  font-variant: small-caps;
+  letter-spacing: 0.15em;
+  color: #3a1a08;
+  font-weight: 700;
+}
+
+.journal-note-date {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #6a4a20;
+}
+
+.journal-polaroid {
+  align-self: center;
+  max-width: 150px;
+  max-height: 150px;
+  background: #f4efe2;
+  padding: 6px 6px 20px;
+  margin: 4px 0 10px;
+  transform: rotate(-2.5deg);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(80, 50, 20, 0.3);
+}
+
+.journal-intention {
+  font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.2rem;
+  font-style: italic;
+  line-height: 30px;
+  color: #2a1004;
+  margin-bottom: 10px;
+  quotes: """ """;
+  position: relative;
+  z-index: 2;
+}
+
+.journal-intention::before { content: open-quote; }
+.journal-intention::after { content: close-quote; }
+.journal-intention:empty { display: none; }
+
+/* the writing sits on the rules: 30px line, 30px rule pitch — in the
+   hand's own typewriter. The deep bottom pad keeps the last line clear
+   of the instrument band at the page's foot. */
+.journal-editor {
+  flex: 1;
+  overflow-y: auto;
+  font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.28rem;
+  line-height: 30px;
+  color: #2a1004;
+  outline: none;
+  padding: 0 2px 110px;
+  caret-color: #6a3010;
+  position: relative;
+  z-index: 2;
+}
+
+.journal-editor:empty::before {
+  content: 'write here. the book keeps it.';
+  color: rgba(106, 48, 16, 0.66);
+  font-style: italic;
+}
+
+.journal-editor .smark { border-radius: 2px; padding: 0 1px; }
+.journal-editor .smark-hl { background: rgba(240, 220, 90, 0.55); cursor: pointer; }
+.journal-editor .smark-hl:hover { background: rgba(240, 220, 90, 0.85); }
+
+/* ── the DOM pens: fallback only — hidden once the three.js desk layer is
+   live (canvas takes the corner; .folio-3d-live is set by folio-3d.js) */
+
+.journal-tools {
+  position: absolute;
+  right: -8px;
+  bottom: -16px;
+  width: 250px;
+  height: 120px;
+  z-index: 45;
+  pointer-events: none;
+}
+
+.folio-3d-live .journal-tools { display: none; }
+
+.journal-pen {
+  position: absolute;
+  pointer-events: auto;
+  font-family: inherit;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  filter: drop-shadow(2px 3px 2px rgba(20, 10, 4, 0.35));
+  transition: transform 0.16s ease, filter 0.16s ease;
+  transform-origin: 55% 55%;
+}
+.journal-pen:focus-visible {
+  outline: 2px solid #e8c890;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* each pen put down at its own angle, fanned across the corner */
+.journal-pen[data-pen="hl"]     { right: 2px;   bottom: 44px; transform: rotate(-24deg); }
+.journal-pen[data-pen="red"]    { right: 48px;  bottom: 12px; transform: rotate(19deg); }
+.journal-pen[data-pen="blue"]   { right: 100px; bottom: 30px; transform: rotate(-11deg); }
+.journal-pen[data-pen="green"]  { right: 148px; bottom: 6px;  transform: rotate(30deg); }
+.journal-pen[data-pen="violet"] { right: 200px; bottom: 26px; transform: rotate(-33deg); }
+
+.journal-pen:hover { opacity: 1; }
+
+.journal-pen[data-pen="hl"]:hover     { transform: rotate(-24deg) translateY(-5px); }
+.journal-pen[data-pen="red"]:hover    { transform: rotate(19deg) translateY(-5px); }
+.journal-pen[data-pen="blue"]:hover   { transform: rotate(-11deg) translateY(-5px); }
+.journal-pen[data-pen="green"]:hover  { transform: rotate(30deg) translateY(-5px); }
+.journal-pen[data-pen="violet"]:hover { transform: rotate(-33deg) translateY(-5px); }
+
+/* the chosen pen lifts and glows faintly, cap beside it */
+.journal-pen.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(255, 240, 200, 0.85)) drop-shadow(2px 3px 2px rgba(20, 10, 4, 0.35));
+}
+.journal-pen[data-pen="hl"].active     { transform: rotate(-24deg) translateY(-9px); }
+.journal-pen[data-pen="red"].active    { transform: rotate(19deg) translateY(-9px); }
+.journal-pen[data-pen="blue"].active   { transform: rotate(-11deg) translateY(-9px); }
+.journal-pen[data-pen="green"].active  { transform: rotate(30deg) translateY(-9px); }
+.journal-pen[data-pen="violet"].active { transform: rotate(-33deg) translateY(-9px); }
+
+.journal-pen svg { display: block; overflow: visible; }
+
+/* the highlighter's cap: seated while idle, slid off beside the barrel
+   while the pen is armed — the nib stays bare as long as it is in use. */
+.journal-pen .pen-cap {
+  transition: transform 0.24s ease;
+}
+.journal-pen.active .pen-cap {
+  transform: translate(15px, 7px) rotate(38deg);
+}
+
+/* riason's murmur: one line in the chosen ink, written above the pens */
+.journal-pen-say {
+  position: absolute;
+  right: 22px;
+  bottom: 136px;
+  z-index: 46;
+  font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  transform: rotate(-2deg);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  max-width: 320px;
+  text-align: right;
+  text-shadow: 0 1px 0 rgba(255, 250, 232, 0.55);
+}
+.journal-pen-say.show { opacity: 0.95; }
+
+/* ── highlight popover: a pinned scrap of the same paper ─────────────── */
+
+.journal-pop {
+  position: absolute;
+  z-index: 60;
+  width: 220px;
+  background: linear-gradient(180deg, #f0e2c0 0%, #d8c49a 100%);
+  border: 1px solid #6a4a20;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  padding: 8px 10px;
+  transform: rotate(-0.6deg);
+}
+
+.journal-pop::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d8b890, #6a3a18 70%);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.journal-pop[hidden] { display: none; }
+
+.journal-pop-text {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #3a1a08;
+  border-left: 3px solid rgba(240, 200, 60, 0.9);
+  padding-left: 6px;
+  margin-bottom: 6px;
+  max-height: 60px;
+  overflow: hidden;
+}
+
+.journal-pop-note {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #2a1004;
+  background: rgba(255, 250, 235, 0.6);
+  border: 1px solid rgba(106, 74, 32, 0.5);
+  border-radius: 2px;
+  padding: 4px 6px;
+  resize: vertical;
+}
+
+.journal-pop-actions { display: flex; gap: 6px; margin-top: 6px; }
+
+.journal-pop-actions button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-style: italic;
+  background: none;
+  border: 1px solid #6a4a20;
+  color: #3a1a08;
+  border-radius: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.journal-pop-actions button:hover { background: rgba(120, 80, 40, 0.15); }
+
+/* ── stamp + slip ─────────────────────────────────────────────────────── */
+
+.journal-stamp {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  font-variant: small-caps;
+  font-size: 0.875rem;
+  letter-spacing: 0.3em;
+  color: #6a3010;
+  border: 1.5px solid #6a3010;
+  padding: 2px 10px;
+  transform: rotate(-7deg) translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 5;
+}
+
+.journal-note:hover .journal-stamp { opacity: 0.9; }
+
+.journal-slip {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: #6a3010;
+  background: linear-gradient(180deg, #f4e8c8 0%, #e2d0a0 100%);
+  border: 1px solid #aa7838;
+  border-radius: 2px;
+  padding: 3px 12px 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 252, 235, 0.7);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 6;
+}
+
+.journal-slip:hover {
+  transform: translateY(-2px) rotate(-0.5deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 252, 235, 0.7);
+}
+.journal-slip:active { transform: translateY(0); }
+.journal-slip:focus-visible { outline: 2px solid #6a3010; outline-offset: 2px; }
+.journal-slip[hidden] { display: none; }
+
+/* ── diagenic exit: a red ribbon bookmark trailing from the page top ───
+   You never "close" this room; you leave a ribbon in the book and go. */
+.journal-exit-ribbon {
+  position: absolute;
+  /* draped over the fore-edge: the ribbon trails out of the right side
+     of the book, the way a bookmark actually lies — only a sliver (12px,
+     inside the leaf's 20px right margin) rests on the page, the rest
+     hangs past the edge. Out of the reader's way. */
+  top: 96px;
+  right: -18px;
+  width: 30px;
+  height: 130px;
+  z-index: 30;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.journal-exit-ribbon:focus-visible { outline: 2px solid #e8c890; outline-offset: 4px; border-radius: 6px; }
+.journal-exit-ribbon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 22%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.2) 100%),
+    linear-gradient(180deg, #c84040 0%, #a52c2c 55%, #8a2020 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 14px), 0 100%);
+  box-shadow: inset 0 -14px 18px rgba(0, 0, 0, 0.22);
+  transition: transform 0.16s ease;
+}
+.journal-exit-ribbon:hover::before { transform: translateY(4px); }
+.journal-exit-ribbon::after {
+  content: 'leave';
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  /* faintly legible at rest — an exit you can find is an exit that works;
+     it warms to full ink on approach */
+  color: rgba(232, 200, 144, 0.45);
+  transition: color 0.15s ease;
+  pointer-events: none;
+}
+.journal-exit-ribbon:hover::after,
+.journal-exit-ribbon:focus-visible::after { color: rgba(232, 200, 144, 0.8); }
+
+/* ── the summon bell: small brass, pinned beside the ribbon ──────────── */
+.journal-summon-bell {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  margin-left: 64px;
+  width: 52px;
+  height: 52px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #5a3a10;
+  border-radius: 50%;
+  color: #d8a860;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 236, 190, 0.55) 0%, rgba(255, 236, 190, 0) 55%),
+    linear-gradient(180deg, #b8862e 0%, #8a6220 60%, #5a3e12 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 210, 0.45),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  padding: 0;
+}
+.journal-summon-bell:hover { color: #f0d6a5; filter: brightness(1.12); }
+.journal-summon-bell:focus-visible { outline: 2px solid #e8c890; outline-offset: 3px; }
+.journal-summon-bell[aria-expanded="true"] {
+  color: #f0d6a5;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 210, 0.45),
+    0 0 12px rgba(232, 200, 130, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.journal-summon-bell[aria-expanded="true"] svg { transform: rotate(-12deg); }
+.journal-summon-bell svg { transition: transform 0.2s ease; }
+.journal-summon-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  color: rgba(232, 200, 144, 0);
+  white-space: nowrap;
+  transition: color 0.15s ease;
+  pointer-events: none;
+}
+.journal-summon-bell:hover .journal-summon-label,
+.journal-summon-bell:focus-visible .journal-summon-label { color: rgba(232, 200, 144, 0.8); }
+
+/* ── riason's chat box: the tutorial's speaker grammar, on a scrap ─────
+   voice label + text line + response gate, typewriter reveal, visible
+   skip. Absolute, not fixed: the CRT glass clips it like every layer. */
+.journal-chat {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5%;
+  transform: translateX(-50%);
+  width: min(640px, 92%);
+  z-index: 80;
+  background:
+    radial-gradient(circle 12px at 18% 12%, rgba(140, 90, 40, 0.16) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #ecdfba 0%, #d4c49c 100%);
+  border: 1px solid #6a4a20;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px rgba(74, 42, 16, 0.5),
+    0 14px 30px rgba(0, 0, 0, 0.65);
+  padding: 10px 14px 12px;
+  transform: translateX(-50%) rotate(-0.4deg);
+  color: #3a2010;
+}
+.journal-chat[hidden] { display: none; }
+.journal-chat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(106, 74, 32, 0.55);
+  padding-bottom: 4px;
+  margin-bottom: 7px;
+}
+.journal-chat-voice {
+  font-size: 1rem;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: #aa7838;
+}
+.journal-chat-skip {
+  font-family: inherit;
+  font-size: 1rem;
+  font-style: italic;
+  color: #6a4a20;
+  background: none;
+  border: 1px solid #6a4a20;
+  border-radius: 2px;
+  padding: 5px 12px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.journal-chat-skip:hover { color: #2a1004; background: rgba(120, 80, 40, 0.12); }
+.journal-chat-skip:focus-visible { outline: 2px solid #e8c890; outline-offset: 2px; }
+.journal-chat-text {
+  font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  min-height: 3.2em;
+  color: #2a1004;
+}
+.journal-chat-gate {
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #6a3010;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  margin: 4px 0 0 auto;
+  display: block;
+  cursor: pointer;
+  min-height: 44px;
+  animation: journal-gate-pulse 1.4s ease-in-out infinite;
+}
+.journal-chat-gate:hover { color: #2a1004; }
+.journal-chat-gate:focus-visible { outline: 2px solid #6a3010; outline-offset: 2px; }
+@keyframes journal-gate-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* ── the recall: riason prompts, you type the line back ───────────────── */
+.journal-recall {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  width: min(660px, 94%);
+  z-index: 82;
+  text-align: center;
+}
+.journal-recall[hidden] { display: none; }
+.journal-recall-label {
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: rgba(232, 200, 144, 0.75);
+  margin-bottom: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.journal-recall-line {
+  font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 1.5rem;
+  color: #3a2010;
+  background:
+    radial-gradient(circle 12px at 18% 12%, rgba(140, 90, 40, 0.16) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #ecdfba 0%, #d4c49c 100%);
+  border: 1px solid #6a4a20;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px rgba(74, 42, 16, 0.5),
+    0 10px 24px rgba(0, 0, 0, 0.6);
+  padding: 14px 18px;
+  display: inline-block;
+  transform: rotate(-0.5deg);
+  min-height: 1.4em;
+}
+.journal-recall-done {
+  color: #7a4210;
+  text-decoration: underline;
+  text-decoration-color: rgba(170, 120, 56, 0.75);
+  text-underline-offset: 5px;
+}
+.journal-recall .journal-chat-skip { margin-top: 10px; }
+
+/* ── riason's card, pinned over the desk ─────────────────────────────── */
+
+.journal-raison {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 12, 5, 0.72);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.journal-raison.open { opacity: 1; pointer-events: auto; }
+
+.journal-raison-inner {
+  width: 78%;
+  max-width: 420px;
+  background:
+    radial-gradient(circle 12px at 18% 12%, rgba(140, 90, 40, 0.16) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #ecdfba 0%, #d4c49c 100%);
+  border: 1px solid #6a4a20;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px rgba(74, 42, 16, 0.5),
+    0 14px 30px rgba(0, 0, 0, 0.65);
+  padding: 18px 22px;
+  font-style: italic;
+  color: #3a2010;
+  letter-spacing: 0.03em;
+  transform: rotate(-0.5deg);
+  position: relative;
+}
+
+.journal-raison-inner::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d8b890, #5a2e12 70%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
+}
+
+.journal-raison-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #6a4a20;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.journal-raison-name {
+  font-size: 0.875rem;
+  color: #6a3010;
+  letter-spacing: 0.25em;
+  font-weight: 700;
+}
+
+.journal-raison-close {
+  background: none;
+  border: 1px solid #6a4a20;
+  color: #6a4a20;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 30px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.journal-raison-close:hover { background: rgba(120, 80, 40, 0.12); color: #3a1a08; }
+.journal-raison-close:focus-visible { outline: 2px solid #e8c890; outline-offset: 2px; }
+
+.journal-raison-body { font-size: 1rem; line-height: 1.55; }
+
+/* ── cursor, scrollbars ──────────────────────────────────────────────── */
+
+.journal-app {
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2 22l3-7 12-12 4 4-12 12z' fill='%23d8b890' stroke='%236a3a18'/><path d='M2 22l3-7 4 4z' fill='%23e8dcc0' stroke='%236a3a18'/><path d='M17 3l4 4 2-2-4-4z' fill='%23aa7838' stroke='%236a3a18'/></svg>") 2 22, auto;
+}
+
+.journal-app button { cursor: inherit; }
+
+.journal-app ::-webkit-scrollbar, .journal-app::-webkit-scrollbar { width: 10px; height: 10px; }
+.journal-app ::-webkit-scrollbar-track, .journal-app::-webkit-scrollbar-track { background: rgba(58, 26, 8, 0.4); border-radius: 6px; }
+.journal-app ::-webkit-scrollbar-thumb, .journal-app::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #aa7838 0%, #4a2a10 100%); border-radius: 6px; border: 2px solid rgba(26, 10, 5, 0.6); }
+.journal-app ::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
+.journal-app, .journal-app * { scrollbar-width: thin; scrollbar-color: #aa7838 rgba(58, 26, 8, 0.4); }
+
+/* ── brass corner clasps — brighten as relations are bound ───────────── */
+
+.journal-cap {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  z-index: 6;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 240, 200, 0.5), rgba(255, 240, 200, 0) 60%),
+    linear-gradient(135deg, #8a6a34 0%, #5a4420 55%, #3a2c12 100%);
+  border: 1px solid #2a1e0a;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 210, 0.35),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: filter 0.6s ease, box-shadow 0.6s ease;
+}
+.journal-cap.tl { top: -4px; left: -4px; }
+.journal-cap.tr { top: -4px; right: -4px; }
+.journal-cap.bl { bottom: -4px; left: -4px; }
+.journal-cap.br { bottom: -4px; right: -4px; }
+
+.journal-binding[data-relations="1"] .journal-cap { filter: brightness(1.3) saturate(1.15); }
+.journal-binding[data-relations="2"] .journal-cap { filter: brightness(1.6) saturate(1.3); }
+.journal-binding[data-relations="3"] .journal-cap {
+  filter: brightness(1.95) saturate(1.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 225, 0.55),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(232, 200, 130, 0.35);
+}
+
+/* the bound edge carries the unread tally in graphite */
+.journal-spine-tally {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.95rem;
+  letter-spacing: 0.5em;
+  color: #e8c890;
+  opacity: 0.85;
+  margin-top: 6px;
+}
+
+/* the unread count again, in the hand — under the tally */
+.journal-spine::after {
+  content: attr(data-unread);
+  display: block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: 'Shine Typewriter', 'Segoe Script', cursive;
+  font-size: 0.92rem;
+  color: #d8b890;
+  opacity: 0.75;
+  margin-top: 4px;
+  min-height: 1em;
+}
+
+.journal-spine[data-unread="0"]::after { content: none; }
+
+/* ── ribbons + marginalia ─────────────────────────────────────────────── */
+
+.journal-ribbon {
+  display: inline-block;
+  width: 4px;
+  height: 15px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  background: linear-gradient(180deg, #c84040 0%, #8a2020 70%, #6a1616 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 220, 0.4), 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.journal-list-item { position: relative; }
+
+/* hover marginalia: an annotated row confesses its first note in the margin */
+.journal-list-item[data-marginal]::after {
+  content: attr(data-marginal);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 4px;
+  width: 130px;
+  font-family: 'Shine Typewriter', 'Segoe Script', cursive;
+  font-size: 0.98rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: #6a3010;
+  background: linear-gradient(180deg, #f4e8c8 0%, #ecdcb4 100%);
+  border-left: 2px solid #aa7838;
+  padding: 3px 7px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.journal-list-item[data-marginal]:hover::after,
+.journal-list-item[data-marginal]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.journal-list-item:focus-visible {
+  outline: 2px solid #6a3010;
+  outline-offset: -2px;
+  background: rgba(120, 80, 40, 0.14);
+}
+
+/* ── narrow book: the folio folds — index above, leaf below ──────────── */
+@media (max-width: 900px) {
+  .journal-list-item[data-marginal]::after {
+    left: 10px;
+    right: auto;
+    top: calc(100% - 2px);
+    width: calc(100% - 30px);
+  }
+  .journal-binding { display: flex; flex-direction: column; width: 96%; height: 94%; }
+  .journal-drawers { max-height: 40%; border-radius: 6px 6px 0 0; }
+  .journal-spine { width: auto !important; min-width: 0 !important; flex-direction: row; padding: 0 10px; }
+  .journal-spine-text, .journal-spine-tally, .journal-spine::after { writing-mode: horizontal-tb; transform: none; margin: 0 10px; }
+  .journal-note { flex: 1; border-radius: 0 0 6px 6px; }
+  /* the ribbon still marks the page on a narrow book — it just trails from
+     the top edge, above the drawers, instead of hanging off the fore-edge */
+  .journal-exit-ribbon { top: 6px; right: 10px; width: 26px; height: 88px; z-index: 40; }
+  .journal-exit-ribbon::after { color: rgba(232, 200, 144, 0.6); font-size: 0.72rem; top: calc(100% + 2px); }
+  .journal-summon-bell { z-index: 40; }
+  .journal-chat, .journal-recall { width: 94%; }
+}
+
+/* ── reduced motion: the room holds still ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .journal-stamp, .journal-pen, .journal-cap, .journal-slip,
+  .journal-list-item[data-marginal]::after, .journal-raison,
+  .journal-exit-ribbon::before,
+  .journal-summon-bell svg, .journal-chat-gate { transition: none; animation: none; }
+}
+
+/* Rainy Day (s.shadowOn) — rain on the desk: the oaked boards go to a
+   cold blue-black and the lamp pool dims. A real palette shift, not an
+   opacity wash (the dimming lives in styles/shadow.css). */
+.machine.shadow-on .journal-app {
+  background:
+    radial-gradient(ellipse 60% 42% at 50% 12%, rgba(140, 170, 200, 0.07) 0%, rgba(0,0,0,0) 70%),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.28) 0 1px,
+      rgba(0,0,0,0) 1px 46px,
+      rgba(255,255,255,0.015) 46px 47px,
+      rgba(0,0,0,0) 47px 90px),
+    linear-gradient(180deg, #141c26 0%, #0e141c 55%, #090d13 100%);
+}

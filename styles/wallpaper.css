@@ -1,0 +1,378 @@
+/* ============================================================================
+   wallpaper.css — the glass's own picture.
+
+   The travelling machine is one object, and every traveller repainted its
+   tube. This is the picture in the glass behind the desktop: not a filter and
+   not a tint daubed over the machine — a place, drawn in the traveller's own
+   material, with one or two marks they left on it.
+
+   Rules this file holds to (covenant):
+     · material, not hue. Pigment, paper, canvas, water, stone, card, velvet.
+     · quiet centre. The picture does not compete with the work standing on
+       it: the brightest marks sit at the edges, the middle stays dim enough
+       to read a pink thread across.
+     · silhouette first. At thumbnail size the material and the mark still
+       say whose tube it is. `.wp-thumb` folds the real thing down rather
+       than inventing a second, simpler swatch.
+     · motion with consent. The few drifting pictures (corrupted, vanir,
+       ravaging) still hold perfectly still under prefers-reduced-motion.
+     · residue, not caption. The marks are the maker's own — an accession
+       number, a stall number, a tide height. Nothing here explains itself.
+
+   `body[data-theme]` paints the machine's paint (styles/machine.css); this
+   file paints the picture inside the glass. apply-theme.js copies the skin
+   onto the wallpaper element as data-wt, so any surface that mounts a
+   .wallpaper can show any traveller's tube.
+   ============================================================================ */
+
+.wallpaper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #22102d;      /* Wanderlust's astronomical threshold */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.wallpaper::before,
+.wallpaper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Wanderlust's homescreen sky: violet-black depth, warm fields, two star
+   distances, and red kept only at the corners. */
+.wallpaper[data-wt="wanderlust"]{background-image:radial-gradient(ellipse 35% 28% at 18% 24%,rgba(255,202,125,.16),transparent 72%),radial-gradient(ellipse 42% 30% at 78% 68%,rgba(228,111,158,.13),transparent 72%),radial-gradient(ellipse 28% 36% at 51% 46%,rgba(153,103,206,.15),transparent 75%),radial-gradient(circle at 94% 5%,rgba(221,70,102,.28),transparent 22%),radial-gradient(circle at 4% 95%,rgba(221,70,102,.24),transparent 22%),linear-gradient(145deg,#22102d 0%,#160b25 48%,#080815 100%)}
+.wallpaper[data-wt="wanderlust"]::before{background-image:radial-gradient(circle,rgba(246,231,196,.72) 0 1px,transparent 1.5px),radial-gradient(circle,rgba(199,174,235,.58) 0 1px,transparent 1.5px);background-size:87px 73px,131px 109px;background-position:18px 12px,42px 38px;opacity:.6}
+.wallpaper[data-wt="wanderlust"]::after{background:radial-gradient(ellipse 62% 58% at 50% 46%,rgba(34,16,45,.4),transparent 78%),linear-gradient(180deg,rgba(0,0,0,.3),transparent 22%,transparent 74%,rgba(0,0,0,.44))}
+
+#desktop .wallpaper{background-image:radial-gradient(ellipse 35% 28% at 18% 24%,rgba(255,202,125,.16),transparent 72%),radial-gradient(ellipse 42% 30% at 78% 68%,rgba(228,111,158,.13),transparent 72%),radial-gradient(ellipse 28% 36% at 51% 46%,rgba(153,103,206,.15),transparent 75%),radial-gradient(circle at 94% 5%,rgba(221,70,102,.28),transparent 22%),radial-gradient(circle at 4% 95%,rgba(221,70,102,.24),transparent 22%),linear-gradient(145deg,#22102d 0%,#160b25 48%,#080815 100%)}
+#desktop .wallpaper::before{background-image:radial-gradient(circle,rgba(246,231,196,.72) 0 1px,transparent 1.5px),radial-gradient(circle,rgba(199,174,235,.58) 0 1px,transparent 1.5px);background-size:87px 73px,131px 109px;background-position:18px 12px,42px 38px;opacity:.6}
+
+/* ── the thumbnails ──────────────────────────────────────────────────────
+   A drawer tile is a small window onto the real picture, not a swatch: the
+   wallpaper is laid out at the glass's own size and folded down, so what the
+   hand previews is exactly what the machine will wear. --wp-fit is the fold. */
+.wp-thumb {
+  position: relative;
+  overflow: hidden;
+}
+.wp-thumb > .wallpaper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1180px;
+  height: 738px;
+  transform-origin: top left;
+  transform: scale(var(--wp-fit, 0.08));
+}
+
+/* The locker's chips. A pigment locker shows a chip of the tin, not a label
+   about it: these are cut at true size, one from the place in each picture
+   where the pigment is thickest. Nothing is redrawn smaller, so the chip
+   cannot lie about the tin. */
+.wp-thumb[data-sample] > .wallpaper { --wp-fit: 1; }
+.wp-thumb[data-sample="corrupted"]  > .wallpaper { transform: translate(-440px, -300px) scale(1); }
+.wp-thumb[data-sample="wanderlust"]  > .wallpaper { transform: translate(-820px, -160px) scale(1); }
+.wp-thumb[data-sample="riason"]      > .wallpaper { transform: translate(-880px, -140px) scale(1); }
+.wp-thumb[data-sample="physius"]     > .wallpaper { transform: translate(-150px, -205px) scale(1); }
+.wp-thumb[data-sample="whimsy"]      > .wallpaper { transform: translate(-120px, -40px)  scale(1); }
+.wp-thumb[data-sample="vanir"]       > .wallpaper { transform: translate(-200px, -450px) scale(1); }
+.wp-thumb[data-sample="entity404"]   > .wallpaper { transform: translate(-300px, -470px) scale(1); }
+.wp-thumb[data-sample="arcana"]      > .wallpaper { transform: translate(-372px, -352px) scale(1); }
+.wp-thumb[data-sample="librarian"]   > .wallpaper { transform: translate(-740px, -84px)  scale(1); }
+.wp-thumb[data-sample="elizabeth"]   > .wallpaper { transform: translate(-800px, -528px) scale(1); }
+.wp-thumb[data-sample="iris"]        > .wallpaper { transform: translate(-920px, -150px) scale(1); }
+.wp-thumb[data-sample="ravaging"]    > .wallpaper { transform: translate(-780px, -528px) scale(1); }
+.wp-thumb[data-sample="royalty"]     > .wallpaper { transform: translate(-490px, -556px) scale(1); }
+.wp-thumb[data-sample="clean"]       > .wallpaper { transform: translate(-520px, -350px) scale(1); }
+.wp-thumb[data-sample="shadow"]      > .wallpaper { transform: translate(-1000px, -240px) scale(1); }
+.wp-thumb[data-sample="mono"]        > .wallpaper { transform: translate(-20px, -300px)   scale(1); }
+.wp-thumb[data-sample="gold"]        > .wallpaper { transform: translate(-520px, -8px)    scale(1); }
+
+/* the shared quiet: every picture ends under the same soft desk-light fall-off
+   so no traveller's tube outshouts the work standing on it */
+.wallpaper::after {
+  background:
+    radial-gradient(ellipse 62% 58% at 50% 46%, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0) 78%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 74%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* ── corrupted — the tube it was born in ────────────────────────────────
+   Faded red phosphor, drifts. Burn-in of a retired panel, one hairline
+   crack, and the maker's tally along the bottom edge. */
+.wallpaper[data-wt="corrupted"] {
+  background-image:
+    repeating-linear-gradient(180deg, rgba(255, 60, 40, 0.035) 0px, rgba(255, 60, 40, 0.035) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(ellipse 74% 62% at 50% 40%, rgba(150, 24, 16, 0.5) 0%, rgba(60, 6, 4, 0.32) 52%, rgba(10, 0, 0, 0) 82%),
+    linear-gradient(180deg, #3a0806 0%, #210201 46%, #0d0000 100%);
+}
+.wallpaper[data-wt="corrupted"]::before {
+  background:
+    linear-gradient(104deg, rgba(0, 0, 0, 0) 46.6%, rgba(255, 120, 90, 0.16) 46.9%, rgba(255, 120, 90, 0.05) 47.4%, rgba(0, 0, 0, 0) 47.8%),
+    radial-gradient(ellipse 16% 12% at 79% 22%, rgba(220, 70, 40, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+/* ── wanderlust — sugar paper and a summoning arc ───────────────────────
+   Striped wrapper stock at dusk, a yellow arc chalked over it, the corner
+   torn where it was opened. */
+.wallpaper[data-wt="wanderlust"] {
+  background-image:
+    repeating-linear-gradient(38deg, rgba(255, 105, 180, 0.16) 0px, rgba(255, 105, 180, 0.16) 26px, rgba(0, 0, 0, 0) 26px, rgba(0, 0, 0, 0) 60px),
+    radial-gradient(ellipse 70% 60% at 24% 78%, rgba(232, 120, 170, 0.22) 0%, rgba(0, 0, 0, 0) 66%),
+    linear-gradient(168deg, #2a0a1c 0%, #1a0612 52%, #0c0309 100%);
+}
+.wallpaper[data-wt="wanderlust"]::before {
+  background:
+    radial-gradient(circle at 78% 26%, rgba(255, 216, 64, 0) 22%, rgba(255, 216, 64, 0.30) 22.6%, rgba(255, 216, 64, 0.30) 23.4%, rgba(255, 216, 64, 0) 24%),
+    radial-gradient(circle at 78% 26%, rgba(255, 216, 64, 0) 30%, rgba(255, 216, 64, 0.18) 30.5%, rgba(255, 216, 64, 0.18) 31.2%, rgba(255, 216, 64, 0) 31.8%);
+}
+
+/* ── riason — the observer's drafting vellum ────────────────────────────
+   Cold graph stock, one red correction arc, a ring left by a cup that was
+   set down on the drawing. */
+.wallpaper[data-wt="riason"] {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(140, 180, 230, 0.09) 0px, rgba(140, 180, 230, 0.09) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 44px),
+    repeating-linear-gradient(180deg, rgba(140, 180, 230, 0.07) 0px, rgba(140, 180, 230, 0.07) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 44px),
+    radial-gradient(ellipse 66% 58% at 62% 34%, rgba(90, 120, 190, 0.24) 0%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(180deg, #0b1226 0%, #070c1a 55%, #03050d 100%);
+}
+.wallpaper[data-wt="riason"]::before {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(190, 150, 90, 0) 5.6%, rgba(190, 150, 90, 0.12) 5.9%, rgba(190, 150, 90, 0.12) 6.6%, rgba(190, 150, 90, 0) 6.9%),
+    radial-gradient(circle at 84% 22%, rgba(180, 60, 60, 0) 9%, rgba(180, 60, 60, 0.22) 9.3%, rgba(180, 60, 60, 0.22) 9.9%, rgba(180, 60, 60, 0) 10.2%);
+}
+
+/* ── physius — the quarry face ──────────────────────────────────────────
+   Basalt, copper in the seams, chisel strokes left in. */
+.wallpaper[data-wt="physius"] {
+  background-image:
+    repeating-linear-gradient(74deg, rgba(255, 255, 255, 0.022) 0px, rgba(255, 255, 255, 0.022) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 9px),
+    radial-gradient(ellipse 48% 34% at 22% 30%, rgba(190, 110, 50, 0.20) 0%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(196deg, #241d18 0%, #13100d 48%, #080605 100%);
+}
+
+/* ── whimsy — the midway tarp ───────────────────────────────────────────
+   Canvas weave, a scalloped awning along the top, grommets, the bulbs
+   switched off for the night. */
+.wallpaper[data-wt="whimsy"] {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(240, 200, 150, 0.045) 0px, rgba(240, 200, 150, 0.045) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 4px),
+    repeating-linear-gradient(90deg, rgba(240, 200, 150, 0.04) 0px, rgba(240, 200, 150, 0.04) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 4px),
+    linear-gradient(180deg, rgba(140, 20, 16, 0.55) 0%, rgba(90, 12, 10, 0.28) 16%, rgba(0, 0, 0, 0) 34%),
+    linear-gradient(180deg, #200907 0%, #120504 60%, #080202 100%);
+}
+.wallpaper[data-wt="whimsy"]::before {
+  background:
+    repeating-radial-gradient(circle at 0 0, rgba(240, 214, 170, 0.20) 0px, rgba(240, 214, 170, 0.20) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 26px) 0 0 / 52px 30px repeat-x,
+    radial-gradient(circle at 12% 8%, rgba(255, 214, 120, 0.30) 0%, rgba(255, 214, 120, 0.30) 1.4%, rgba(0, 0, 0, 0) 2%),
+    radial-gradient(circle at 38% 8%, rgba(255, 214, 120, 0.24) 0%, rgba(255, 214, 120, 0.24) 1.4%, rgba(0, 0, 0, 0) 2%),
+    radial-gradient(circle at 64% 8%, rgba(255, 214, 120, 0.24) 0%, rgba(255, 214, 120, 0.24) 1.4%, rgba(0, 0, 0, 0) 2%),
+    radial-gradient(circle at 90% 8%, rgba(255, 214, 120, 0.28) 0%, rgba(255, 214, 120, 0.28) 1.4%, rgba(0, 0, 0, 0) 2%);
+}
+
+/* ── vanir — the deep ───────────────────────────────────────────────────
+   Black water with a slow green swell coming up from underneath, one foam
+   line where the water remembers being higher. */
+.wallpaper[data-wt="vanir"] {
+  background-image:
+    radial-gradient(ellipse 84% 44% at 50% 104%, rgba(42, 154, 154, 0.30) 0%, rgba(20, 90, 96, 0.16) 46%, rgba(0, 0, 0, 0) 78%),
+    radial-gradient(ellipse 60% 30% at 22% 16%, rgba(60, 130, 180, 0.16) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #041014 0%, #030c10 46%, #01060a 100%);
+}
+.wallpaper[data-wt="vanir"]::before {
+  background:
+    linear-gradient(180deg, rgba(180, 230, 220, 0) 63.5%, rgba(180, 230, 220, 0.14) 63.9%, rgba(180, 230, 220, 0.05) 64.4%, rgba(0, 0, 0, 0) 65%),
+    linear-gradient(180deg, rgba(180, 230, 220, 0) 71.5%, rgba(180, 230, 220, 0.08) 71.8%, rgba(0, 0, 0, 0) 72.4%);
+}
+
+/* ── entity404 — the void that answers ──────────────────────────────────
+   Green phosphor in a black field, the address repeating into the dark, a
+   band of dead pixels across the lower third. */
+.wallpaper[data-wt="entity404"] {
+  background-image:
+    repeating-linear-gradient(180deg, rgba(0, 255, 102, 0.05) 0px, rgba(0, 255, 102, 0.05) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(ellipse 60% 50% at 50% 44%, rgba(0, 120, 50, 0.16) 0%, rgba(0, 0, 0, 0) 74%),
+    linear-gradient(180deg, #021305 0%, #010a03 60%, #000501 100%);
+}
+.wallpaper[data-wt="entity404"]::before {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 66%, rgba(0, 255, 102, 0.10) 66.4%, rgba(0, 255, 102, 0.02) 68.2%, rgba(0, 0, 0, 0) 68.6%),
+    repeating-linear-gradient(90deg, rgba(0, 255, 102, 0.07) 0px, rgba(0, 255, 102, 0.07) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 17px);
+  opacity: 0.5;
+}
+
+/* ── arcana — the deck's table cloth ────────────────────────────────────
+   Grey felt, a chalk circle drawn and not dusted off, three cards left
+   face-down where the reading stopped. */
+.wallpaper[data-wt="arcana"] {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 3px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.10) 0px, rgba(0, 0, 0, 0.10) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(ellipse 58% 54% at 50% 50%, rgba(228, 224, 214, 0.07) 0%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(180deg, #17171a 0%, #0e0e11 58%, #070708 100%);
+}
+.wallpaper[data-wt="arcana"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cg fill='none' stroke='%23e8e4da' stroke-opacity='0.22' stroke-width='2'%3E%3Ccircle cx='500' cy='500' r='250'/%3E%3Ccircle cx='500' cy='500' r='244' stroke-dasharray='6 9'/%3E%3C/g%3E%3Cg fill='%23e8e4da' fill-opacity='0.10' stroke='%23e8e4da' stroke-opacity='0.30' stroke-width='2'%3E%3Crect x='620' y='250' width='92' height='140' rx='7'/%3E%3Crect x='700' y='380' width='92' height='140' rx='7'/%3E%3Crect x='560' y='420' width='92' height='140' rx='7'/%3E%3C/g%3E%3C/svg%3E") 50% 50% / 74% auto no-repeat;
+}
+.wallpaper[data-wt="arcana"]::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cg fill='none' stroke='%23e8e4da' stroke-opacity='0.22' stroke-width='2'%3E%3Ccircle cx='500' cy='500' r='250'/%3E%3Ccircle cx='500' cy='500' r='244' stroke-dasharray='6 9'/%3E%3C/g%3E%3Cg fill='%23e8e4da' fill-opacity='0.10' stroke='%23e8e4da' stroke-opacity='0.30' stroke-width='2'%3E%3Crect x='620' y='250' width='92' height='140' rx='7'/%3E%3Crect x='700' y='380' width='92' height='140' rx='7'/%3E%3Crect x='560' y='420' width='92' height='140' rx='7'/%3E%3C/g%3E%3C/svg%3E") 50% 50% / 74% auto no-repeat,
+    radial-gradient(ellipse 62% 58% at 50% 46%, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0) 78%);
+}
+
+/* ── librarian — the drawers ────────────────────────────────────────────
+   Sepia card stock, ruled, one brass label plate holding the maker's own
+   accession number. */
+.wallpaper[data-wt="librarian"] {
+  background-image:
+    repeating-linear-gradient(180deg, rgba(90, 60, 30, 0.16) 0px, rgba(90, 60, 30, 0.16) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 30px),
+    radial-gradient(ellipse 68% 58% at 30% 24%, rgba(196, 150, 90, 0.20) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #241a10 0%, #150e08 55%, #0a0705 100%);
+}
+.wallpaper[data-wt="librarian"]::before {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 68%, rgba(212, 175, 90, 0.30) 68.3%, rgba(212, 175, 90, 0.16) 68.9%, rgba(0, 0, 0, 0) 69.2%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 12%, rgba(212, 175, 90, 0.22) 12.3%, rgba(212, 175, 90, 0.10) 13.1%, rgba(0, 0, 0, 0) 13.5%);
+}
+
+/* ── elizabeth — the gilded panel ───────────────────────────────────────
+   Gold leaf laid thin on black, worn back to the ground where the hand
+   rested, a chain of small links drawn along the foot. */
+.wallpaper[data-wt="elizabeth"] {
+  background-image:
+    radial-gradient(ellipse 74% 52% at 50% -10%, rgba(212, 175, 55, 0.22) 0%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(ellipse 40% 34% at 76% 74%, rgba(212, 175, 55, 0.10) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #14100a 0%, #0a0706 58%, #050303 100%);
+}
+.wallpaper[data-wt="elizabeth"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300'%3E%3Cg fill='none' stroke='%23d4af37' stroke-opacity='0.34' stroke-width='3'%3E%3Cpath d='M0 150 Q60 60 120 150 T240 150 T360 150 T480 150 T600 150 T720 150 T840 150 T960 150 T1080 150 T1200 150'/%3E%3C/g%3E%3C/svg%3E") 50% 88% / 82% auto no-repeat,
+    radial-gradient(ellipse 20% 14% at 84% 66%, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0) 72%);
+}
+
+/* ── iris — the mapmaker's plate ────────────────────────────────────────
+   Parchment, iron-gall contours, a compass rose inked into the corner
+   (study the atlas and it is there), a scale bar along the foot. */
+.wallpaper[data-wt="iris"] {
+  background-image:
+    repeating-linear-gradient(96deg, rgba(60, 40, 16, 0.10) 0px, rgba(60, 40, 16, 0.10) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 58px),
+    radial-gradient(ellipse 62% 56% at 28% 30%, rgba(200, 172, 120, 0.18) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(170deg, #241b0e 0%, #171008 52%, #0c0804 100%);
+}
+.wallpaper[data-wt="iris"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%233a2610' stroke-opacity='0.78' stroke-width='1.1'%3E%3Ccircle cx='100' cy='100' r='62'/%3E%3Ccircle cx='100' cy='100' r='54' stroke-dasharray='2 5'/%3E%3C/g%3E%3Cg fill='%233a2610' fill-opacity='0.5' stroke='%233a2610' stroke-opacity='0.7' stroke-width='0.8'%3E%3Cpath d='M100 30 L108 100 L100 170 L92 100 Z'/%3E%3Cpath d='M30 100 L100 92 L170 100 L100 108 Z'/%3E%3C/g%3E%3Ccircle cx='100' cy='100' r='6' fill='%233a2610' fill-opacity='0.6'/%3E%3C/svg%3E") 86% 22% / 22% auto no-repeat,
+    linear-gradient(0deg, rgba(58, 38, 16, 0) 84%, rgba(58, 38, 16, 0.55) 84.4%, rgba(58, 38, 16, 0.55) 85%, rgba(58, 38, 16, 0) 85.4%);
+}
+.wallpaper[data-wt="iris"]::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%233a2610' stroke-opacity='0.78' stroke-width='1.1'%3E%3Ccircle cx='100' cy='100' r='62'/%3E%3Ccircle cx='100' cy='100' r='54' stroke-dasharray='2 5'/%3E%3C/g%3E%3Cg fill='%233a2610' fill-opacity='0.5' stroke='%233a2610' stroke-opacity='0.7' stroke-width='0.8'%3E%3Cpath d='M100 30 L108 100 L100 170 L92 100 Z'/%3E%3Cpath d='M30 100 L100 92 L170 100 L100 108 Z'/%3E%3C/g%3E%3Ccircle cx='100' cy='100' r='6' fill='%233a2610' fill-opacity='0.6'/%3E%3C/svg%3E") 86% 22% / 22% auto no-repeat,
+    radial-gradient(circle at 12% 86%, rgba(30, 20, 8, 0.8) 0%, rgba(30, 20, 8, 0.34) 0.9%, rgba(0, 0, 0, 0) 2.4%),
+    radial-gradient(ellipse 62% 58% at 50% 46%, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0) 78%);
+}
+
+/* ── ravaging — the ground he keeps turning over ────────────────────────
+   Loam, rust, a length of chain still buried, weeds coming up between the
+   rubble. */
+.wallpaper[data-wt="ravaging"] {
+  background-image:
+    repeating-linear-gradient(24deg, rgba(180, 110, 60, 0.05) 0px, rgba(180, 110, 60, 0.05) 3px, rgba(0, 0, 0, 0) 3px, rgba(0, 0, 0, 0) 11px),
+    radial-gradient(ellipse 56% 40% at 70% 76%, rgba(150, 80, 30, 0.22) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #1b1410 0%, #120d09 56%, #070504 100%);
+}
+.wallpaper[data-wt="ravaging"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Cg fill='none' stroke='%23aa6e3c' stroke-opacity='0.42' stroke-width='2.4'%3E%3Ccircle cx='40' cy='80' r='12'/%3E%3Ccircle cx='64' cy='80' r='12'/%3E%3Ccircle cx='88' cy='80' r='12'/%3E%3Ccircle cx='112' cy='80' r='12'/%3E%3C/g%3E%3Cg fill='%235a4632' fill-opacity='0.34'%3E%3Crect x='200' y='60' width='34' height='18' rx='2'/%3E%3Crect x='244' y='72' width='26' height='14' rx='2'/%3E%3C/g%3E%3C/svg%3E") 76% 74% / 34% auto no-repeat;
+}
+
+/* ── royalty — velvet and thread ────────────────────────────────────────
+   Deep purple pile with the nap brushed one way, gold fringe, the crest
+   worked in thread at the shoulder. */
+.wallpaper[data-wt="royalty"] {
+  background-image:
+    repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.022) 0px, rgba(255, 255, 255, 0.022) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 6px),
+    radial-gradient(ellipse 70% 56% at 50% 12%, rgba(150, 90, 220, 0.22) 0%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(180deg, #200f38 0%, #150826 56%, #090312 100%);
+}
+.wallpaper[data-wt="royalty"]::before {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 140'%3E%3Cg fill='none' stroke='%23e8c860' stroke-opacity='0.5' stroke-width='2.4'%3E%3Cpath d='M60 8 L108 30 V74 C108 106 84 124 60 132 C36 124 12 106 12 74 V30 Z'/%3E%3Cpath d='M60 34 V106 M36 60 H84'/%3E%3C/g%3E%3C/svg%3E") 50% 78% / 17% auto no-repeat,
+    linear-gradient(0deg, rgba(232, 200, 96, 0.22) 0%, rgba(232, 200, 96, 0.22) 1.6%, rgba(0, 0, 0, 0) 1.6%);
+}
+
+/* ── clean — a tube with nothing burnt into it yet ──────────────────────
+   Even grey, one test-card cross, no history. */
+.wallpaper[data-wt="clean"] {
+  background-image:
+    linear-gradient(180deg, #1c1c1a 0%, #141412 60%, #0b0b0a 100%);
+}
+.wallpaper[data-wt="clean"]::before {
+  background:
+    linear-gradient(90deg, rgba(200, 198, 190, 0) 49.85%, rgba(200, 198, 190, 0.16) 50%, rgba(200, 198, 190, 0) 50.15%),
+    linear-gradient(180deg, rgba(200, 198, 190, 0) 49.8%, rgba(200, 198, 190, 0.16) 50%, rgba(200, 198, 190, 0) 50.2%);
+}
+
+/* ── shadow — the machine with the light off ────────────────────────────
+   Near black, a red glow arriving from off-frame, the pool edge just
+   visible. */
+.wallpaper[data-wt="shadow"] {
+  background-image:
+    radial-gradient(ellipse 60% 50% at 108% 30%, rgba(120, 16, 24, 0.30) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #040204 0%, #020102 60%, #000 100%);
+}
+
+/* ── mono — one grey print ──────────────────────────────────────────────
+   Halftone dither, a hairline frame, nothing else. */
+.wallpaper[data-wt="mono"] {
+  background-image:
+    repeating-radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 5px) 0 0 / 5px 5px,
+    linear-gradient(180deg, #131313 0%, #0c0c0c 60%, #060606 100%);
+}
+.wallpaper[data-wt="mono"]::before {
+  background:
+    linear-gradient(90deg, rgba(210, 210, 210, 0) 2.6%, rgba(210, 210, 210, 0.20) 2.6%, rgba(210, 210, 210, 0.20) 2.75%, rgba(210, 210, 210, 0) 2.75%),
+    linear-gradient(90deg, rgba(210, 210, 210, 0) 97.25%, rgba(210, 210, 210, 0.20) 97.25%, rgba(210, 210, 210, 0.20) 97.4%, rgba(210, 210, 210, 0) 97.4%);
+}
+
+/* ── gold — the brushed plate ───────────────────────────────────────────
+   Brass brushed one way, a rim of it catching light at the corners. */
+.wallpaper[data-wt="gold"] {
+  background-image:
+    repeating-linear-gradient(88deg, rgba(255, 240, 190, 0.05) 0px, rgba(255, 240, 190, 0.05) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 4px),
+    radial-gradient(ellipse 78% 60% at 50% 0%, rgba(232, 184, 48, 0.22) 0%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(180deg, #1e1408 0%, #130d05 58%, #080502 100%);
+}
+.wallpaper[data-wt="gold"]::before {
+  background:
+    linear-gradient(180deg, rgba(245, 216, 112, 0.26) 0%, rgba(245, 216, 112, 0.26) 1.2%, rgba(0, 0, 0, 0) 1.2%),
+    linear-gradient(0deg, rgba(245, 216, 112, 0.18) 0%, rgba(245, 216, 112, 0.18) 1.2%, rgba(0, 0, 0, 0) 1.2%);
+}
+
+/* ── the drifting few ───────────────────────────────────────────────────
+   Three travellers left their picture moving: the born-in tube breathes,
+   the deep swells, the turned earth settles. Motion is a gift — under
+   reduced motion these stand perfectly still. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes wp-breathe {
+    from { opacity: 0.86; transform: scale(1); }
+    to   { opacity: 1;    transform: scale(1.02); }
+  }
+  @keyframes wp-swell {
+    from { transform: translateY(1.6%); }
+    to   { transform: translateY(-1.2%); }
+  }
+  @keyframes wp-settle {
+    from { transform: translateY(-0.7%); }
+    to   { transform: translateY(0.7%); }
+  }
+  .wallpaper[data-wt="corrupted"]::before { animation: wp-breathe 14s ease-in-out infinite alternate; }
+  .wallpaper[data-wt="vanir"]::before { animation: wp-swell 22s ease-in-out infinite alternate; }
+  .wallpaper[data-wt="ravaging"]::before { animation: wp-settle 26s ease-in-out infinite alternate; }
+}

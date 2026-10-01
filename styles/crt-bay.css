@@ -1,0 +1,1435 @@
+/* ============================================================================
+   crt-bay.css — THE CARTRIDGE DOCK · homescreen trial, v5
+
+   One complete unit bolted to the bottom bevel: machined face, dark slot
+   mouth the tray emerges from, a keycap-styled eject (same molded-dish
+   language as the console's keycaps), an engraved maker's plate, corner
+   screws, and an IDC ribbon cable — rainbow conductors in black
+   connectors — running from the dock's underside toward the back of the
+   case. The tray rises AND falls as a rigid mechanical door. The top
+   bevel shrinks: LIBER · VACUI centers alone, candle and waves hold the
+   corners, the triangle seal posts by the dock. The settings cog is
+   embedded in the plastic — engraved, no shadow, no idle spin.
+   Everything sizes in cqi against the bezel so proportions hold at any
+   resolution. Trial only: linked from desktop.html alone until approved.
+   ============================================================================ */
+
+/* ── glyphs stand down (desktop trial) ──────────────────────────────────
+   The twelve carvings rest — hidden, not removed: carvings.js still
+   renders them and still lights .active (the machinery stays warm for
+   the future sweep); twelve-works state is untouched. Only the paint
+   is off. */
+.carving { display: none; }
+
+/* ── glyphs, resolution-free (kept for the sweep's return) ─────────────── */
+.bezel { --carving-size: clamp(26px, 3.4cqi, 52px); }
+
+/* the top band carries only the stamp now — shallower than the crowned
+   v4, deeper than stock so the larger plate breathes. The depth is a
+   DESKTOP stance: rooms keep the stock bezel padding their layouts
+   were tuned against (the dock needs no top room — it lives at the
+   bottom bevel). */
+.bezel.crt-bay-desk { padding-top: clamp(42px, 5.4cqi, 70px); }
+
+/* Legacy pages used to place a second live status span beside the bezel.
+   The dock now owns the only status surface; keep stale markup harmless for
+   cached shells and third-party embeds. */
+.machine > .crt-bay-status { display: none !important; }
+
+/* ── the dock — one complete unit, bolted to the bottom bevel ──────────── */
+.crt-bay {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 1.4cqi;
+  width: min(320px, 28cqi);
+  height: clamp(48px, 6.2cqi, 82px);
+  z-index: 30;
+  isolation: isolate;
+}
+
+/* Run 2 assembly contract: the lower bay is a mounted keyboard/console
+   unit. The dark apron is the load-bearing shadow; the brass rails are the
+   two points where the hardware meets the bezel instead of floating above it. */
+.crt-dock-mount {
+  position: absolute;
+  z-index: 0;
+  left: -3%;
+  right: -3%;
+  bottom: -10%;
+  height: 24%;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, #655036 0%, #302519 42%, #17120d 100%);
+  border: 1px solid rgba(40, 28, 14, 0.85);
+  box-shadow: inset 0 2px 0 rgba(229, 197, 130, 0.22), 0 4px 7px rgba(0, 0, 0, 0.52);
+  pointer-events: none;
+}
+.crt-dock-mount::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 3px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #9b7843 0 14px, transparent 14px 24px);
+  opacity: 0.62;
+}
+.crt-dock-rail {
+  position: absolute;
+  z-index: 2;
+  top: 15%;
+  bottom: -4%;
+  width: clamp(5px, 0.7cqi, 9px);
+  border-radius: 2px;
+  background: linear-gradient(90deg, #594329, #c39a58 45%, #5a4228);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5), inset 0 0 1px rgba(255, 239, 188, 0.65);
+  pointer-events: none;
+}
+.crt-dock-rail.rail-left { left: 2.5%; }
+.crt-dock-rail.rail-right { right: 2.5%; }
+.crt-dock-face {
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 100, 70, 0.05) 0 2px, rgba(0, 0, 0, 0) 2px 4px),
+    linear-gradient(180deg, #f0e6d0 0%, #e4d7b6 45%, #cfc09a 85%, #b3a37c 100%);
+  border: 1px solid #9a8a62;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 #fff9e7,
+    inset 0 -2px 5px rgba(84, 62, 34, 0.4),
+    0 2px 0 #8f7f58,
+    0 4px 8px rgba(0, 0, 0, 0.45);
+}
+/* the motor seam — the face carries the light while the door travels */
+.crt-bay.ejecting .crt-dock-face {
+  box-shadow:
+    inset 0 1px 0 #fff9e7,
+    inset 0 -2px 5px rgba(84, 62, 34, 0.4),
+    0 2px 0 #8f7f58,
+    0 4px 8px rgba(0, 0, 0, 0.45),
+    0 0 12px 2px rgba(212, 175, 101, 0.35);
+}
+
+/* the slot mouth — the dark opening the tray rises behind */
+.crt-dock-slot {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 12%;
+  height: 34%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1d150c 0%, #35291a 70%, #241a0e 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.85),
+    inset 0 -1px 1px rgba(255, 244, 214, 0.28),
+    0 1px 0 rgba(255, 248, 225, 0.55);
+}
+/* the guide rails glinting behind the lamps */
+.crt-dock-slot::after {
+  content: '';
+  position: absolute;
+  inset: 22% 12%;
+  background: repeating-linear-gradient(90deg, rgba(212, 180, 120, 0.28) 0 2px, transparent 2px 14px);
+  opacity: 0.35;
+}
+
+/* the eject — a keycap, same language as the console's caps: raised rim,
+   concave molded dish, the mark pressed into the dish */
+.crt-bay-eject {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10%;
+  width: clamp(22px, 2.9cqi, 40px);
+  height: clamp(20px, 2.6cqi, 36px);
+  padding: 0;
+  border-radius: 6px 6px 5px 5px;
+  border: 1px solid #8a7448;
+  cursor: pointer;
+  font-size: clamp(8px, 1cqi, 13px);
+  background:
+    radial-gradient(120% 90% at 50% 30%, #f7efd8 0%, #e8dcbc 55%, #cdbd94 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 252, 240, 0.9),
+    inset 0 -3px 4px rgba(110, 88, 50, 0.45),
+    0 2px 0 #6e5c38,
+    0 3px 5px rgba(0, 0, 0, 0.4);
+  transition: transform 0.08s ease, box-shadow 0.15s ease, filter 0.2s ease;
+}
+/* the molded mark — triangle over its bar, pointing up, pressed into
+   the dish like a keycap's legend */
+.crt-bay-eject::before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 0.55em solid transparent;
+  border-right: 0.55em solid transparent;
+  border-bottom: 0.8em solid #5a431c;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 230, 0.7));
+}
+.crt-bay-eject::after {
+  content: '';
+  display: block;
+  margin: 0.2em auto 0;
+  width: 1.5em;
+  height: 0.28em;
+  border-radius: 1px;
+  background: #5a431c;
+  box-shadow: 0 1px 0 rgba(255, 250, 230, 0.7);
+}
+.crt-bay-eject:hover { filter: brightness(1.05); }
+.crt-bay-eject:active {
+  transform: translateX(-50%) translateY(2px);
+  box-shadow: inset 0 2px 4px rgba(90, 68, 30, 0.55), inset 0 -1px 2px rgba(110, 88, 50, 0.3), 0 0 0 #6e5c38, 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.crt-bay-eject:focus-visible { outline: 2px solid #8a6a2a; outline-offset: 2px; }
+.crt-bay-eject[aria-pressed='true'] { box-shadow: inset 0 2px 4px rgba(90, 68, 30, 0.55), inset 0 -1px 2px rgba(110, 88, 50, 0.3), 0 1px 0 #6e5c38, 0 1px 2px rgba(0, 0, 0, 0.4); }
+
+/* the maker's plate — engraved into the face, left of the slot */
+.crt-dock-plate {
+  position: absolute;
+  left: 9%;
+  bottom: 14%;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: clamp(8px, 0.9cqi, 12px);
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: rgba(90, 68, 30, 0.75);
+  text-shadow: 0 1px 0 rgba(255, 248, 225, 0.6);  pointer-events: none;
+}
+
+
+/* corner screws, machined */
+.crt-dock-screw {
+  position: absolute;
+  width: clamp(6px, 0.8cqi, 11px);
+  height: clamp(6px, 0.8cqi, 11px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #d4c6a4 0%, #8f7c56 70%);
+  box-shadow: inset 0 1px 1px rgba(255, 246, 220, 0.5), 0 1px 1px rgba(40, 30, 14, 0.5);  pointer-events: none;
+}
+
+.crt-dock-screw::after {
+  content: '';
+  display: block;
+  margin: 40% 14% 0;
+  height: 1px;
+  background: rgba(40, 28, 12, 0.6);
+  transform: rotate(38deg);
+}
+.crt-dock-screw.tl { left: 3.5%; top: 14%; }
+.crt-dock-screw.tr { right: 3.5%; top: 14%; }
+
+/* ── the port + the ribbon — IDC era, rainbow conductors ────────────────
+   The connection port is IN the holder: a recessed black socket plate
+   on the dock's face, lower-right — the engraving holds the left, the
+   eject the center, so nothing clips. The ribbon hangs FROM the port,
+   drops as a clean parallel flat pack, then bends and runs left out
+   under the machine — the monitor base paints over the run, so the
+   cord reads as routed all the way behind. */
+.crt-dock-port {
+  position: absolute;
+  right: 7%;
+  bottom: 13%;
+  width: clamp(40px, 5.4cqi, 74px);
+  height: clamp(10px, 1.35cqi, 18px);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #14100b 0%, #2b2217 70%, #1a140d 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.85),
+    inset 0 -1px 1px rgba(255, 244, 214, 0.18),
+    0 1px 0 rgba(255, 248, 225, 0.55);
+}
+.crt-dock-port::before {
+  /* the gold contact strip inside the mouth */
+  content: '';
+  position: absolute;
+  inset: 28% 10%;
+  border-radius: 1.5px;
+  background: repeating-linear-gradient(90deg, #caa45c 0 3px, #3a2c16 3px 5.5px);
+  box-shadow: inset 0 1px 1px rgba(255, 240, 200, 0.4);
+  opacity: 0.85;
+}
+.crt-dock-port::after {
+  /* the latch shoulders on the socket's top edge */
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(90deg, #0d0a07, #241c12 30% 70%, #0d0a07);
+}
+/* the plug — lives in the port, tracks its mouth exactly: a child of
+   the port, width 100% of the socket, top edge tucking 2px up into it */
+.crt-bay-plug {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 50%;
+  width: 100%;
+  height: clamp(15px, 1.9cqi, 26px);
+  transform: translateX(-50%);
+  z-index: 29;  pointer-events: none;
+}
+
+/* the routed ribbon — painted by the BEZEL, under the dock (z 25 <
+   dock 30), so the base and the dock's lip overlap it naturally. The
+   element is sized and pinned top-left to the port's own box at
+   runtime (aspect-exact to the viewBox, so nothing letterboxes). */
+.crt-bay-ribbon {
+  position: absolute;
+  z-index: 25;  pointer-events: none;
+}
+
+.crt-bay.ejecting .crt-bay-ribbon { transform: scaleY(1.045); }
+
+/* ── the light bar — the twelve dots live IN the slot mouth ───────────
+   Indicator lamps in the recess: lit dots glow against the dark brown
+   like drive-activity lights; unlit dots are sockets in the shadow. */
+/* the lamp dots — ported from the retired keybed: unlit dots are
+   sockets in the shadow, lit dots are drive-activity lamps */
+.keybank-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, #6a5a40, #2c2114 75%);
+  border: 1px solid #6a5a3c;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 252, 240, 0.6);
+  transition: box-shadow 0.2s ease;
+}
+.keybank-dot.lit {
+  background: var(--gl, #d6ae5d);
+  border-color: #3a2c14;
+  box-shadow: 0 0 10px 3px var(--gl, #d6ae5d), 0 1px 0 rgba(255, 252, 240, 0.6);
+}
+.keybank-dot:focus-visible { outline: 2px solid #8a6a2a; outline-offset: 2px; }
+
+.crt-bay-dots {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(5px, 0.7cqi, 11px);
+  z-index: 2;
+}
+.crt-bay-dots .keybank-dot {
+  width: clamp(6px, 0.85cqi, 12px);
+  height: clamp(6px, 0.85cqi, 12px);
+  border-color: rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 244, 214, 0.14);
+}
+.crt-bay-dots .keybank-dot.lit {
+  border-color: rgba(255, 236, 190, 0.35);
+  box-shadow: 0 0 10px 3px var(--gl, #d6ae5d), 0 0 22px 6px var(--gl, #d6ae5d), inset 0 1px 1px rgba(255, 252, 230, 0.7);
+}
+
+/* ── the nameplate — the dock's live status line, engraved into the
+   bezel plastic right under the unit (the old strip's aria-live voice,
+   re-homed). Tiny, tracked, quiet. ─────────────────────────────────── */
+.crt-bay-status {
+  position: absolute;
+  top: calc(100% + 2px);
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 76%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(9px, 0.85cqi, 10px);
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  color: rgba(74, 56, 26, 0.72);
+  text-shadow: 0 1px 0 rgba(255, 250, 230, 0.4);  pointer-events: none;
+}
+.crt-bay-status,
+.crt-bay .crt-bay-status,
+.machine > .crt-bay-status { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+/* The live line remains available to assistive technology but never competes
+   with the physical dock, app content, or the monitor base. */
+.crt-bay-status:not(.is-quiet) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  display: none !important;
+}
+
+
+/* ── the top bevel — stamp centers alone, glyphs to the sides ──────────── */
+.liber-plate {
+  bottom: auto;
+  top: clamp(24px, 3cqi, 42px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(16px, 1.75svw, 36px);
+  letter-spacing: 0.34em;
+}
+/* the flanks: candle left, waves right, on their own row — tucked
+   BELOW the power LED (top 24 / right 28) so the corner reads clean,
+   and outboard of the stamp */
+.carving[data-id='candle'] { top: clamp(38px, 3.6cqi, 54px); left: clamp(52px, 4.6cqi, 80px); right: auto; }
+.carving[data-id='thread'] { top: clamp(38px, 3.6cqi, 54px); left: auto; right: clamp(52px, 4.6cqi, 80px); }
+/* the triangle seal posts by the dock: low on the left bevel, guarding
+   the cartridge way */
+.carving[data-id='stone'] {
+  top: auto;
+  bottom: clamp(46px, 6cqi, 92px);
+  left: clamp(12px, 1.6cqi, 24px);
+  transform: none;
+}
+.carving.active[data-id='stone'] { transform: scale(1.1); }
+
+/* ── the settings cog, embedded in the plastic ───────────────────────────
+   Engraved hardware: no drop shadow, no glow, no idle spin — it turns
+   only when asked. The label etches into the beige instead of glowing. */
+.bezel .settings-cog {
+  position: absolute;
+  left: auto;
+  right: 1.6cqi;
+  bottom: 6.5cqi;
+  width: auto;
+  transform: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  filter: none;
+}
+.bezel .settings-cog:hover { filter: none; }
+.bezel .settings-cog svg {
+  width: clamp(30px, 4.2cqi, 66px);
+  height: clamp(30px, 4.2cqi, 66px);
+  opacity: 0.92;
+}
+.bezel .settings-cog .settings-cog-label {
+  font-size: clamp(9px, 0.95cqi, 14px);
+  letter-spacing: 0.18em;
+  color: rgba(90, 68, 30, 0.8);
+  text-shadow: 0 1px 0 rgba(255, 248, 225, 0.6);
+}
+.bezel .settings-cog .settings-cog-gear { animation: none; }
+.bezel .settings-cog:hover .settings-cog-gear { animation: cog-spin 4s linear infinite; }
+
+/* ── the slot — where the door comes from ────────────────────────────────
+   Lives INSIDE the screen (js mounts it there): its bottom edge is the
+   machine's seam. The screen's own edge does the revealing; nothing
+   fades. */
+.crt-bay-well {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: min(50cqi, 640px);
+  height: clamp(360px, 48cqi, 660px);
+  z-index: 60;
+  overflow: hidden;  pointer-events: none;
+}
+
+
+.crt-bay-tray {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY(102%);
+  /* Closed cartridges must not remain keyboard-focusable below the glass.
+     They are physically present, but not an available interface state. */
+  visibility: hidden;
+  pointer-events: none;
+}
+.crt-bay-tray.out {
+  /* the door rising: stick — judder — break loose — run — overshoot —
+     seat. One rigid piece, linear so the velocity reads as machinery. */
+  animation: tray-rise 0.85s linear both;
+  visibility: visible;
+  pointer-events: auto;
+}
+@keyframes tray-rise {
+  0%   { transform: translateY(102%); }
+  7%   { transform: translateY(101.1%); }
+  11%  { transform: translateY(102%); }
+  20%  { transform: translateY(93%); }
+  58%  { transform: translateY(34%); }
+  84%  { transform: translateY(-1.4%); }
+  90%  { transform: translateY(0.4%); }
+  95%  { transform: translateY(-0.2%); }
+  100% { transform: translateY(0); }
+}
+.crt-bay-tray.closing {
+  /* the door falling: unseat pop — gravity run — into the well —
+     the latch catches it home */
+  animation: tray-fall 0.72s linear both;
+  visibility: visible;
+  pointer-events: none;
+}
+@keyframes tray-fall {
+  0%   { transform: translateY(0); }
+  9%   { transform: translateY(-1.6%); }  /* the latch lets go */
+  16%  { transform: translateY(4%); }
+  55%  { transform: translateY(58%); }    /* the accelerating run */
+  82%  { transform: translateY(100.8%); }
+  88%  { transform: translateY(102.6%); } /* into the well, hard */
+  93%  { transform: translateY(101.4%); } /* the catch takes the load */
+  100% { transform: translateY(102%); }   /* seated shut */
+}
+/* the seat lights: a flash on landing (rising) and on the catch (falling) */
+.crt-bay-tray.out .crt-tray-carriage { animation: tray-seat-glow 0.85s linear both; }
+.crt-bay-tray.closing .crt-tray-carriage { animation: tray-seat-glow-fall 0.72s linear both; }
+@keyframes tray-seat-glow {
+  0%, 82% { filter: brightness(1); }
+  86%     { filter: brightness(1.13); }
+  100%    { filter: brightness(1); }
+}
+@keyframes tray-seat-glow-fall {
+  0%, 84% { filter: brightness(1); }
+  89%     { filter: brightness(1.1); }
+  100%    { filter: brightness(1); }
+}
+
+.crt-tray-carriage {
+  position: relative;
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 100, 70, 0.05) 0 2px, rgba(0, 0, 0, 0) 2px 4px),
+    linear-gradient(180deg, #efe5cf 0%, #e2d5b4 55%, #c9b98f 100%);
+  border-radius: 10px 10px 8px 8px;
+  border: 1px solid #a08c60;
+  box-shadow:
+    inset 0 1px 0 #fff9e7,
+    inset 0 0 0 3px rgba(255, 250, 230, 0.35),
+    inset 0 -3px 8px rgba(84, 62, 34, 0.35),
+    0 16px 30px rgba(0, 0, 0, 0.6);
+  padding: clamp(12px, 1.7cqi, 24px) clamp(14px, 1.9cqi, 26px) clamp(10px, 1.4cqi, 20px);
+}
+/* the mounting apron — a brass foot with its own screws */
+.crt-tray-carriage::after {
+  content: '';
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: -1.4cqi;
+  height: 1.5cqi;
+  min-height: 10px;
+  border-radius: 0 0 7px 7px;
+  background:
+    radial-gradient(circle at 8% 45%, #6a5232 0 8%, transparent 9%),
+    radial-gradient(circle at 92% 45%, #6a5232 0 8%, transparent 9%),
+    linear-gradient(180deg, #9a7c48 0%, #6e5430 70%, #4a3618 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.4), 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+.crt-bay-tray::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -12px;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 72%);
+  filter: blur(3px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* the tray's grid — the carts speak for themselves, no prose header */
+.crt-tray-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(9px, 1.2cqi, 16px);
+}
+
+/* ── the cartridge — eleven small hovering material objects ──────────
+   Same tray, same slot mouth, new matter: each cart is a small object
+   from a different traveller's time. Mockup §10 vacui ritual: summon
+   grid (cart-summon + cart-hover), per-room dock-cart gradients
+   (home/journal/games/toybox/arcana/learn/ruby/dreams/pete/sea/stone
+   + the empty-console sockets state), selected cart's .vacui-seat
+   drop-into-slot, the cart foreground while the room wakes behind. */
+.crt-cartridge {
+  --ac: #a88858;
+  /* The dock is a 64px pixel-art object: stepped edges and hard marks are
+     intentional, not a browser-rendering accident. */
+  image-rendering: pixelated;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  height: clamp(44px, 5.6cqi, 78px);
+  padding: 6% 0 0;
+  border: 1px solid #9a8a62;
+  border-radius: 8px 8px 6px 6px;
+  cursor: pointer;
+  background:
+    radial-gradient(130% 95% at 50% 26%, #f8f0da 0%, #ecdfc0 48%, #d6c69e 86%, #c6b48c 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 252, 240, 0.9),
+    inset 3px 0 4px rgba(255, 246, 220, 0.35),
+    inset -3px 0 5px rgba(110, 88, 50, 0.22),
+    inset 0 -5px 7px rgba(110, 88, 50, 0.42),
+    0 3px 0 #6e5c38,
+    0 6px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+}
+.crt-cartridge.mat-water .crt-cart-mark,
+.crt-cartridge.mat-marquee .crt-cart-mark,
+.crt-cartridge.mat-chalk .crt-cart-mark,
+.crt-cartridge.mat-trellis .crt-cart-mark,
+.crt-cartridge.mat-fog .crt-cart-mark,
+.crt-cartridge.mat-loam .crt-cart-mark,
+.crt-cartridge.mat-stone .crt-cart-mark { background: rgba(8, 6, 8, 0.45); }
+.crt-cartridge.mat-water .crt-cart-mark svg,
+.crt-cartridge.mat-marquee .crt-cart-mark svg,
+.crt-cartridge.mat-chalk .crt-cart-mark svg,
+.crt-cartridge.mat-trellis .crt-cart-mark svg,
+.crt-cartridge.mat-fog .crt-cart-mark svg,
+.crt-cartridge.mat-loam .crt-cart-mark svg,
+.crt-cartridge.mat-stone .crt-cart-mark svg { stroke: #f1dcb0; }
+.crt-cartridge.mat-water .crt-cart-label,
+.crt-cartridge.mat-marquee .crt-cart-label,
+.crt-cartridge.mat-chalk .crt-cart-label,
+.crt-cartridge.mat-trellis .crt-cart-label,
+.crt-cartridge.mat-fog .crt-cart-label,
+.crt-cartridge.mat-loam .crt-cart-label { color: #f6ecd2; background: rgba(10, 8, 6, 0.74); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85); }
+.crt-cartridge.mat-tile .crt-cart-mark { background: rgba(255, 255, 255, 0.4); }
+.crt-cartridge.mat-sand .crt-cart-mark { background: rgba(216, 184, 119, 0.5); }
+.crt-cartridge.mat-sand .crt-cart-mark svg { stroke: #4a3820; }
+.crt-cartridge.mat-sand .crt-cart-label { color: #4a3820; background: rgba(216, 184, 119, 0.55); }
+.crt-cartridge.mat-index .crt-cart-mark svg { stroke: #5a2e1e; }
+.crt-cartridge.mat-index .crt-cart-label { color: #5a2e1e; background: rgba(244, 236, 216, 0.55); }
+.crt-cartridge .crt-cart-mark,
+.crt-cartridge .crt-cart-lamp {
+  image-rendering: pixelated;
+}
+
+/* the summon: carts gather out of the tray mouth one after another, then
+   hold their hover over the slot */
+.crt-bay-tray.out .crt-cartridge {
+  animation: cart-summon 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both, cart-hover 3.2s ease-in-out 0.65s infinite;
+}
+/* weight — the float is matter, not UI: heavy carts (stone, index,
+   loam) barely leave the tray on a slow brass beat; light ones (water,
+   chalk, fog) drift high and slow. The middle matters keep cart-hover.
+   (The nth-child stagger below still wins animation-delay: equal
+   specificity, later source.) */
+.crt-bay-tray.out .crt-cartridge.mat-stone,
+.crt-bay-tray.out .crt-cartridge.mat-index,
+.crt-bay-tray.out .crt-cartridge.mat-loam {
+  animation: cart-summon 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both, cart-hover-heavy 4.4s ease-in-out 0.65s infinite;
+}
+.crt-bay-tray.out .crt-cartridge.mat-water,
+.crt-bay-tray.out .crt-cartridge.mat-chalk,
+.crt-bay-tray.out .crt-cartridge.mat-fog {
+  animation: cart-summon 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both, cart-hover-light 2.9s ease-in-out 0.65s infinite;
+}
+@keyframes cart-hover-heavy {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes cart-hover-light {
+  0%, 100% { transform: translateY(-2px) rotate(1deg); }
+  50% { transform: translateY(-12px) rotate(-3deg); }
+}
+.crt-bay-tray.out .crt-cartridge:nth-child(2) { animation-delay: 0.06s, 0.71s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(3) { animation-delay: 0.12s, 0.77s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(4) { animation-delay: 0.18s, 0.83s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(5) { animation-delay: 0.24s, 0.89s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(6) { animation-delay: 0.3s, 0.95s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(7) { animation-delay: 0.36s, 1.01s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(8) { animation-delay: 0.42s, 1.07s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(9) { animation-delay: 0.48s, 1.13s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(10) { animation-delay: 0.54s, 1.19s; }
+.crt-bay-tray.out .crt-cartridge:nth-child(11) { animation-delay: 0.6s, 1.25s; }
+@keyframes cart-summon {
+  from { opacity: 0; transform: translateY(24px) rotate(8deg) scale(0.7); }
+  to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+}
+@keyframes cart-hover {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-9px) rotate(-2deg); }
+}
+/* the choice: the room wakes behind while the chosen cart stays
+   foreground matter, then drops into the slot and vanishes */
+.crt-tray-grid.entering .crt-cartridge:not(.selected) { opacity: 0.14; filter: blur(2px); }
+.crt-tray-grid.entering .crt-cartridge.selected { z-index: 5; animation: vacui-seat 1.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+@keyframes vacui-seat {
+  0% { transform: translateY(0) rotate(0) scale(1); }
+  24% { transform: translateY(-8px) rotate(-3deg) scale(1.04); }
+  100% { transform: translateY(175px) scale(0.22) rotate(3deg); opacity: 0; }
+}
+/* ── the eleven matters ───────────────────────────────────────────────
+   Copy-hidden test: hide every label and each cart still reads by its
+   own material + micro-motion. Mockup gradients first, matter on top. */
+.crt-cartridge.mat-starfield {
+  background: linear-gradient(145deg, #6f5730, #241721);
+  border-color: #f1c879;
+}
+.crt-cartridge.mat-starfield::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 4px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, #fff 0 1px, transparent 2px),
+    radial-gradient(circle, #ff8fb8 0 1px, transparent 2px),
+    radial-gradient(circle, #8bd8df 0 1px, transparent 2px);
+  background-size: 17px 15px, 29px 23px, 47px 35px;
+  opacity: 0.55;
+  animation: starfield-orbit 9s linear infinite;
+}
+@keyframes starfield-orbit { to { transform: rotate(8deg) scale(1.06); } }
+.crt-cartridge.mat-stone {
+  background: linear-gradient(145deg, #77726c, #262629);
+  border-color: #d7d0c4;
+  box-shadow: inset 0 2px 0 #8f8b86, inset 0 -6px 12px #000, 0 3px 0 #111, 0 6px 10px rgba(0, 0, 0, 0.5);
+}
+.crt-cartridge.mat-vellum {
+  background: repeating-linear-gradient(0deg, #efe3c8 0 12px, #d9c9a4 12px 13px);
+  border: 1px solid #6b5636;
+  border-left: 8px solid #5a2e1e;
+}
+.crt-cartridge.mat-vellum .crt-cart-mark { animation: vellum-breathe 4s ease-in-out infinite; }
+@keyframes vellum-breathe { 50% { filter: brightness(1.06); } }
+.crt-cartridge.mat-water {
+  background: linear-gradient(180deg, #14546b, #07151b);
+  border: 1px solid #8bd8df;
+  border-radius: 40% 60% 55% 45% / 12% 12% 88% 88%;
+  box-shadow: inset 0 -18px 30px #000, inset 0 0 0 2px rgba(139, 216, 223, 0.25), 0 3px 0 #0a2a2a, 0 6px 10px rgba(0, 0, 0, 0.5);
+}
+.crt-cartridge.mat-water .crt-cart-mark { animation: water-sway 3s ease-in-out infinite; }
+@keyframes water-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.crt-cartridge.mat-marquee {
+  background: linear-gradient(180deg, #3a1410, #1c0b08);
+  border: 3px solid #6b3a1a;
+  border-radius: 4px;
+}
+.crt-cartridge.mat-marquee::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 8px;
+  background: radial-gradient(circle, #ffe9a3 0 3px, transparent 4px) 0 0 / 16px 8px repeat-x;
+  animation: bulb-chase 1.2s steps(2) infinite;
+}
+@keyframes bulb-chase { 50% { opacity: 0.45; } }
+.crt-cartridge.mat-tile {
+  background: linear-gradient(135deg, #7fd7d0, #f6c6d9 45%, #f8e5a6);
+  border: 3px solid #5f4b87;
+  border-radius: 12px;
+  box-shadow: inset 0 -6px 0 rgba(255, 255, 255, 0.33), 3px 4px 0 #21152f, 0 6px 10px rgba(0, 0, 0, 0.5);
+}
+.crt-cartridge.mat-tile::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  animation: tile-drip 2.6s ease-in-out infinite;
+}
+@keyframes tile-drip {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50% { transform: translateY(2px); opacity: 0.55; }
+}
+.crt-cartridge.mat-chalk {
+  background-color: #181424;
+  background-image: radial-gradient(circle, #f4e8d2 0 1px, transparent 1.6px);
+  background-size: 12px 12px;
+  border: 3px ridge #8a6f3c;
+  border-radius: 50% 50% 8px 8px / 18px 18px 8px 8px;
+}
+.crt-cartridge.mat-chalk::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(255, 228, 156, 0.6);
+  border-radius: 50%;
+  animation: chalk-dust 5s ease-in-out infinite;
+}
+@keyframes chalk-dust {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+.crt-cartridge.mat-index {
+  background-color: #e6dcc4;
+  background-image: linear-gradient(180deg, rgba(90, 31, 31, 0.06), rgba(90, 31, 31, 0));
+  border-right: 10px solid #5a1f1f;
+  border-radius: 2px;
+}
+.crt-cartridge.mat-index::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 18%;
+  right: 18%;
+  height: 3px;
+  background: #5a1f1f;
+  box-shadow: 0 7px #5a1f1f66, 0 14px #5a1f1f44;
+  transform: rotate(-2deg);
+  animation: card-fan 2.8s ease-in-out infinite;
+}
+@keyframes card-fan {
+  0%, 100% { transform: rotate(-2deg) translateX(0); }
+  50% { transform: rotate(2deg) translateX(2px); }
+}
+.crt-cartridge.mat-trellis {
+  background: linear-gradient(145deg, #182719, #293b22 55%, #111b16);
+  border: 2px solid #6b4a2a;
+  border-radius: 30px 30px 8px 8px;
+}
+.crt-cartridge.mat-trellis::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  pointer-events: none;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(0deg, #9baf5a 0 7px, transparent 7px 14px);
+  opacity: 0.7;
+}
+.crt-cartridge.mat-trellis .crt-cart-mark { animation: trellis-sway 4.5s ease-in-out infinite; }
+@keyframes trellis-sway {
+  0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+}
+.crt-cartridge.mat-fog {
+  background: linear-gradient(145deg, #1a2140, #4e4b78 58%, #1a182e);
+  border: 1px solid #a48ad4;
+  border-radius: 38% 12% 44% 18%;
+  box-shadow: inset 0 0 22px #0008, 0 3px 0 #2a2450, 0 6px 10px rgba(0, 0, 0, 0.5);
+}
+.crt-cartridge.mat-fog::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 60%, rgba(244, 232, 210, 0.4), transparent 65%);
+  filter: blur(1px);
+  animation: fog-drift 6s ease-in-out infinite;
+}
+@keyframes fog-drift {
+  0%, 100% { transform: translateX(-3px); opacity: 0.7; }
+  50% { transform: translateX(3px); opacity: 1; }
+}
+.crt-cartridge.mat-loam {
+  background: linear-gradient(145deg, #2a211e, #080909 62%, #3e1717);
+  border: 1px solid #8a6840;
+  border-radius: 3px 14px 4px 8px;
+  box-shadow: inset 0 0 24px #000, inset 0 -8px 0 rgba(232, 101, 111, 0.13), 0 3px 0 #1d1a15, 0 6px 10px rgba(0, 0, 0, 0.5);
+}
+.crt-cartridge.mat-loam::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 14%;
+  right: 14%;
+  height: 8px;
+  background: #d8cfae;
+  opacity: 0.9;
+  transform: rotate(-3deg);
+  border-left: 2px dashed #8a6840;
+  border-right: 2px dashed #8a6840;
+  animation: tape-flutter 2.2s ease-in-out infinite;
+}
+@keyframes tape-flutter {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50% { transform: rotate(-1deg) translateY(-2px); }
+}
+/* the empty console — sockets EMPTY per the tutorial beat: unvisited
+   carts read as unseated shells, lamp dark, matter dimmed but legible */
+/* the room's mark — a small carving recessed into the shell above the
+   label: the emblem cast into an era cartridge, engraved dark with a
+   light lip below, sitting in a shallow concave dish */
+.crt-cart-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  width: clamp(20px, 2.5cqi, 34px);
+  height: clamp(18px, 2.2cqi, 30px);
+  margin-bottom: 5%;
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(110, 88, 50, 0.14) 0%, rgba(110, 88, 50, 0.05) 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(90, 68, 30, 0.35),
+    inset 0 -1px 0 rgba(255, 250, 230, 0.55);
+}
+.crt-cart-mark svg {
+  width: 72%;
+  height: 72%;
+  fill: none;
+  stroke: #5f4820;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 0 rgba(255, 250, 230, 0.75));
+  opacity: 0.9;
+}
+.crt-cart-label {
+  max-width: 96%;
+  position: relative;
+  z-index: 1;
+  padding: 0.22em 0.28em 0.16em;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(248, 240, 218, 0.9) 0%, rgba(234, 220, 186, 0.84) 100%);
+  color: #241704;
+  font-family: 'Germania', 'Courier New', Courier, monospace;
+  font-size: clamp(10px, 1.12cqi, 15px);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: lowercase;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* debossed: shadow inside the top of the dish, light on the lip below */
+  text-shadow: 0 1px 0 rgba(255, 250, 230, 0.9);
+  box-shadow: inset 0 2px 3px rgba(90, 68, 30, 0.38), inset 0 -1px 0 rgba(255, 250, 230, 0.65);
+}
+.crt-cartridge::after {
+  /* brass contact pins under the front wall */
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 6%;
+  height: 4px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, #caa45c 0 3px, #6e4e1e 3px 5px);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.55), inset 0 -1px 1px rgba(20, 4, 2, 0.6);
+  opacity: 0.9;
+}
+.crt-cartridge:hover, .crt-cartridge:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  outline: 2px solid #8a6a2a;
+  outline-offset: 2px;
+}
+.crt-cartridge:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 4px rgba(90, 68, 30, 0.45),
+    inset -3px 0 5px rgba(110, 88, 50, 0.22),
+    inset 0 -2px 4px rgba(255, 246, 220, 0.25),
+    0 1px 0 #6e5c38,
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* the lamp slot — the keycap's recessed ember, lit when visited */
+.crt-cart-lamp {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 16%;
+  height: 3px;
+  border-radius: 2px;
+  background: #3a2c16;
+  box-shadow: inset 0 1px 2px rgba(30, 20, 8, 0.8), 0 1px 0 rgba(255, 248, 225, 0.5);
+  overflow: hidden;
+  z-index: 1;
+}
+.crt-cart-lamp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ac);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.crt-cartridge.visited .crt-cart-lamp::after { opacity: 0.8; box-shadow: 0 0 6px 1px var(--ac); }
+
+/* the empty socket — pre-visit cartridges read as unseated shells:
+   matte paint, dim mark, lamp dark. The quiet gate still holds
+   underneath (aria-disabled); this is paint only. */
+.crt-cartridge.empty { filter: saturate(0.72); }
+.crt-cartridge.empty .crt-cart-mark svg { opacity: 0.55; }
+.crt-cartridge.empty .crt-cart-lamp::after { opacity: 0; }
+
+/* the seat thud — the whole machine takes the landing (always-on;
+   motion is part of the vacui, no reduced-motion branch) */
+@keyframes crt-seat-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 1px); }
+  40% { transform: translate(3px, -1px); }
+  60% { transform: translate(-2px, 0); }
+  80% { transform: translate(2px, 0); }
+}
+.machine.crt-shake { animation: crt-seat-shake 0.5s linear; }
+@keyframes crt-seat-flash {
+  0%, 100% { filter: brightness(1); }
+  30% { filter: brightness(1.22); }
+  60% { filter: brightness(1.08); }
+}
+.machine.crt-flash { animation: crt-seat-flash 0.5s linear; }
+
+/* 44px targets — cartridges already exceed it; lamps keep their small
+   paint but carry a full-size hit area */
+.crt-cartridge { min-width: 44px; min-height: 44px; }
+.crt-bay-dots .keybank-dot { position: relative; }
+.crt-bay-dots .keybank-dot::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* ── small windows ──────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* the unit collapses to a single-row micro console on the small
+     glass, seated in the bottom bezel padding where no room places a
+     control's center (door, draw, release, facets all sit higher) —
+     the same zone the old chrome's dot strip held */
+  .crt-bay {
+    left: auto;
+    right: 10px;
+    transform: none;
+    bottom: 0;
+    width: clamp(150px, 42cqi, 220px);
+    height: 22px;
+  }
+  .crt-dock-face { border-radius: 5px 5px 0 0; }
+  .crt-dock-slot { left: 4%; right: 32%; top: 24%; height: 50%; }
+  .crt-bay-dots { gap: 3px; }
+  .crt-bay-dots .keybank-dot { width: 5px; height: 5px; }
+  .crt-bay-eject {
+    left: auto;
+    right: 4%;
+    transform: none;
+    bottom: 16%;
+    width: 20px;
+    height: 15px;
+    border-radius: 3px 3px 2px 2px;
+  }
+  .crt-dock-plate { display: none; }
+  .crt-dock-port { right: 27%; bottom: 32%; width: 18px; height: 7px; }
+  .crt-bay-status { top: auto; bottom: calc(100% + 1px); font-size: 9px; line-height: 1.15; }
+  .crt-bay-well { width: min(300px, 84%); height: 300px; }
+  /* the dressed run is a desk-view luxury: on the small glass the cord
+     stays home in the port and the long fold hides (it would paint
+     over the rooms' own lower controls) */
+  .crt-bay-ribbon, .crt-bay-plug { display: none; }
+  .liber-plate { top: 20px; }
+  .carving[data-id='candle'] { top: 38px; left: 42px; }
+  .carving[data-id='thread'] { top: 38px; right: 42px; }
+  .carving[data-id='stone'] { bottom: 52px; left: 10px; }
+  .bezel .settings-cog { right: 8px; bottom: 42px; }
+}
+
+/* the stone's lock, worn by the shell: the sigil cart carries the cross */
+.crt-cartridge.crossed .crt-cart-label { text-decoration: line-through; opacity: 0.55; }
+.crt-cartridge.crossed .crt-cart-mark svg { opacity: 0.35; }
+.crt-cartridge.crossed::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 2px;
+  background: rgba(160, 60, 40, 0.65);
+  transform: rotate(-14deg);
+  box-shadow: 0 1px 0 rgba(255, 248, 225, 0.35);  pointer-events: none;
+}
+
+/* ── Run 7 cartridge pitch: the holder and the floating matters share one
+   diegetic object language ───────────────────────────────────────────────
+   The cartridge is no longer a tiny beige UI card. It is a retro artifact:
+   squared shell, shoulder notch, contact teeth, recessed label, hard shadow.
+   The dock is its charging cradle: dark socket, brass rails, matching teeth.
+   Layout, proportions, labels, and navigation remain unchanged. */
+html.pixel-register .crt-dock-face {
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, rgba(210, 164, 84, 0.08) 0 4px, transparent 4px 12px),
+    linear-gradient(180deg, #332517 0%, #1f160f 48%, #120d09 100%);
+  border: 2px solid #8a6736;
+  box-shadow:
+    inset 0 2px 0 rgba(238, 205, 137, 0.32),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.56),
+    5px 5px 0 rgba(0, 0, 0, 0.5);
+}
+html.pixel-register .crt-dock-slot {
+  border-radius: 0;
+  background: #0a0806;
+  border: 2px solid #5d4529;
+  box-shadow: inset 0 4px 0 #000, inset 0 -2px 0 rgba(218, 172, 91, 0.28);
+}
+html.pixel-register .crt-dock-port {
+  border-radius: 0;
+  border: 2px solid #5d4529;
+}
+html.pixel-register .crt-bay-eject {
+  border-radius: 1px;
+  background: #6e4e29;
+  border: 2px solid #c69a50;
+  box-shadow: inset 0 2px 0 #e2bd72, 3px 3px 0 #090705;
+}
+html.pixel-register .crt-bay-eject::before,
+html.pixel-register .crt-bay-eject::after { filter: none; background-color: #1a1009; border-bottom-color: #1a1009; }
+html.pixel-register .crt-dock-plate {
+  color: #d7af63;
+  text-shadow: 2px 2px 0 #080604;
+}
+
+html.pixel-register .crt-cartridge {
+  border-radius: 1px;
+  border-width: 2px;
+  min-height: 44px;
+  background: #302015;
+  box-shadow:
+    inset 0 2px 0 rgba(240, 202, 122, 0.34),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.54),
+    4px 4px 0 rgba(0, 0, 0, 0.58);
+  image-rendering: pixelated;
+}
+html.pixel-register .crt-cartridge::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 14%;
+  right: 14%;
+  height: 5px;
+  background: #b98942;
+  box-shadow: 3px 0 0 #5b3b1d, -3px 0 0 #5b3b1d;
+  z-index: 2;
+  pointer-events: none;
+}
+html.pixel-register .crt-cartridge::after {
+  left: 18%;
+  right: 18%;
+  bottom: 5%;
+  height: 5px;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, #e0b45d 0 3px, #4a3018 3px 7px);
+  box-shadow: 0 2px 0 #070504;
+}
+html.pixel-register .crt-cart-mark {
+  border-radius: 1px;
+  background: #120d09;
+  border: 1px solid #8b6835;
+  box-shadow: inset 2px 2px 0 #050403, 2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+html.pixel-register .crt-cart-label {
+  border-radius: 0;
+  color: #f6dd98;
+  background: #17100b;
+  border: 1px solid #73532b;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: clamp(11px, 1.05cqi, 14px);
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 0 #080604;
+  box-shadow: none;
+}
+html.pixel-register .crt-cart-lamp {
+  border-radius: 0;
+  height: 4px;
+  background: #090705;
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge {
+  filter: saturate(1.08) contrast(1.08);
+}
+
+/* ── the launch row ───────────────────────────────────────────────────────
+   Clicking the holder opens a clear bottom-of-screen arc. The beige tray
+   background is intentionally gone: the cartridges are the ritual objects,
+   floating in a single readable row while the machine stays visible behind. */
+html.pixel-register .crt-bay-well {
+  width: min(94cqi, 920px);
+  height: clamp(120px, 16cqi, 190px);
+  bottom: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+html.pixel-register .crt-bay-tray {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+html.pixel-register .crt-bay-tray.out { pointer-events: auto; }
+html.pixel-register .crt-tray-carriage {
+  display: block;
+  width: 100%;
+  padding: 0 0 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+html.pixel-register .crt-tray-carriage::after,
+html.pixel-register .crt-bay-tray::after { display: none; }
+html.pixel-register .crt-tray-grid {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(3px, 0.45cqi, 8px);
+  width: 100%;
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge {
+  flex: 0 0 clamp(58px, 6.8cqi, 86px);
+  width: clamp(58px, 6.8cqi, 86px);
+  height: clamp(68px, 8.2cqi, 102px);
+  min-width: 58px;
+  min-height: 68px;
+  top: var(--arc-y, 0px);
+  rotate: var(--arc-r, 0deg);
+  animation: cart-erupt 0.78s cubic-bezier(0.16, 0.86, 0.22, 1) both;
+  animation-delay: var(--summon-delay, 0s);
+}
+/* A shallow bowl: the middle cartridges sit higher, the ends turn inward. */
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(1) { --arc-y: 18px; --arc-r: -8deg; --erupt-r: -12deg; --summon-delay: 0s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(2) { --arc-y: 10px; --arc-r: -6deg; --erupt-r: -10deg; --summon-delay: .05s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(3) { --arc-y: 4px; --arc-r: -4deg; --erupt-r: -8deg; --summon-delay: .10s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(4) { --arc-y: 0px; --arc-r: -2deg; --erupt-r: -5deg; --summon-delay: .15s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(5) { --arc-y: -3px; --arc-r: -1deg; --erupt-r: -2deg; --summon-delay: .20s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(6) { --arc-y: -5px; --arc-r: 0deg; --erupt-r: 0deg; --summon-delay: .25s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(7) { --arc-y: -3px; --arc-r: 1deg; --erupt-r: 2deg; --summon-delay: .30s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(8) { --arc-y: 0px; --arc-r: 2deg; --erupt-r: 5deg; --summon-delay: .35s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(9) { --arc-y: 4px; --arc-r: 4deg; --erupt-r: 8deg; --summon-delay: .40s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(10) { --arc-y: 10px; --arc-r: 6deg; --erupt-r: 10deg; --summon-delay: .45s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(11) { --arc-y: 18px; --arc-r: 8deg; --erupt-r: 12deg; --summon-delay: .50s; }
+@keyframes cart-erupt {
+  0% { opacity: 0; transform: translateY(180px) scale(.24) rotate(var(--erupt-r, 0deg)); }
+  48% { opacity: 1; transform: translateY(-14px) scale(1.08) rotate(calc(var(--erupt-r, 0deg) * .55)); }
+  76% { transform: translateY(6px) scale(.98) rotate(calc(var(--erupt-r, 0deg) * .2)); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+html.pixel-register .crt-bay.ejecting .crt-dock-face {
+  animation: dock-socket-pulse .78s steps(3, end) both;
+}
+@keyframes dock-socket-pulse {
+  0%, 100% { filter: brightness(1); }
+  35% { filter: brightness(1.35); }
+  60% { filter: brightness(1.08); }
+}
+html.pixel-register .crt-bay-tray.out .crt-cart-label {
+  max-width: 96%;
+  padding: 3px 3px 2px;
+  font-size: clamp(10px, 0.9cqi, 12px);
+  letter-spacing: .02em;
+  color: #ffe4a8;
+  background: #080604;
+  border: 2px solid #c99b4e;
+  text-shadow: 2px 2px 0 #000;
+}
+html.pixel-register .crt-bay-tray.out .crt-cart-mark {
+  width: clamp(24px, 2.8cqi, 38px);
+  height: clamp(22px, 2.5cqi, 34px);
+  margin-bottom: 5px;
+}
+@media (max-width: 600px) {
+  html.pixel-register .crt-bay-well { width: 96%; height: 112px; }
+  html.pixel-register .crt-tray-grid { gap: 2px; transform: scale(.72); transform-origin: bottom center; }
+}
+
+/* ── Run 8: two-row cartridge cradle ─────────────────────────────────────
+   The tray is now a themed holder on the left edge of the monitor. Two
+   larger rows give every cartridge room for a readable name while keeping
+   the open scene transparent: only the shells, contact teeth, and a small
+   socket rail are painted. The Pixi migration can replace this single
+   holder surface without changing the cartridge DOM contract. */
+html.pixel-register .crt-bay {
+  left: clamp(4%, 6cqi, 9%);
+  right: auto;
+  transform: none;
+  width: min(270px, 24cqi);
+  height: clamp(58px, 6.2cqi, 82px);
+  bottom: 1.4cqi;
+}
+html.pixel-register .crt-bay.ejecting .crt-dock-face {
+  box-shadow:
+    inset 0 2px 0 rgba(238, 205, 137, 0.32),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.56),
+    5px 5px 0 rgba(0, 0, 0, 0.5),
+    6px 0 0 #c99445;
+}
+html.pixel-register .crt-bay-well {
+  left: clamp(7%, 9cqi, 13%);
+  right: auto;
+  transform: none;
+  width: min(34cqi, 520px);
+  height: clamp(246px, 29cqi, 330px);
+  bottom: 0;
+  overflow: visible;
+}
+html.pixel-register .crt-tray-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: clamp(104px, 10.5cqi, 140px);
+  align-items: end;
+  justify-items: stretch;
+  gap: clamp(8px, 0.8cqi, 13px) clamp(5px, 0.65cqi, 10px);
+  width: 100%;
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge {
+  grid-column: span 2;
+  width: auto;
+  min-width: 0;
+  min-height: 104px;
+  height: clamp(104px, 10.5cqi, 140px);
+  top: 0;
+  rotate: var(--arc-r, 0deg);
+  animation: cart-erupt-left 0.68s steps(6, end) both;
+  animation-delay: var(--summon-delay, 0s);
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(1) { --arc-y: 15px; --arc-r: -5deg; --summon-delay: 0s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(2) { --arc-y: 8px; --arc-r: -3deg; --summon-delay: .05s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(3) { --arc-y: 2px; --arc-r: -1deg; --summon-delay: .10s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(4) { --arc-y: 0px; --arc-r: 1deg; --summon-delay: .15s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(5) { --arc-y: 8px; --arc-r: 3deg; --summon-delay: .20s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(6) { --arc-y: 15px; --arc-r: 5deg; --summon-delay: .25s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(7) { grid-column: 2 / span 2; --arc-y: 15px; --arc-r: -4deg; --summon-delay: .30s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(8) { grid-column: 4 / span 2; --arc-y: 7px; --arc-r: -2deg; --summon-delay: .35s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(9) { grid-column: 6 / span 2; --arc-y: 0px; --arc-r: 0deg; --summon-delay: .40s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(10) { grid-column: 8 / span 2; --arc-y: 7px; --arc-r: 2deg; --summon-delay: .45s; }
+html.pixel-register .crt-bay-tray.out .crt-cartridge:nth-child(11) { grid-column: 10 / span 2; --arc-y: 15px; --arc-r: 4deg; --summon-delay: .50s; }
+@keyframes cart-erupt-left {
+  0% { opacity: 0; transform: translate(34px, 150px) scale(.28) rotate(0deg); }
+  55% { opacity: 1; transform: translate(-5px, -10px) scale(1.04) rotate(var(--arc-r, 0deg)); }
+  82% { transform: translate(2px, 4px) scale(.98) rotate(var(--arc-r, 0deg)); }
+  100% { opacity: 1; transform: translate(0, var(--arc-y, 0px)) scale(1) rotate(var(--arc-r, 0deg)); }
+}
+html.pixel-register .crt-bay-tray.closing .crt-cartridge {
+  animation: cart-retract-left .42s steps(5, end) both;
+  animation-delay: calc((0.55s - var(--summon-delay, 0s)) * .55);
+}
+@keyframes cart-retract-left {
+  0% { opacity: 1; transform: translate(0, var(--arc-y, 0px)) scale(1) rotate(var(--arc-r, 0deg)); }
+  55% { opacity: .9; transform: translate(12px, 42px) scale(.72) rotate(0deg); }
+  100% { opacity: 0; transform: translate(28px, 150px) scale(.18) rotate(0deg); }
+}
+html.pixel-register .crt-bay-tray.out .crt-cart-label {
+  max-width: 100%;
+  padding: 4px 3px 3px;
+  font-size: clamp(10px, 0.95cqi, 13px);
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #fff0bd;
+  background: #090705;
+  border: 2px solid #d2a052;
+  text-shadow: 2px 2px 0 #000;
+}
+html.pixel-register .crt-bay-tray.out .crt-cart-mark {
+  width: clamp(30px, 3.2cqi, 46px);
+  height: clamp(28px, 3cqi, 42px);
+  margin-bottom: 7px;
+}
+html.pixel-register .crt-bay-tray.out .crt-tray-carriage::before {
+  content: '';
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -10px;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, #8e6530 0 8px, transparent 8px 18px);
+  opacity: .8;
+  box-shadow: 0 4px 0 #070504;
+}
+@media (max-width: 600px) {
+  html.pixel-register .crt-bay-well { left: 2%; width: 96%; height: 220px; }
+  html.pixel-register .crt-tray-grid { grid-auto-rows: 92px; gap: 5px 3px; }
+  html.pixel-register .crt-bay-tray.out .crt-cartridge { min-height: 92px; height: 92px; }
+  html.pixel-register .crt-bay-tray.out .crt-cart-label { font-size: 12px; padding: 4px 2px 3px; }
+}
+
+/* ── Run 8 refinement: the under-monitor top loader ──────────────────────
+   The holder is a small retro console beneath the monitor, not a side
+   drawer. The cartridges rise in front of the glass, then drop vertically
+   into the dark top-loading mouth. This is deliberately one clean surface
+   for the future Pixi holder: slot, rails, contact lights, and no scenery. */
+html.pixel-register .crt-bay {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: min(300px, 25cqi);
+  height: clamp(58px, 6.2cqi, 84px);
+  bottom: -2.6cqi;
+}
+html.pixel-register .crt-bay::before {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  left: 9%;
+  right: 9%;
+  top: -7px;
+  height: 10px;
+  background: #090705;
+  border: 2px solid #8e6530;
+  box-shadow: inset 0 3px 0 #000, 3px 3px 0 rgba(0, 0, 0, .55);
+  pointer-events: none;
+}
+html.pixel-register .crt-bay::after {
+  content: 'TOP LOAD';
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: -5px;
+  transform: translate(-50%, -100%);
+  padding: 2px 6px;
+  color: #d8aa58;
+  background: #120d09;
+  border: 1px solid #765128;
+  font: 10px/1 'VT323', 'Courier New', monospace;
+  letter-spacing: .16em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+html.pixel-register .crt-bay-well {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: min(72cqi, 960px);
+  height: clamp(270px, 32cqi, 360px);
+  bottom: 0;
+}
+html.pixel-register .crt-bay-tray.out .crt-tray-grid {
+  grid-template-rows: repeat(2, clamp(118px, 12cqi, 154px));
+  row-gap: clamp(14px, 1.4cqi, 22px);
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge {
+  min-height: 118px;
+  height: clamp(118px, 12cqi, 154px);
+}
+html.pixel-register .crt-bay-tray.out .crt-cartridge {
+  animation-name: cart-erupt-top-loader;
+}
+@keyframes cart-erupt-top-loader {
+  0% { opacity: 0; transform: translateY(170px) scale(.24) rotate(0deg); }
+  48% { opacity: 1; transform: translateY(-18px) scale(1.06) rotate(var(--arc-r, 0deg)); }
+  78% { transform: translateY(5px) scale(.98) rotate(var(--arc-r, 0deg)); }
+  100% { opacity: 1; transform: translateY(var(--arc-y, 0px)) scale(1) rotate(var(--arc-r, 0deg)); }
+}
+html.pixel-register .crt-bay-tray.closing .crt-cartridge {
+  animation-name: cart-retract-top-loader;
+}
+@keyframes cart-retract-top-loader {
+  0% { opacity: 1; transform: translateY(var(--arc-y, 0px)) scale(1) rotate(var(--arc-r, 0deg)); }
+  52% { opacity: .88; transform: translateY(28px) scale(.72) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(170px) scale(.18) rotate(0deg); }
+}

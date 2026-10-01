@@ -1,0 +1,51 @@
+/* scars.css — Corruption scars on the bezel shell.
+   The covenant calls for "corruption scars" that are visible up close,
+   as texture not just color. We use a dedicated element so each scratch
+   has a definite LENGTH, not a full-bezel stripe. The 6 scratches are
+   positioned around the bezel; the radial gradient splotches give the
+   shell that heat-damage yellowing near the top and bottom. The
+   `visited` count deepens the overlay. */
+
+.corruption-scars {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 4;
+  background:
+    radial-gradient(ellipse 18px 10px at 12% 22%, rgba(60, 30, 10, 0.55) 0%, rgba(60, 30, 10, 0) 70%),
+    radial-gradient(ellipse 22px 14px at 88% 38%, rgba(40, 20, 5, 0.5) 0%, rgba(40, 20, 5, 0) 70%),
+    radial-gradient(ellipse 14px 9px at 22% 78%, rgba(70, 35, 15, 0.45) 0%, rgba(70, 35, 15, 0) 70%),
+    radial-gradient(ellipse 28px 8px at 78% 82%, rgba(50, 25, 10, 0.55) 0%, rgba(50, 25, 10, 0) 70%),
+    radial-gradient(circle 6px at 50% 6%, rgba(80, 40, 20, 0.6) 0%, rgba(80, 40, 20, 0) 70%),
+    radial-gradient(circle 8px at 6% 50%, rgba(45, 20, 5, 0.5) 0%, rgba(45, 20, 5, 0) 70%),
+    radial-gradient(circle 5px at 94% 16%, rgba(60, 30, 10, 0.5) 0%, rgba(60, 30, 10, 0) 70%),
+    radial-gradient(circle 7px at 4% 92%, rgba(50, 25, 10, 0.5) 0%, rgba(50, 25, 10, 0) 70%),
+    radial-gradient(ellipse 60% 30% at 50% 0%, rgba(120, 60, 30, 0.08) 0%, rgba(120, 60, 30, 0) 60%),
+    radial-gradient(ellipse 40% 20% at 30% 100%, rgba(80, 30, 10, 0.10) 0%, rgba(80, 30, 10, 0) 60%);
+  transition: filter 0.6s;
+}
+
+.corruption-scars .scar {
+  position: absolute;
+  background: linear-gradient(90deg, transparent 0%, rgba(40, 20, 5, 0.7) 30%, rgba(40, 20, 5, 0.7) 70%, transparent 100%);
+  transform-origin: left center;
+}
+
+.corruption-scars .scar-1 { top: 14%;  left: 4%;  width: 30px; height: 1px; transform: rotate(72deg);  }
+.corruption-scars .scar-2 { top: 30%;  right: 4%; width: 22px; height: 1px; transform: rotate(105deg); }
+.corruption-scars .scar-3 { top: 68%;  left: 12%; width: 18px; height: 1px; transform: rotate(168deg); }
+.corruption-scars .scar-4 { top: 86%;  right: 14%;width: 26px; height: 1px; transform: rotate(155deg); }
+.corruption-scars .scar-5 { top: 50%;  left: 8%;  width: 12px; height: 1px; transform: rotate(35deg);  }
+.corruption-scars .scar-6 { top: 22%;  right: 18%;width: 10px; height: 1px; transform: rotate(195deg); }
+
+/* Deepen the scars the more visitors you have sat with. */
+.machine.visited-3  .corruption-scars { filter: brightness(0.92) contrast(1.08); }
+.machine.visited-6  .corruption-scars { filter: brightness(0.86) contrast(1.15); }
+.machine.visited-9  .corruption-scars { filter: brightness(0.78) contrast(1.22); }
+.machine.visited-12 .corruption-scars { filter: brightness(0.68) contrast(1.30) sepia(0.18); }
+
+/* Shadow overdrive reddens the scars. */
+.machine.shadow-on .corruption-scars {
+  filter: brightness(0.55) contrast(1.4) hue-rotate(-18deg) sepia(0.3);
+}

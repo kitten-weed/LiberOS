@@ -1,0 +1,790 @@
+/* toybox.css — Pip's sink-world, diegetic. Pip was trapped here by accident;
+   the other travellers leave toys in the basin. Wanderlust's grasp never
+   touched this room: no gilt, no pine — enamel, limescale, rust, wire, tape,
+   one warm bulb. The sink IS the screen. JS contract (toybox.js):
+   .toybox-flank + .shelf-obj (built per material, --jc set inline),
+   .toybox-crewbar [data-crew] drag geometry,
+   .toybox-raison + .open,
+   canvas painted by powder.js — dress AROUND it, never its internals. */
+.toybox-app {
+  --porc-hi: #a8bcb0;
+  --porc: #5a7268;
+  --porc-lo: #22332c;
+  --tile: #2c3a34;
+  --grout: #17211c;
+  --rust: #8a4a28;
+  --lime: #cfd8c8;
+  --bulb: #ffd98a;
+  --wire: #6a6f72;
+  --basin-half: 110px;   /* half the basin width, set by fitBasin() */
+  --tool-row: 68px;      /* the tool row's height; the soap line clears it */
+  position: absolute; inset: 0;
+  color: #cfd8c8;
+  font-family: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', cursive;
+  background:
+    radial-gradient(90% 60% at 62% 8%, rgba(255, 217, 138, 0.13), transparent 55%),
+    radial-gradient(120% 90% at 50% 115%, rgba(0, 0, 0, 0.65), transparent 60%),
+    linear-gradient(180deg, #111c18 0%, #0d1411 55%, #080d0a 100%);
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+/* ── the damp air: motes drifting in the bulb light ── */
+.toybox-motes {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6;
+  background-image:
+    radial-gradient(1.5px 1.5px at 18% 30%, rgba(255, 240, 200, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 34% 52%, rgba(255, 240, 200, 0.4), transparent 60%),
+    radial-gradient(2px 1.5px at 55% 24%, rgba(255, 240, 200, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 70% 44%, rgba(255, 240, 200, 0.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 84% 62%, rgba(255, 240, 200, 0.3), transparent 60%),
+    radial-gradient(1px 1px at 26% 68%, rgba(255, 240, 200, 0.3), transparent 60%);
+  animation: mote-drift 9s ease-in-out infinite alternate;
+}
+@keyframes mote-drift {
+  from { transform: translate(0, 0); opacity: 0.45; }
+  to   { transform: translate(6px, -8px); opacity: 0.7; }
+}
+
+/* ── rain window, high on the left tiles beside the sign ── */
+.sink-window {
+  position: absolute; top: 42px; left: 200px; width: 84px; height: 58px; z-index: 2;
+  background:
+    linear-gradient(160deg, rgba(140, 170, 190, 0.20), rgba(60, 90, 110, 0.10) 55%, rgba(20, 30, 40, 0.22)),
+    linear-gradient(180deg, #16242c, #0e181e);
+  border: 3px solid #242e2a; border-radius: 3px;
+  box-shadow: inset 0 0 14px rgba(120, 170, 200, 0.12), 0 2px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.sink-window i {
+  position: absolute; inset: 2px;
+  background:
+    linear-gradient(115deg, transparent 42%, rgba(190, 220, 240, 0.16) 43% 46%, transparent 47%),
+    linear-gradient(65deg, transparent 58%, rgba(190, 220, 240, 0.10) 59% 61%, transparent 62%);
+  pointer-events: none;
+}
+.sink-window i:nth-child(1) { inset: 2px 50% 52% 2px; border-right: 2px solid #242e2a; border-bottom: 2px solid #242e2a; }
+.sink-window i:nth-child(2) { inset: 2px 2px 52% 50%; border-bottom: 2px solid #242e2a; }
+.sink-window i:nth-child(3) { inset: 52% 50% 2px 2px; border-right: 2px solid #242e2a; }
+.sink-window i:nth-child(4) { inset: 52% 2px 2px 50%; }
+
+/* ── one warm bulb on a cord: the only kindness in the room ── */
+.sink-bulblight {
+  position: absolute; top: -30px; left: -40px; width: 260px; height: 210px; z-index: 4;
+  background: radial-gradient(60% 55% at 34% 22%, rgba(255, 217, 138, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.sink-bulblight::before {
+  content: ''; position: absolute; top: 0; left: 76px; width: 2px; height: 26px;
+  background: linear-gradient(180deg, #3a3f3c, #23282400);
+}
+.sink-bulblight::after {
+  content: ''; position: absolute; top: 24px; left: 68px;
+  width: 18px; height: 22px; border-radius: 50% 50% 46% 46%;
+  background: radial-gradient(circle at 40% 35%, #fff4d0, #e8b860 55%, #7a5a20 90%);
+  box-shadow: 0 0 22px 8px rgba(255, 217, 138, 0.4), 0 0 52px 18px rgba(255, 217, 138, 0.14);
+}
+
+/* ── dressing: the left-wall supply pipe, run of the old building ── */
+.sink-leftpipe {
+  position: absolute; top: 118px; bottom: 36px; left: 16px; width: 13px; z-index: 1;
+  background: linear-gradient(90deg, #39413f, #5a6466 40%, #2c3330 90%);
+  border-radius: 0 0 3px 3px;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.6), 2px 0 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+.sink-leftpipe::before, .sink-leftpipe::after {
+  content: ''; position: absolute; left: -3px; width: 19px; height: 7px;
+  background: linear-gradient(180deg, #6a7476, #39413f);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.sink-leftpipe::before { top: 14%; }
+.sink-leftpipe::after { top: 58%; }
+
+/* ── dressing: a towel hung to dry, right flank ── */
+.sink-towel {
+  position: absolute; top: 186px; right: 22px; width: 56px; height: 96px; z-index: 1;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(0, 0, 0, 0.12) 6px 8px),
+    linear-gradient(180deg, #6a5848 0%, #5a4a3c 55%, #4a3c30 100%);
+  border-radius: 3px 3px 8px 8px;
+  box-shadow: inset 0 2px 3px rgba(255, 240, 210, 0.14), inset 0 -8px 12px rgba(0, 0, 0, 0.35), 3px 4px 8px rgba(0, 0, 0, 0.5);
+  transform: rotate(1.6deg);
+  pointer-events: none;
+}
+/* the fold it hangs over */
+.sink-towel::before {
+  content: ''; position: absolute; top: -4px; left: -3px; right: -3px; height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #7a6858, #5a4a3c);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.55);
+}
+/* rail ends peeking out */
+.sink-towel::after {
+  content: ''; position: absolute; top: -1px; left: -12px; width: 80px; height: 4px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #8a9496, #4a5254);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ── the floor: chipped tiles below the apron line ── */
+.toybox-app::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 36px; z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(207, 216, 200, 0.14), transparent 22%),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 1.5px, transparent 1.5px 30px),
+    linear-gradient(180deg, #1a231e 0%, #131a16 100%);
+  box-shadow: inset 0 1px 0 rgba(207, 216, 200, 0.16);
+  pointer-events: none;
+}
+
+/* ── titlebar: a strip of the wall, not a web bar ── */
+.toybox-titlebar {
+  position: absolute; top: 0; left: 0; right: 0; height: 36px; z-index: 8;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 76px 0 14px;
+  background: linear-gradient(180deg, rgba(10, 16, 13, 0.92), rgba(10, 16, 13, 0.65));
+  border-bottom: 1px solid rgba(168, 188, 176, 0.22);
+  color: #b8c8bc;
+}
+.toybox-titlebar-name {
+  font-size: 1.02rem; letter-spacing: 0.06em;
+  transform: rotate(-1.4deg);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 217, 138, 0.2);
+}
+.toybox-titlebar-sub {
+  font-style: normal; font-size: 1rem; letter-spacing: 0.04em; color: #9ab0a4;
+  transform: rotate(-0.5deg);
+}
+.toybox-help, .toybox-exit {
+  margin-left: auto;
+  background: linear-gradient(180deg, #2a352f, #17211c);
+  border: 1px solid #3e4c44; color: #b8c8bc;
+  border-radius: 50%; cursor: pointer; padding: 0;
+  min-width: 44px; min-height: 44px; line-height: 42px; font-size: 0.95rem;
+  font-family: inherit;
+  box-shadow: inset 0 1px 0 rgba(207, 216, 200, 0.2), 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+.toybox-exit { margin-left: 0; }
+.toybox-help:active, .toybox-exit:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ── splashback: cracked tiles behind the basin ── */
+.sink-splash {
+  position: absolute; top: 36px; left: 0; right: 0; height: 84px; z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.35)),
+    repeating-linear-gradient(0deg, var(--grout) 0 1.5px, transparent 1.5px 21px),
+    repeating-linear-gradient(90deg, var(--grout) 0 1.5px, transparent 1.5px 27px),
+    linear-gradient(180deg, #32443c 0%, #2a3a32 60%, #233029 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+/* one cracked tile — the world has scars */
+.sink-splash::before {
+  content: ''; position: absolute; top: 22px; left: 46px; width: 26px; height: 21px;
+  background:
+    linear-gradient(52deg, transparent 47%, rgba(0, 0, 0, 0.75) 48% 52%, transparent 53%),
+    linear-gradient(180deg, #3a4c44, #2e3e36);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+/* water stain bleeding from the tap down the tiles */
+.sink-splash::after {
+  content: ''; position: absolute; top: 0; right: 64px; width: 16px; height: 64%;
+  background:
+    radial-gradient(60% 90% at 50% 0%, rgba(120, 90, 50, 0.28), transparent 75%),
+    linear-gradient(180deg, transparent, rgba(138, 74, 40, 0.18));
+  filter: blur(0.5px);
+}
+.sink-scumline {
+  position: absolute; left: 0; right: 0; bottom: -2px; height: 5px;
+  background: linear-gradient(180deg, rgba(207, 216, 200, 0.28), rgba(207, 216, 200, 0.06) 60%, transparent);
+  filter: blur(0.5px);
+}
+
+/* ── the sign: greasy-finger magnet letters on the tiles ── */
+.toybox-sign {
+  position: absolute; top: 14px; left: 14px;
+  display: flex; flex-wrap: wrap; gap: 2px 7px; align-items: baseline;
+  max-width: 170px;   /* wraps to two short lines; the rain window sits beside it */
+  font-size: 1.16rem; letter-spacing: 0.02em; font-style: normal;
+}
+.toybox-sign .word { display: inline-flex; }
+.toybox-sign .mag {
+  font-style: normal; color: #e8dcc0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), 0 0 8px rgba(232, 220, 192, 0.25);
+  display: inline-block;
+}
+.toybox-sign .mag:nth-child(3n) { color: #d8b050; transform: rotate(3.5deg) translateY(1px); }
+.toybox-sign .mag:nth-child(3n+1) { transform: rotate(-2.5deg); }
+.toybox-sign .mag:nth-child(4n) { transform: rotate(1.8deg) translateY(-1px); }
+.toybox-sign .word:nth-child(2) { margin-top: 1px; }
+
+/* ── the tap: pipe drops from the wall, spout arcs over the BASIN.
+   Anchored to the basin's right shoulder via --basin-half (fitBasin). ── */
+.tap-assembly { position: absolute; top: 96px; left: calc(50% + var(--basin-half) - 34px); width: 54px; height: 62px; z-index: 3; pointer-events: none; }
+.tap-pipe {
+  position: absolute; top: -60px; right: 16px; width: 9px; height: 118px;
+  background: linear-gradient(90deg, #4a5254, #8a9496 45%, #39413f 90%);
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.6), 1px 0 2px rgba(0, 0, 0, 0.5);
+}
+/* wall flange where the pipe leaves the tiles */
+.tap-pipe::before {
+  content: ''; position: absolute; top: -5px; left: -3px; width: 15px; height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #8a9496, #4a5254);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.tap-spout {
+  position: absolute; top: 52px; left: 0; width: 40px; height: 10px;
+  background: linear-gradient(180deg, #8a9496, #4a5254 70%, #39413f);
+  border-radius: 0 4px 5px 5px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.5);
+}
+.tap-spout-hole {
+  position: absolute; top: 61px; left: 3px; width: 5px; height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #1a2020, #000);
+  box-shadow: 0 0 6px rgba(140, 180, 200, 0.2);
+}
+/* the rusted drip — the world is old */
+.tap-spout-hole::after {
+  content: ''; position: absolute; left: 1px; top: 6px; width: 3px; height: 5px;
+  border-radius: 40% 40% 60% 60%;
+  background: linear-gradient(180deg, rgba(170, 200, 220, 0.75), rgba(120, 160, 190, 0.45));
+  animation: drip 3.4s ease-in infinite;
+}
+@keyframes drip {
+  0%, 78% { transform: translateY(0) scaleY(0.5); opacity: 0; }
+  82% { opacity: 1; }
+  100% { transform: translateY(46px) scaleY(1.4); opacity: 0; }
+}
+/* the valve wheel bolted on the drop pipe: turn it, the world pauses */
+.toybox-action.tap-handle {
+  position: absolute; top: 44px; left: calc(50% + var(--basin-half) - 26px); z-index: 4;
+  width: 52px; height: 52px; border-radius: 50%;
+  padding: 0; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  font-family: inherit; font-size: 1rem; letter-spacing: 0.08em; color: #9ab0a4;
+}
+.tap-handle .tool-art {
+  display: block; width: 34px; height: 34px; border-radius: 50%;
+  background:
+    conic-gradient(from 15deg, #9aa4a6 0 8%, transparent 8% 17%, #9aa4a6 17% 25%, transparent 25% 34%, #9aa4a6 34% 42%, transparent 42% 51%, #9aa4a6 51% 59%, transparent 59% 68%, #9aa4a6 68% 76%, transparent 76% 85%, #9aa4a6 85% 93%, transparent 93%),
+    radial-gradient(circle, #b8c2c4 0 30%, #5a6466 31% 55%, #39413f 56% 72%, transparent 73%),
+    radial-gradient(circle, #39413f 0 74%, transparent 75%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.2s ease;
+}
+.tap-handle:hover .tool-art, .tap-handle:focus-visible .tool-art { transform: rotate(22deg); outline: none; }
+.tap-handle:active .tool-art { transform: rotate(90deg); }
+.tap-handle[aria-pressed="true"] .tool-art {
+  transform: rotate(90deg);
+  box-shadow: 0 0 12px rgba(255, 217, 138, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.tap-handle[aria-pressed="true"] span { color: #ffd98a; }
+.tap-handle span { text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8); }
+
+/* ── the flank boards: one labelled shelf per traveller, the objects
+   themselves on them — no labels on the things, names on the boards ── */
+.toybox-flank {
+  position: absolute; top: 114px; bottom: 44px; width: 210px; z-index: 2;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+  /* seven boards have to stand in this column with all of the thirteen
+     traveller shelves on them — at 178px the widest shelf (four objects at
+     their 44px hit areas) wrapped to a second row, which pushed every left
+     shelf out of register with the right and ran the last two off the
+     bottom. 210px holds four objects on one row; the paddings below are
+     trimmed to the board's own shadow doing the separating. */
+  padding: 6px 10px 8px; display: flex; flex-direction: column; gap: 0;
+}
+/* the fade says: the board keeps going past its edge */
+.toybox-flank::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 18px;
+  background: linear-gradient(180deg, transparent, rgba(19, 26, 22, 0.95));
+  pointer-events: none;
+  z-index: 2;
+}
+.toybox-flank::-webkit-scrollbar { display: none; }
+.flank-left { left: 10px; transform: rotate(-0.4deg); }
+.flank-right { right: 10px; transform: rotate(0.4deg); }
+/* the boards: painted planks with two screws at the top */
+.toybox-flank::before {
+  content: ''; position: absolute; inset: 0; border-radius: 3px; z-index: -1;
+  background:
+    radial-gradient(circle at 8px 8px, #7a8486 0 1.8px, rgba(0, 0, 0, 0.6) 2.2px, transparent 3px),
+    radial-gradient(circle at calc(100% - 8px) 8px, #7a8486 0 1.8px, rgba(0, 0, 0, 0.6) 2.2px, transparent 3px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.13) 0 2px, transparent 2px 14px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.32), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.32)),
+    linear-gradient(180deg, #3a4840, #26322b);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(207, 216, 200, 0.16);
+}
+.shelf-group { padding-bottom: 0; }
+
+/* the shelf itself: a board jutting from the wall — faux 3d, front face
+   carrying the brass plaque, top face catching the bulb light */
+.shelf-board {
+  /* tall enough to carry the plaque at its 16px instruction size — the
+     board must grow with its label, never spill it over the objects */
+  position: relative; height: 22px; margin: -3px 1px 0; border-radius: 0 0 2px 2px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.5)),
+    linear-gradient(180deg, #4a3c2c, #332a1e 60%, #211a12);
+  box-shadow:
+    0 4px 6px -2px rgba(0, 0, 0, 0.65),
+    inset 0 2px 0 rgba(228, 240, 216, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+/* the lit top edge — the bulb is up-left */
+.shelf-board::before {
+  content: ''; position: absolute; left: 0; right: 0; top: -2px; height: 2px;
+  background: linear-gradient(90deg, rgba(236, 200, 138, 0.5), rgba(228, 240, 216, 0.16) 55%, rgba(236, 200, 138, 0.3));
+}
+/* under-board shadow on the wall */
+.shelf-board::after {
+  content: ''; position: absolute; left: 3px; right: -2px; top: 100%; height: 7px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent);
+  pointer-events: none;
+}
+.shelf-group:last-child { border-bottom: none; padding-bottom: 0; box-shadow: none; }
+/* brass plaque screwed to the shelf's front face */
+.shelf-plate {
+  position: absolute; left: 7px; bottom: 2px; z-index: 1;
+  display: inline-block; font-size: 1rem; letter-spacing: 0.14em; line-height: 1.1;
+  white-space: nowrap;   /* a two-line name would spill the board again */
+  color: #f0e8d0; background: linear-gradient(180deg, #8a7a50, #5a4e30);
+  border-radius: 2px; padding: 0 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 240, 200, 0.3);
+}
+/* the objects: one pixel sprite apiece, sitting on the board above */
+.shelf-row { display: flex; flex-wrap: wrap; gap: 1px 2px; align-items: flex-end; padding: 0 0 2px; }
+.shelf-obj {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: transparent; border: 1px solid transparent; border-radius: 5px;
+  padding: 2px 3px; cursor: pointer; min-width: 44px; min-height: 44px;
+  justify-content: flex-end;
+  font-family: inherit; color: inherit;
+}
+.shelf-obj:hover, .shelf-obj:focus-visible {
+  border-color: rgba(207, 216, 200, 0.3); background: rgba(207, 216, 200, 0.07);
+  outline: none;
+}
+.shelf-obj .obj-art { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.45)); }
+.shelf-obj.on {
+  border-color: var(--jc);
+  background: color-mix(in srgb, var(--jc) 16%, transparent);
+  box-shadow: 0 0 12px -3px var(--jc), inset 0 0 8px -4px var(--jc);
+}
+.obj-label { display: none; }   /* aria-label carries the name */
+/* pixel sprites drawn at their authored scale — never stretched to a box,
+   never smoothed. keeps the room's register: the basin and the crew are
+   pixelated, so the objects are too. (the .obj-* rules below style the
+   fallback <i> art for any shelf item without a PIX sprite) */
+.obj-art { display: block; position: relative; width: auto; height: auto; image-rendering: pixelated; }
+
+/* ── the objects: each drawn as the thing itself ── */
+.obj-sandbag {
+  margin: 4px auto 0; width: 28px; height: 18px;
+  border-radius: 38% 38% 44% 44% / 30% 30% 70% 70%;
+  background: repeating-linear-gradient(50deg, rgba(0, 0, 0, 0.14) 0 3px, transparent 3px 7px),
+    radial-gradient(circle at 35% 30%, #ecc878, #d8aa50 55%, #9a7838);
+  box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.35);
+}
+.obj-sandbag::before { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 10px; height: 6px; border-radius: 3px; background: #8a6828; }
+.obj-bottle {
+  margin: 8px auto 0; width: 17px; height: 18px; border-radius: 4px 4px 6px 6px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.25), transparent 30%),
+    linear-gradient(180deg, rgba(74, 138, 200, 0.35) 0 30%, #4a8ac8 31% 100%);
+  border: 1px solid #2a5a88;
+}
+.obj-bottle::before { content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 7px; height: 8px; background: #2a5a88; border-radius: 2px 2px 0 0; }
+.obj-matches {
+  margin: 8px auto 0; width: 26px; height: 17px; border-radius: 2px;
+  background: linear-gradient(180deg, #7a3a28 0 70%, #5a2a1c 70% 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.obj-matches::before { content: ''; position: absolute; top: -6px; left: 4px; width: 5px; height: 6px; border-radius: 50% 50% 40% 40%; background: radial-gradient(circle at 40% 30%, #ffd98a, #e05a20); box-shadow: 8px 0 0 #e05a20, 16px 1px 0 #c84a18; }
+.obj-oilcan { margin: 9px auto 0; width: 22px; height: 15px; border-radius: 3px 6px 2px 2px; background: linear-gradient(180deg, #a89848, #6a5e28); position: relative; }
+.obj-oilcan::before { content: ''; position: absolute; top: -5px; right: -8px; width: 12px; height: 4px; background: #6a5e28; border-radius: 2px; transform: rotate(-28deg); }
+.obj-oilcan::after { content: ''; position: absolute; top: -8px; left: 3px; width: 6px; height: 6px; border-radius: 50%; background: #4a4220; }
+.obj-cellar { margin: 10px auto 0; width: 18px; height: 14px; border-radius: 3px 3px 5px 5px; background: linear-gradient(180deg, #e8e4da, #b8b4a8); border: 1px solid #8a887c; }
+.obj-cellar::before { content: ''; position: absolute; top: -6px; left: 1px; right: 1px; height: 7px; border-radius: 8px 8px 2px 2px; background: linear-gradient(180deg, #f4f0e6, #c8c4b8); border: 1px solid #8a887c; border-bottom: none; }
+.obj-packet {
+  margin: 1px auto; width: 20px; height: 24px; border-radius: 2px;
+  background: radial-gradient(circle at 50% 68%, #7a9a3a 0 3px, transparent 4px),
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(0, 0, 0, 0.06) 4px 5px),
+    linear-gradient(180deg, #c8a86a, #a08850);
+  box-shadow: inset 0 0 0 1px rgba(90, 70, 40, 0.5);
+}
+.obj-plate { margin: 5px auto; width: 22px; height: 16px; border-radius: 2px; background: linear-gradient(180deg, #8a9496, #5a6466); position: relative; }
+.obj-plate::before, .obj-plate::after { content: ''; position: absolute; width: 2.5px; height: 2.5px; border-radius: 50%; background: #39413f; box-shadow: 16px 0 0 #39413f; top: 2px; }
+.obj-plate::after { top: auto; bottom: 2px; }
+.obj-plank { margin: 7px auto; width: 28px; height: 12px; border-radius: 2px; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12) 0 1.5px, transparent 1.5px 4px), linear-gradient(180deg, #b8864a, #8a6234); }
+.obj-stone { margin: 5px auto; width: 24px; height: 16px; border-radius: 45% 55% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(circle at 35% 30%, #b8b6ac, #9a988f 55%, #6a6860); }
+.obj-crucible { margin: 8px auto 0; width: 20px; height: 16px; border-radius: 3px 3px 8px 8px; background: linear-gradient(180deg, #4a4440, #2a2622); position: relative; }
+.obj-crucible::before { content: ''; position: absolute; top: -3px; left: -1px; right: -1px; height: 5px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #ffd070, #e87020 60%, #803010); box-shadow: 0 0 8px rgba(232, 112, 32, 0.6); }
+.obj-icecube { margin: 4px auto; width: 20px; height: 18px; border-radius: 4px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0 18%, transparent 20%), linear-gradient(180deg, rgba(154, 208, 224, 0.9), rgba(110, 170, 200, 0.9)); box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.5); }
+.obj-snowdab { margin: 7px auto 0; width: 24px; height: 13px; border-radius: 50% 50% 20% 20% / 90% 90% 10% 10%; background: radial-gradient(circle at 40% 20%, #ffffff, #e4ecf2 60%, #c8d8e4); }
+.obj-hinge { margin: 8px auto 0; width: 26px; height: 10px; border-radius: 2px; background: linear-gradient(180deg, #c0c8ce, #8890a0); position: relative; }
+.obj-hinge::before { content: ''; position: absolute; left: 50%; top: -2px; width: 6px; height: 14px; border-radius: 3px; transform: translateX(-50%); background: linear-gradient(180deg, #d8dee4, #98a0b0); box-shadow: inset 0 0 0 1px #687080; }
+.obj-keg {
+  margin: 3px auto; width: 20px; height: 19px; border-radius: 5px / 9px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 35%, rgba(0, 0, 0, 0.25) 85%),
+    repeating-linear-gradient(0deg, #7a5c38 0 5px, #4a3a24 5px 7px);
+}
+.obj-ball { margin: 5px auto; width: 17px; height: 17px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f2a6c2, #e07a9e 55%, #a84a6e); position: relative; }
+.obj-ball::before { content: ''; position: absolute; left: 0; right: 0; top: 6px; height: 3px; background: rgba(255, 255, 255, 0.75); transform: rotate(-18deg); }
+.obj-rocket { margin: 0 auto; width: 8px; height: 22px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #e05a20 0 22%, #e0c890 22% 88%, #8a6838 88%); position: relative; }
+.obj-rocket::before { content: ''; position: absolute; bottom: -4px; left: -4px; width: 16px; height: 3px; border-radius: 2px; background: #c84a18; }
+.obj-jar {
+  margin: 3px auto 0; width: 18px; height: 20px; border-radius: 3px 3px 6px 6px;
+  background: radial-gradient(60% 50% at 50% 70%, rgba(154, 216, 154, 0.75), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(154, 216, 154, 0.35) 40%, rgba(60, 110, 70, 0.5));
+  border: 1px solid #4a6a54;
+}
+.obj-jar::before { content: ''; position: absolute; top: -5px; left: 2px; right: 2px; height: 5px; border-radius: 2px; background: #6a7a70; }
+.obj-battery { margin: 2px auto; width: 16px; height: 22px; border-radius: 3px; background: repeating-linear-gradient(0deg, #3a3a34 0 4px, #ffe482 4px 11px); position: relative; }
+.obj-battery::before { content: ''; position: absolute; top: -3px; left: 4px; right: 4px; height: 3px; border-radius: 2px 2px 0 0; background: #8a8a80; }
+.obj-battery::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 42%, #2a2a24 43% 50%, transparent 51% 62%, #2a2a24 63% 70%, transparent 71%); }
+.obj-spool { margin: 4px auto; width: 20px; height: 18px; background: repeating-linear-gradient(0deg, #b08ae0 0 3px, #9a74c8 3px 5px); border-left: 3px solid #6a5090; border-right: 3px solid #6a5090; border-radius: 1px; }
+.obj-antfarm {
+  margin: 5px auto; width: 22px; height: 16px; border-radius: 3px;
+  background: radial-gradient(circle at 6px 8px, #241a10 0 1.5px, transparent 2.5px) 0 0/8px 8px,
+    radial-gradient(circle at 3px 4px, #241a10 0 1.5px, transparent 2.5px) 4px 4px/8px 8px,
+    linear-gradient(180deg, #a8784a, #7a5430);
+}
+.obj-soapbar { margin: 7px auto 0; width: 22px; height: 12px; border-radius: 6px / 8px; background: linear-gradient(180deg, #cce8f0, #9ec8d8); box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7); position: relative; }
+.obj-soapbar::before { content: ''; position: absolute; left: 6px; right: 6px; top: 4px; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.6); }
+.obj-wand { margin: 2px auto 0; width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid #c8e8f4; box-shadow: 0 0 6px rgba(200, 232, 244, 0.4); position: relative; }
+.obj-wand::before { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 3px; height: 9px; background: #9ab8c8; border-radius: 1px; }
+.obj-sponge {
+  margin: 6px auto 0; width: 24px; height: 14px; border-radius: 3px;
+  background: radial-gradient(circle at 6px 5px, #8a7a3a 0 1.5px, transparent 2.5px) 0 0/9px 7px,
+    radial-gradient(circle at 4px 3px, #8a7a3a 0 1.5px, transparent 2.5px) 5px 3px/9px 7px,
+    linear-gradient(135deg, #d8c878, #b8a858 75%, #8a7a3a);
+}
+
+/* narrow screens: the boards become two horizontal strips */
+.toybox-app.compact .toybox-flank {
+  flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+  width: auto; left: 8px; right: 8px; bottom: auto; height: 84px;
+  padding: 4px 8px 11px; gap: 8px; align-items: flex-start;
+}
+.toybox-app.compact .flank-left, .toybox-app.compact .flank-right { transform: none; }
+.toybox-app.compact .flank-left { top: 104px; }
+.toybox-app.compact .flank-right { top: 192px; }
+
+/* lane C: compact glass repair. The strips spanned the whole glass, so at
+   the small stage the pause valve died under the left strip's box and the
+   crew bar and towel rail died under the right one. The strips keep to the
+   left 56% of the glass now; the valve moves to the free right margin on
+   its pipe, and the bottom band belongs to the crew and the rail alone.
+   The right strip still crosses the basin's left shoulder — the boards are
+   wall shelves, the basin is under them; the drain and the pour-heart of
+   the world stay clear. */
+.toybox-app.compact .toybox-flank { width: 56%; right: auto; height: 72px; }
+/* under the titlebar sign, one 70px band per strip (plaque + one object
+   row); the bottom band — crew bar, plug, towel rail — starts app-rel 189
+   and nothing stands under anything. The pit's left shoulder sits under
+   the strips' lane: wall boards over the basin, its pour-face and drain
+   in the clear. */
+.toybox-app.compact .flank-left { top: 36px; }
+.toybox-app.compact .flank-right { top: 112px; }
+/* the valve rides its own right margin: same 52px drop from wheel to pipe
+   art as the wide layout, just off the strip's lane */
+.toybox-app.compact .toybox-action.tap-handle { left: auto; right: 12px; top: 8px; }
+.toybox-app.compact .tap-assembly { left: auto; right: 20px; top: 60px; }
+.toybox-app.compact .toybox-crewbar { gap: 5px; padding: 4px 7px 6px; }
+.toybox-app.compact .toybox-crew-btn { padding: 4px 5px; }
+.toybox-app.compact .toybox-actions { gap: 6px; }
+.toybox-app.compact .toybox-action { padding: 4px 5px; }
+/* A plaque is 16px instruction text and often wider than the objects it
+   labels. Absolutely positioned it cannot widen its own group, so on the
+   strip layout every long name — e-lizabeth, the scribe, wanderlust — ran
+   over its neighbour. Sized to max-content and lifted into flow, the board
+   grows to whichever is wider: its shelf of objects or its name. */
+.toybox-app.compact .shelf-group {
+  border-bottom: none; padding-bottom: 0; padding-right: 10px;
+  border-right: 1px solid rgba(0, 0, 0, 0.42); flex: 0 0 auto; width: max-content;
+}
+.toybox-app.compact .shelf-board { display: flex; align-items: center; }
+.toybox-app.compact .shelf-plate { position: static; }
+.toybox-app.compact .shelf-row { flex-wrap: nowrap; }
+
+/* ── the basin: wide as the world it holds ── */
+.toybox-pit {
+  position: absolute; top: 186px; bottom: 34px; left: 50%; transform: translateX(-50%);
+  width: 320px; max-width: calc(100% - 22px);
+  border: 2px solid #101815; border-radius: 12px 12px 16px 16px;
+  touch-action: none;
+  background: linear-gradient(180deg, #31423a 0%, #26362e 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(207, 216, 200, 0.22),
+    inset 3px 0 0 rgba(207, 216, 200, 0.10),
+    inset -3px 0 0 rgba(207, 216, 200, 0.10),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.7),
+    inset 0 0 34px rgba(0, 0, 0, 0.55),
+    0 10px 22px rgba(0, 0, 0, 0.75),
+    0 0 0 5px #4a5c52,
+    0 0 0 7px #26322b,
+    0 0 0 8px rgba(207, 216, 200, 0.2);
+}
+/* the basin's raised inner ledge */
+.toybox-pit::before {
+  content: ''; position: absolute; inset: 8px;
+  border-radius: 8px 8px 12px 12px;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 -1px 0 rgba(207, 216, 200, 0.12);
+  pointer-events: none; z-index: 2;
+}
+/* the porcelain itself: limescale tears, faint tide rings, the drain hollow,
+   and the speckle of old enamel — the world under the powder */
+.toybox-pit::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  pointer-events: none; z-index: 3;
+  background:
+    radial-gradient(7% 9% at 50% calc(100% - 17px), rgba(0, 0, 0, 0.6) 0 42%, rgba(207, 216, 200, 0.16) 46% 56%, transparent 62%),
+    radial-gradient(20% 24px at 50% calc(100% - 17px), transparent 52%, rgba(207, 216, 200, 0.09) 55% 57%, transparent 60%),
+    radial-gradient(28% 36px at 50% calc(100% - 17px), transparent 54%, rgba(207, 216, 200, 0.05) 57% 59%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 12% 30%, rgba(228, 240, 216, 0.2), transparent 60%) 0 0/26px 22px,
+    radial-gradient(1px 1px at 60% 55%, rgba(0, 0, 0, 0.3), transparent 60%) 0 0/31px 27px,
+    linear-gradient(100deg, transparent 18%, rgba(207, 216, 200, 0.10) 19% 20%, transparent 21%),
+    radial-gradient(30% 12% at 20% 4%, rgba(207, 216, 200, 0.18), transparent 70%),
+    radial-gradient(40% 10% at 78% 96%, rgba(138, 74, 40, 0.14), transparent 70%),
+    linear-gradient(115deg, rgba(228, 240, 216, 0.07) 0%, transparent 26%);
+}
+.toybox-canvas { display: block; width: 100%; height: 100%; touch-action: none; image-rendering: pixelated; border-radius: 8px 8px 12px 12px;
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g transform='rotate(-18 14 14)'><rect x='6' y='14' width='14' height='8' rx='1.5' fill='%23c8a050' stroke='%234a3010'/><rect x='6' y='14' width='14' height='3' fill='%237a3a28'/><rect x='9' y='18' width='8' height='1.4' fill='%234a3010'/></g><path d='M4 12l5-6 3 3-5 6z' fill='%23d8c8a8' stroke='%234a3010'/><circle cx='22' cy='5' r='2' fill='%23ffd98a'/></svg>") 4 12, pointer; }
+.toybox-tray-shine {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit;
+  background:
+    linear-gradient(115deg, rgba(228, 240, 216, 0.08) 0%, transparent 30%),
+    radial-gradient(120% 26% at 50% 0%, rgba(255, 217, 138, 0.09), transparent 60%);
+}
+
+/* ── the plug: a real brass plug on its chain, in the basin floor ── */
+.toybox-action.plug {
+  position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); z-index: 4;
+  width: 56px; height: 48px; padding: 2px 4px; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px;
+  font-family: inherit; font-size: 1rem; letter-spacing: 0.1em; color: #9ab0a4;
+}
+.toybox-action.plug .tool-art {
+  display: block; width: 22px; height: 15px; border-radius: 50% 50% 42% 42% / 62% 62% 38% 38%;
+  background:
+    linear-gradient(90deg, transparent 46%, #6a5830 47% 53%, transparent 54%),
+    radial-gradient(circle at 38% 28%, #f0d890, #c8a850 45%, #8a6828 80%, #5a4218);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 240, 190, 0.5);
+  transition: transform 0.15s ease;
+}
+.toybox-action.plug:hover .tool-art, .toybox-action.plug:focus-visible .tool-art { transform: translateY(2px); outline: none; }
+.toybox-action.plug:active .tool-art { transform: translateY(5px) scale(0.92); }
+.toybox-action.plug span { text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85); }
+.toybox-action.plug .plug-chain {
+  position: absolute; left: 50%; bottom: 15px; transform: translateX(-50%);
+  width: 3px; height: 0;
+  background: radial-gradient(circle at 50% 25%, #c8a850 0 1.5px, transparent 2px) 0 0 / 3px 4px repeat-y;
+  opacity: 0.9; pointer-events: none;
+}
+.toybox-action.plug.open .tool-art { transform: translateY(-7px); }
+.toybox-action.plug.open .plug-chain { height: 9px; }
+
+.toybox-crewbar {
+  position: absolute; left: 10px; bottom: 6px; z-index: 3;
+  display: flex; align-items: flex-end; gap: 7px;
+  padding: 4px 10px 6px;
+  background:
+    linear-gradient(180deg, rgba(207, 216, 200, 0.14), rgba(0, 0, 0, 0.3) 75%),
+    linear-gradient(180deg, #3e4c44, #26322b);
+  border: 1px solid #4a5850;
+  border-radius: 6px 10px 3px 3px;
+  box-shadow: inset 0 1px 0 rgba(207, 216, 200, 0.2), 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+/* soap-dish ribs */
+.toybox-crewbar::before {
+  content: ''; position: absolute; inset: auto 8px 2px 8px; height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.4) 0 3px, transparent 3px 7px);
+  border-radius: 2px;
+}
+.toybox-crew-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px;
+  padding: 4px 6px; background: transparent; border: none;
+  min-width: 44px; min-height: 44px;
+  cursor: grab; font-family: inherit; color: inherit;
+}
+/* the residents' names, chalked on the rim — no guessing by tooltip */
+.toybox-crew-name {
+  font-size: 1rem; letter-spacing: 0.06em; color: #cfd8c8;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  line-height: 1.1;
+}
+.toybox-crew-btn:active { cursor: grabbing; }
+.toybox-crew-btn .toybox-crew-art { transition: transform 0.15s ease, filter 0.15s ease; }
+.toybox-crew-btn:hover .toybox-crew-art, .toybox-crew-btn:focus-visible .toybox-crew-art { transform: translateY(-2px); }
+.toybox-crew-btn:focus-visible { outline: 2px solid var(--bulb); outline-offset: 2px; }
+.toybox-crew-btn.held { z-index: 5; }
+.toybox-crew-btn.held .toybox-crew-art {
+  transform: scale(1.18) translateY(-3px);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 6px rgba(255, 217, 138, 0.35));
+}
+.toybox-crew-art { display: block; image-rendering: pixelated; }
+
+/* ── towel rail: the toothbrush (sweep) and polaroid (keep) ── */
+.toybox-actions {
+  position: absolute; right: 10px; bottom: 4px; z-index: 3;
+  display: flex; gap: 10px; align-items: flex-end;
+  min-height: var(--tool-row);
+}
+.toybox-action {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-family: inherit; font-size: 1rem; letter-spacing: 0.1em;
+  background: transparent; border: none; color: #8aa093;
+  cursor: pointer; padding: 4px 6px; min-width: 44px; min-height: 44px;
+  justify-content: flex-end;
+}
+.toybox-action .tool-art {
+  display: block;
+  width: 40px; height: 34px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.toybox-action:hover .tool-art, .toybox-action:focus-visible .tool-art {
+  transform: translateY(-3px) rotate(-2deg);
+  outline: none;
+}
+.toybox-action:active .tool-art { transform: translateY(1px) scale(0.95); }
+.toybox-action[aria-pressed="true"] span { color: #ffd98a; }
+.toybox-action span { text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85); }
+/* pip's worn broom: straw fan, twine binding, stick from the corner */
+.tool-broom .tool-art {
+  background:
+    radial-gradient(80% 50% at 50% 96%, rgba(255, 230, 170, 0.14), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(220, 190, 120, 0.9) 0 2px, rgba(160, 130, 70, 0.9) 2px 4px),
+    linear-gradient(180deg, transparent 0 52%, rgba(120, 90, 40, 0.9) 52% 58%, transparent 58%),
+    linear-gradient(38deg, transparent 44%, rgba(150, 110, 60, 0.95) 45% 53%, transparent 54%);
+  clip-path: polygon(52% 0, 64% 0, 56% 46%, 100% 58%, 96% 78%, 4% 78%, 0 58%, 44% 46%);
+  border-radius: 0;
+}
+/* a polaroid camera, wrist strap dangling */
+.tool-camera .tool-art {
+  border-radius: 4px;
+  background:
+    radial-gradient(circle at 50% 44%, #10201c 0 22%, #3a5a50 23% 30%, #1c2a24 31% 44%, transparent 45%),
+    linear-gradient(180deg, #d8d4c4 0%, #b0ac9c 52%, #7a786c 78%, #4a4840 79% 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.toybox-action[aria-pressed="true"].tap-handle { color: #ffd98a; }
+
+/* ── result: scrawled in soap on the tiles, on the right flank ── */
+.toybox-result {
+  /* sits above the tool row, measured from the row's own height so the two
+     can never collide again */
+  position: absolute; bottom: calc(var(--tool-row) + 8px); right: 12px; z-index: 2;
+  width: 26%; text-align: right;
+  color: rgba(228, 240, 216, 0.9); font-style: normal;
+  font-size: 1rem; line-height: 1.35; min-height: 1.2em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+/* ── pip's chalk tally on the tiles, beside the tap ── */
+.sink-tally {
+  position: absolute; top: 62px; left: 196px; z-index: 2;
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+.sink-tally span {
+  font-size: 0.72rem; letter-spacing: 0.1em; color: rgba(228, 240, 216, 0.62);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+}
+.sink-tally::before {
+  content: ''; display: block; width: 44px; height: 3px; margin-bottom: 2px;
+  background: repeating-linear-gradient(90deg, rgba(228, 240, 216, 0.5) 0 2px, transparent 2px 5px);
+  opacity: 0.7;
+}
+
+/* the travellers' sign-off on the note */
+.raison-sign {
+  display: block; margin-top: 9px; text-align: right;
+  font-size: 0.78rem; color: #55503e; transform: rotate(-0.6deg);
+}
+
+/* ── the note pinned behind the tap ── */
+.toybox-raison { display: none; }
+.toybox-raison.open {
+  display: flex; align-items: flex-start; justify-content: center;
+  position: absolute; inset: 36px 0 0 0; z-index: 6;
+  padding: 18px 20px;
+  background: rgba(5, 9, 7, 0.74);
+  backdrop-filter: none;
+}
+.toybox-raison:not(.open) { pointer-events: none; }
+.toybox-raison-inner {
+  width: min(300px, 100%);
+  border: 1px solid #4a5850; border-radius: 3px;
+  background: linear-gradient(175deg, #dcd8c4 0%, #c2bca4 60%, #a8a088 100%);
+  color: #33322c;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(120, 110, 80, 0.25);
+  padding: 13px 16px 15px; margin-bottom: 12px;
+  transform: rotate(-1deg);
+  position: relative;
+}
+/* a bent nail holds the note */
+.toybox-raison-inner::before {
+  content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+  width: 8px; height: 9px; border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 35% 30%, #b8c2c4, #5a6466 70%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.toybox-raison-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.toybox-raison-name { letter-spacing: 0.1em; font-size: 0.86rem; color: #4a4636; }
+.toybox-raison-close {
+  background: linear-gradient(180deg, #39463f, #242e28);
+  border: 1px solid #4a5850; color: #b8c8bc; border-radius: 50%; cursor: pointer;
+  min-width: 28px; min-height: 28px; line-height: 26px; padding: 0;
+  font-family: inherit;
+  box-shadow: 0 1px 0 rgba(207, 216, 200, 0.15), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+.toybox-raison-close:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7); }
+.toybox-raison-body { line-height: 1.6; }
+
+/* focus stays visible in the damp */
+.toybox-help:focus-visible, .toybox-exit:focus-visible,
+.toybox-raison-close:focus-visible, .shelf-obj:focus-visible,
+.toybox-action:focus-visible, .toybox-crew-btn:focus-visible {
+  outline: 2px solid var(--bulb);
+  outline-offset: 2px;
+}
+
+/* stillness for reduced-motion visitors */
+@media (prefers-reduced-motion: reduce) {
+  .toybox-motes, .tap-spout-hole::after { animation: none; }
+  .shelf-obj, .toybox-action, .tap-handle .tool-art,
+  .toybox-crew-btn, .toybox-crew-btn .toybox-crew-art,
+  .toybox-titlebar-name, .toybox-titlebar-sub,
+  .toybox-raison-inner {
+    transition: none;
+    transform: none;
+  }
+  .tap-handle:active .tool-art,
+  .tap-handle[aria-pressed="true"] .tool-art { transform: rotate(90deg); }
+}
+
+/* Rainy Day (s.shadowOn) - the shelf's own weather.
+   Wet porcelain: the green-glaze tiles go cold, the lime goes pale blue,
+   the bulb light stops being golden. A real palette shift read from the
+   room's own tokens, not an opacity wash. */
+.machine.shadow-on .toybox-app {
+  --porc-hi: #9fb4c2;
+  --porc: #4e6672;
+  --porc-lo: #1c2830;
+  --tile: #243038;
+  --grout: #121c22;
+  --rust: #6a4a52;
+  --lime: #c2d0d8;
+  --bulb: #cfe0ee;
+  --wire: #5c666c;
+}

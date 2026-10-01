@@ -1,0 +1,75 @@
+/* frame-room.css — rooms slotted into the machine's screen as live frames.
+   The bezel chrome (room, carvings, scars, dock console) stays anchored;
+   the framed app fills .screen-stage exactly, under a slim titlebar.
+   (.screen-stage keeps its machine.css absolute inset:0 — it is the
+   containing block for everything slotted here; never re-position it.) */
+
+/* the titlebar strip over a framed room */
+.poppet-titlebar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  z-index: 6;
+  background: linear-gradient(180deg, rgba(10, 7, 4, 0.92), rgba(10, 7, 4, 0.75));
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  font-family: Georgia, serif;
+}
+.poppet-titlebar-name {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d4af65;
+}
+.poppet-titlebar-sub {
+  flex: 1;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: rgba(212, 175, 55, 0.45);
+}
+.poppet-titlebar-leave {
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: transparent;
+  color: #d4af65;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  padding: 3px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.poppet-titlebar-leave:hover { background: rgba(212, 175, 55, 0.12); }
+
+/* the frame fills the stage under the titlebar */
+.lab-frame-wrap {
+  position: absolute;
+  inset: 0;
+  padding-top: 30px;
+  box-sizing: border-box;
+  background: #060403;
+}
+.lab-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── the desktop's home room: the room IS the desktop view now, filling the
+   screen where the space/barycenter constellation lived. The desktop's own
+   furniture (dock console, status line, settings cog, orbit rail) floats above. ── */
+.home-room-frame-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #161009;
+}
+.home-room-frame-wrap .home-room-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

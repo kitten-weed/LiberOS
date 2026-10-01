@@ -1,0 +1,283 @@
+/* ============================================================================
+   boot.css — State 1 (Boot screen)
+
+   Black void. A central deep-red `#4a0000` rectangle holds the boot
+   face: serif "LIBER.OS" and an "ENTER" sub-rectangle, clickable,
+   advances to State 2. (Spec C.2 / audit minor 1: void + central
+   rectangle, ENTER, terse machine voice — no corporate line.)
+
+   THE INK LIFT (aesthetic sweep §2). The plates stay deep red — that
+   is the machine's own alarm colour and the material is not the bug.
+   The INK was: `#aa0000` on `#4a0000` rendered 2.10:1, which made the
+   front door the least legible screen in the machine, and the `enter`
+   CTA the faintest thing in it. One ink now carries the whole face —
+   `--boot-ink`, a hot alarm red measured at 5.25:1 on the plate and
+   6.17:1 on the loading field. Disabled never drops below 3:1, because
+   a control you cannot read is not a control you can consent to.
+   ============================================================================ */
+
+:root {
+  --boot-ink: #ff5a3c;       /* the face ink — 5.25:1 on #4a0000 */
+  --boot-ink-dim: #e07a5f;   /* the patron line — 6.48:1 on #2a0000 */
+}
+
+.state-boot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  color: var(--boot-ink);
+  font-family: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+  position: relative;
+}
+
+.state-boot .boot-rect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(2rem, 6cqi, 4rem) clamp(3rem, 10cqi, 6.5rem);
+  background: #4a0000;
+  border: 2px solid #5a0000;
+  box-shadow:
+    inset 0 0 0 1px #3a0000,
+    inset 0 0 40px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(74, 0, 0, 0.7);
+  text-align: center;
+}
+
+.state-boot .boot-title {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--boot-ink);
+  text-shadow:
+    0 0 12px rgba(255, 90, 60, 0.45),
+    0 0 24px rgba(255, 90, 60, 0.28);
+  margin-bottom: 1.4em;
+  text-align: center;
+  line-height: 1;
+}
+
+.state-boot .boot-start {
+  display: inline-block;
+  margin-top: 0;
+  min-height: 44px;
+  padding: 0.7em 1.6em;
+  background: #3a0000;
+  border: 2px solid #8a2020;
+  color: var(--boot-ink);
+  font-family: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+
+.state-boot .boot-start:hover,
+.state-boot .boot-start:focus {
+  background: #6a1010;
+  color: #fff0eb;
+  border-color: var(--boot-ink);
+  outline: none;
+}
+
+.state-boot .boot-start:active {
+  background: #aa0000;
+  color: #2a0000;
+}
+
+/* Disabled is a state, not an absence: 0.62 keeps the CTA at ~3:1 so the
+   door is still legible while the warning holds it shut. */
+.state-boot .boot-start:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.state-boot .boot-rect { position: relative; }
+
+.state-boot .boot-sub {
+  margin: 0 0 1em;
+  font-style: italic;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  color: #d8a0a0;
+}
+
+.state-boot .boot-help {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5; /* a floating affordance rides above the text flow */
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #3a0000;
+  border: 2px solid #5a0000;
+  color: #d8a0a0;
+  font-family: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.state-boot .boot-help:hover,
+.state-boot .boot-help:focus {
+  background: #5a0000;
+  color: #ff8080;
+  border-color: #aa0000;
+  outline: none;
+}
+.state-boot .boot-help:focus-visible,
+.state-boot .boot-start:focus-visible {
+  outline: 2px solid #ff8080;
+  outline-offset: 2px;
+}
+
+/* ─── the warning screen — a ?-style panel above the computer ─── */
+.boot-warning {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.78);
+}
+.boot-warning.open { display: flex; }
+
+.boot-warning-card {
+  width: min(560px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #4a0000 0%, #2a0000 100%);
+  border: 2px solid #5a0000;
+  box-shadow:
+    inset 0 0 0 1px #3a0000,
+    inset 0 0 40px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba(0, 0, 0, 0.8);
+  padding: 18px 22px 16px;
+  font-family: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+  color: #e8c0c0;
+}
+
+.boot-warning-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #5a0000;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.boot-warning-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #ff8080;
+  font-weight: 700;
+}
+
+.boot-warning-close {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #8a2020;
+  color: #f0c0c0;
+  font-size: 1.3rem;
+  line-height: 40px;
+  cursor: pointer;
+}
+.boot-warning-close:hover,
+.boot-warning-close:focus {
+  background: #5a0000;
+  color: #fff;
+  outline: none;
+}
+.boot-warning-close:focus-visible {
+  outline: 2px solid #ff8080;
+  outline-offset: 2px;
+}
+
+.boot-warning .boot-letter {
+  max-height: 50vh;
+  overflow-y: auto;
+  text-align: left;
+  font-size: clamp(1rem, 1.5vw, 1.05rem);
+  line-height: 1.55;
+  color: #e8b8b8;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #5a0000;
+  padding: 1em 1.2em;
+  margin-bottom: 1em;
+}
+.boot-warning .boot-letter p { margin: 0 0 0.8em; }
+.boot-warning .boot-letter p:last-child { margin-bottom: 0; }
+.boot-warning .boot-letter a { color: #ff8080; }
+
+.boot-warning .boot-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  color: #f0c0c0;
+  cursor: pointer;
+  user-select: none;
+}
+.boot-warning .boot-consent input {
+  width: 1.35em;
+  height: 1.35em;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+  accent-color: #ff5a3c;
+  outline-offset: 3px;
+}
+.boot-warning .boot-consent input:focus-visible {
+  outline: 2px solid #ffb0a0;
+}
+
+.state-boot .boot-consent {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: 1.2em;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  color: #d8a0a0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.state-boot .boot-consent input {
+  width: 1.1em;
+  height: 1.1em;
+  accent-color: #aa0000;
+}
+
+/* ── Phosphor title (ported from the retired pixi-boot canvas) ─────────
+   One authored treatment, DOM-rendered: the pixel-grid room marks, the
+   warm phosphor fill, and the letterpress glow now live on the existing
+   .boot-rect / .boot-title instead of a second renderer. */
+.boot-rect {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(125, 32, 24, 0.12) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(90deg, rgba(125, 32, 24, 0.12) 0 1px, transparent 1px 18px);
+}
+.boot-title {
+  color: #ff684c;
+  text-shadow:
+    0 0 12px rgba(255, 104, 76, 0.55),
+    0 0 24px rgba(255, 104, 76, 0.32),
+    0 0 48px rgba(255, 104, 76, 0.18);
+}
+.boot-sub { color: #d58a73; letter-spacing: 0.28em; }
+.boot-start { color: #ffb09a; letter-spacing: 0.3em; }

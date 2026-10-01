@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Memory — the sand tray</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css?v=lamp1"/>
+  <link rel="stylesheet" href="src/features/memory/memory.css?v=bench61"/>
+  <link rel="stylesheet" href="src/features/memory/house.css"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+
+            <header class="mem-statusbar">
+              <span class="st-name">memory</span>
+              <span class="st-sub" id="mem-sub">the tray holds what words will not</span>
+              <span class="st-spacer"></span>
+              <button type="button" class="mem-btn" id="mem-studies-btn" aria-label="what this room rests on">studies</button>
+              <button type="button" class="mem-btn" id="mem-new" aria-label="empty the tray and begin again">new tray</button>
+              <button type="button" class="mem-btn" id="mem-exit" aria-label="leave">×</button>
+            </header>
+
+            <div class="mem-stage">
+
+              <!-- the 3d room: the tray, the toy box wall, the machines, the photo wall -->
+              <div class="mem-field" id="mem-field" aria-hidden="true"></div>
+
+              <div class="mem-flatnote" id="mem-flatnote" hidden>flat room — this surface runs without WebGL</div>
+
+              <!-- labels for figures in the sand (projected from 3d) -->
+              <div class="mem-labels" id="mem-labels" aria-hidden="true"></div>
+
+              <!-- the saved photographs: strung polaroids on a wire under
+                   the room's name plate — the tray keeps them in view -->
+              <div class="mem-string" id="mem-string" aria-label="the photographs the tray remembers"></div>
+
+              <!-- the tool rail: hand, stick, shovel, brush, bucket -->
+              <nav class="mem-tools" id="mem-tools" role="toolbar" aria-label="the tray tools"></nav>
+
+              <!-- the paint palette: opens beside the rail when the brush is armed -->
+              <div class="mem-palette" id="mem-palette" role="radiogroup" aria-label="paint colours" hidden></div>
+
+              <!-- the red photo button -->
+              <button class="mem-shutter" id="mem-shutter" type="button" title="photograph the tray">
+                <i aria-hidden="true"></i><span>press</span>
+              </button>
+
+              <!-- the photo preview + story + save prompt -->
+              <div class="mem-photo" id="mem-photo" role="dialog" aria-modal="true" aria-labelledby="mem-photo-title" hidden inert>
+                <div class="mem-photo-card">
+                  <div class="mem-photo-head" id="mem-photo-title">— the developing tray —</div>
+                  <img class="mem-photo-img" id="mem-photo-img" alt="photograph of the sand tray" hidden/>
+                  <div class="mem-photo-label-row" id="mem-photo-label-row" hidden>
+                    <label class="mem-photo-label-text" for="mem-photo-label">write it on the back</label>
+                    <input class="mem-photo-label" id="mem-photo-label" type="text" maxlength="60"
+                           autocomplete="off" spellcheck="false" placeholder="e.g. the house before"/>
+                  </div>
+                  <div class="mem-photo-actions" id="mem-photo-actions">
+                    <button type="button" class="mem-btn" id="mem-photo-retake">take another</button>
+                    <button type="button" class="mem-btn" id="mem-photo-save">hang it</button>
+                    <button type="button" class="mem-btn mem-x" id="mem-photo-close" aria-label="cancel">×</button>
+                  </div>
+                  <div class="mem-photo-story" id="mem-photo-story"></div>
+                </div>
+              </div>
+
+              <!-- what this room rests on -->
+              <div class="mem-raison" id="mem-raison" role="dialog" aria-label="what this room rests on" hidden inert>
+                <div class="mem-raison-inner">
+                  <div class="mem-raison-head">
+                    <span>what this room rests on</span>
+                    <button type="button" class="mem-btn mem-x" id="mem-raison-close" aria-label="close">×</button>
+                  </div>
+                  <div class="mem-raison-body">
+                    <p>this is a sand tray, of the kind a therapist keeps on a low table: a bound tray of damp sand and a box of figures beside it. you place the people, animals and things of your world in the sand and arrange them until the arrangement says what you could not.</p>
+                    <p>dora kalff — who built her trays for children who had no words yet — called it “the free and protected space”: nothing you set in the sand is judged, nothing is interpreted to your face, and no figure is more approved than another. the three photographs on the wall are yours to fill in order, one scene, then a second, then a third — a story in three frames.</p>
+                    <p>the machines along the back wall are this room's own magic: things shrink or grow, and one of them prints what a figure looks like when only its shadow is believed. use them as the story asks.</p>
+                    <p>when all three frames hang, the room shows you the story and offers it to the journal as one artifact.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script type="module" src="src/features/memory/memory.js?v=bench67"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'memory',
+    traveller: 'THE MEMORY ROOM',
+    accent: '#d8b877',
+    title: 'the sand tray',
+    lines: ['Arrange the figures on the sand, then take photos. Three photos make a story you can keep in the journal.']
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,406 @@
+/* shadow.css — Rainy Day: the machine's weather-state for the heavy visits.
+   The screen dims, the light goes cool and low, rain falls behind the
+   glass, and the heart slows. Everything still works; nothing expires.
+
+   ONE OWNER: s.shadowOn. src/shadow.js applies the class from state on
+   every page; the desktop icon (src/rainy.js), the settings panel, and the
+   sea room's secret key all write that one key.
+
+   The per-room skins live in each room's OWN stylesheet, never here —
+   covenant Q.1: rooms do not share style files. What lives here is the
+   machine itself and the desktop's weather furniture. */
+
+.shadow-on {
+  animation: rainy-breathe 9s ease-in-out infinite;
+}
+
+@keyframes rainy-breathe {
+  0%, 100% { filter: brightness(0.97) saturate(0.85) hue-rotate(6deg); }
+  50%      { filter: brightness(0.91) saturate(0.8) hue-rotate(9deg); }
+}
+
+/* The LED goes soft blue and keeps a slow heart — present, never urgent. */
+.shadow-on .led {
+  background: radial-gradient(circle, #9cc8e4 0%, #41729a 50%, #12253a 100%) !important;
+  box-shadow:
+    0 0 8px rgba(120, 170, 210, 0.65),
+    0 0 18px rgba(90, 140, 190, 0.32) !important;
+  animation: rainy-led 4.6s ease-in-out infinite;
+}
+
+@keyframes rainy-led {
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50%      { opacity: 0.95; transform: scale(1.06); }
+}
+
+/* The bezel's tell: a low pulse in the vent. */
+.shadow-on .bezel::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  background: #7fb2d4;
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px rgba(110, 168, 207, 0.7),
+    0 0 16px rgba(110, 168, 207, 0.32);
+  animation: rainy-pulse 3.6s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes rainy-pulse {
+  0%   { opacity: 0.3;  transform: translateX(-50%) scale(0.85); }
+  18%  { opacity: 0.8;  transform: translateX(-50%) scale(1.14); }
+  40%  { opacity: 0.42; transform: translateX(-50%) scale(1); }
+  60%  { opacity: 0.75; transform: translateX(-50%) scale(1.1); }
+  100% { opacity: 0.3;  transform: translateX(-50%) scale(0.85); }
+}
+
+/* ─── Rainy Day: the weather is IN the house.
+
+   It falls in the room behind the CRT, in that room's own window — put
+   there by `src/features/crt-room/`, in that room's material. The desk side
+   is what the machine does about it: the room's light goes cold, the tube
+   takes water, the box runs a cool vignette, and the plastic is out in it.
+
+     1. the room's light goes cold         body.rainy-on .room
+     2. the desk side carries no window    (the weather lives in the CRT room)
+     3. the room's own vignette, cooled     body.rainy-on::before
+     4. water the machine let in            .screen-stage::before/::after
+     5. the monitor, damp and cooled        .machine.shadow-on
+
+   There is deliberately no rain, no sky and no sill in this file: a second
+   window at the desk would put the weather in two places. See
+   `liberdev/room-hooks.md` — one object, never two. ─── */
+
+/* 1. the room cools. The warm floor glow and the faint ceiling light both
+      swing toward the window, and the void behind the machine loses its
+      red cast.
+
+      `:not(.crt-room-open)` on purpose. This is the DESK's backdrop, and it
+      is opaque. While the gaze is open, `.room` is lifted to z-index 1 over
+      the room's own scene (z-index 0) — so if this kept painting, the
+      weather would put an opaque sheet over the very room you looked into,
+      and rain would hide the house it is falling in. crt-room.css says
+      `background: transparent` for the same state; this file loads later at
+      equal specificity, so it has to say it too. */
+body.rainy-on:not(.crt-room-open) .room {
+  background:
+    radial-gradient(ellipse at 50% 104%, rgba(96, 148, 194, 0.22) 0%, rgba(0, 0, 0, 0) 34%),
+    radial-gradient(ellipse at 50% 110%, rgba(28, 52, 76, 0.2) 0%, rgba(0, 0, 0, 0) 50%),
+    radial-gradient(ellipse at 50% 95%, rgba(12, 28, 46, 0.6) 0%, rgba(0, 0, 0, 0) 35%),
+    radial-gradient(ellipse at 50% 30%, rgba(24, 46, 68, 0.16) 0%, rgba(0, 0, 0, 0) 45%),
+    radial-gradient(ellipse at 50% 55%, rgba(4, 10, 18, 0.78) 0%, rgba(0, 0, 0, 1) 75%),
+    #000205;
+  filter: hue-rotate(4deg) saturate(0.8) brightness(0.93);
+  transition: background 1.2s ease, filter 1.2s ease;
+}
+
+/* 3. water on the tube. The glass is wet, not rained-through: a few beads
+      sitting on it and a slow run of water down its face. The stage's own
+      pseudo-elements are free and, being absolutely positioned, stay out
+      of its flex layout — nothing the room draws ever moves. */
+.shadow-on .screen-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  background:
+    radial-gradient(circle at 22% 16%, rgba(206, 232, 248, 0.2) 0 2.2px, rgba(206, 232, 248, 0) 2.8px),
+    radial-gradient(circle at 31% 24%, rgba(206, 232, 248, 0.13) 0 1.4px, rgba(206, 232, 248, 0) 1.9px),
+    radial-gradient(circle at 67% 11%, rgba(206, 232, 248, 0.16) 0 1.8px, rgba(206, 232, 248, 0) 2.4px),
+    radial-gradient(circle at 78% 38%, rgba(206, 232, 248, 0.12) 0 2.6px, rgba(206, 232, 248, 0) 3.2px),
+    radial-gradient(circle at 12% 52%, rgba(206, 232, 248, 0.14) 0 1.6px, rgba(206, 232, 248, 0) 2.2px),
+    radial-gradient(circle at 44% 71%, rgba(206, 232, 248, 0.1) 0 2px, rgba(206, 232, 248, 0) 2.6px),
+    radial-gradient(circle at 88% 68%, rgba(206, 232, 248, 0.11) 0 1.5px, rgba(206, 232, 248, 0) 2px),
+    radial-gradient(circle at 58% 88%, rgba(206, 232, 248, 0.1) 0 2.4px, rgba(206, 232, 248, 0) 3px),
+    radial-gradient(ellipse at 50% 24%, rgba(130, 176, 212, 0.07) 0%, rgba(40, 80, 118, 0.06) 48%, rgba(4, 10, 18, 0.52) 100%);
+}
+
+.shadow-on .screen-stage::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  z-index: 9;
+  background-image:
+    linear-gradient(99deg, rgba(196, 226, 248, 0.1) 0 1px, rgba(196, 226, 248, 0) 1px),
+    linear-gradient(99deg, rgba(196, 226, 248, 0.06) 0 1px, rgba(196, 226, 248, 0) 1px);
+  background-size: 41px 137px, 71px 211px;
+  background-position: 0 0, 23px 67px;
+  animation: rainy-run 3.4s linear infinite;
+}
+@keyframes rainy-run {
+  from { background-position: 0 0, 23px 67px; }
+  to   { background-position: 0 137px, 23px 278px; }
+}
+
+/* 3. (see the header — no window and no full-room rain at the desk. The
+      weather is in the house, in the CRT room's own window; the only water
+      loose on this side is what the machine let in: the beads and runnels
+      on the tube, above.) */
+
+/* the cool vignette: the room's own fell away with the warmth */
+body.rainy-on::before {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 0, 0, 0) 30%,
+    rgba(4, 12, 22, calc(var(--scan-vignette) * 0.7)) 88%,
+    rgba(2, 8, 16, calc(var(--scan-vignette) + 0.34)) 100%
+  );
+}
+
+.shadow-on .corruption-scars .scar {
+  background: rgba(10, 18, 28, 0.9) !important;
+  box-shadow: 0 0 4px rgba(110, 160, 200, 0.35);
+}
+
+/* the monitor itself is out in the weather: plastic cold and damp, the
+   plate's brass gone grey. The machine's FACE is not filmed over — an
+   overlay across the tube reads as an opaque pane taped to the screen
+   ("why is the monitor not transparent"). Weather changes how the machine
+   is lit and what colour its plastic is, never how much of the room you can
+   see through it. */
+.shadow-on .liber-plate,
+.shadow-on .bezel {
+  filter: saturate(0.6) brightness(0.86) hue-rotate(7deg);
+}
+
+/* ─── the desktop's weather furniture ────────────────────────────────────
+   One icon, top-left, facing the `look behind` label across the desk.
+   Off it is a plain tile; on it shines, and the label becomes the way out
+   — the same icon, no explanation asked or given. ─── */
+
+.rainy-toggle {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 5px 12px 5px 9px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: #9aa8b4;
+  background: rgba(9, 13, 18, 0.72);
+  border: 1px solid #2e3a46;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.35s, border-color 0.35s, box-shadow 0.35s, background 0.35s;
+}
+
+.rainy-toggle:hover,
+.rainy-toggle:focus-visible {
+  color: #d8e6f0;
+  border-color: #6f8ea6;
+  outline: none;
+}
+
+.rainy-toggle-glyph {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  filter: drop-shadow(0 0 4px rgba(140, 190, 225, 0.45));
+}
+
+.rainy-toggle-label {
+  white-space: nowrap;
+}
+
+/* on: the icon is lit */
+body.rainy-on .rainy-toggle {
+  color: #bcdcf0;
+  border-color: #5d8cae;
+  background: rgba(14, 26, 38, 0.82);
+  box-shadow: 0 0 16px rgba(120, 170, 210, 0.28);
+}
+
+/* the ticker: one line, always true, never an instruction */
+.rainy-ticker {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 55;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 0.09em;
+  color: #7a95a8;
+  background: rgba(6, 10, 16, 0.88);
+  border-top: 1px solid #24313d;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+body.rainy-on .rainy-ticker {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* The line yields, never the helplines: at 439px the ticker's sentence
+   ellipsizes so `hard nights` stays reachable at the right edge. */
+.rainy-ticker-line {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rainy-ticker-answer {
+  flex: none;
+  color: #a8c6dc;
+}
+
+/* the one asked question — asked once a night, never twice */
+.rainy-ask {
+  position: fixed;
+  left: 12px;
+  top: 64px;
+  z-index: 61;
+  width: min(300px, calc(100vw - 24px));
+  box-sizing: border-box;
+  padding: 12px 14px 13px;
+  font-family: 'EB Garamond', Georgia, serif;
+  color: #cadcea;
+  background: linear-gradient(180deg, #14202c 0%, #0a1119 100%);
+  border: 1px solid #3d5568;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.rainy-ask.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.rainy-ask-q {
+  font-style: italic;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.rainy-ask-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rainy-ask-btn {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: #bcd4e4;
+  background: rgba(20, 34, 48, 0.9);
+  border: 1px solid #4a6b84;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.rainy-ask-btn:hover,
+.rainy-ask-btn:focus-visible {
+  color: #eaf4fb;
+  border-color: #8fb6d2;
+  background: rgba(28, 46, 64, 0.95);
+  outline: none;
+}
+
+.rainy-ask-else {
+  display: block;
+  margin-top: 9px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  color: #7fa0b8;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+
+.rainy-ask-else:hover,
+.rainy-ask-else:focus-visible {
+  color: #cfe4f2;
+  outline: none;
+}
+
+/* the helplines, one click closer — always reachable while it rains */
+.rainy-help {
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  color: #8fb0c8;
+  background: none;
+  border: 0;
+  padding: 0 0 0 10px;
+  margin-left: 10px;
+  border-left: 1px solid #24313d;
+  cursor: pointer;
+  flex: none;
+}
+
+.rainy-help:hover,
+.rainy-help:focus-visible {
+  color: #dceaf4;
+  outline: none;
+}
+
+/* ─── the sea room's secret key still toggles the same owner ─── */
+.shadow-prompt {
+  position: fixed;
+  bottom: 30px;
+  right: 18px;
+  background: rgba(8, 16, 24, 0.92);
+  border: 1px solid #3d6a8a;
+  color: #a8c8e0;
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  padding: 4px 10px;
+  letter-spacing: 0.15em;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.shadow-prompt.show { opacity: 0.85; }
+
+/* ─── motion with consent ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* the weather still happens; it just holds still */
+  .shadow-on { animation: none; filter: brightness(0.94) saturate(0.83) hue-rotate(7deg); }
+  .shadow-on .led { animation: none; opacity: 0.85; }
+  .shadow-on .bezel::after { animation: none; opacity: 0.55; }
+  /* the rain still falls; it just holds still in the panes */
+  .shadow-on .screen-stage::after { animation: none; }
+  .rainy-toggle,
+  .rainy-ticker,
+  .rainy-ask { transition: none; }
+}

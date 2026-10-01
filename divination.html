@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Divination — Arcana</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css"/>
+  <link rel="stylesheet" href="src/features/divination/house.css"/>
+  <link rel="stylesheet" href="src/features/divination/divination.css?v=arc1"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+  <link rel="stylesheet" href="styles/frame-room.css?v=slot2"/>
+  <link rel="stylesheet" href="src/features/arcana/arcana.css?v=fill1"/>
+  <style>
+    /* the terminal fills the screen-stage below the machine's titlebar */
+    .screen-stage .arcana { position: absolute; inset: 0; top: 40px; }
+  </style>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <header class="divination-titlebar">
+              <span class="divination-titlebar-name">arcana</span>
+              <span class="divination-titlebar-sub" id="divination-sub">the word table · the coins · the deck</span>
+              <button class="divination-exit" type="button" id="arc-studies-shell" aria-label="what this room rests on" style="margin-left:auto;min-width:auto;padding:4px 14px;border-radius:3px;">studies</button>
+              <button class="divination-exit" type="button" id="divination-exit" aria-label="leave">×</button>
+            </header>
+            <!-- the modular arcana app: the ASCII terminal replaces the tent.
+                 Its own arc-exit button is retired here; the shell's titlebar
+                 is the way out, same as every other room. -->
+            <div class="arcana" data-state="arcana">
+
+              <div class="arc-stage">
+
+                <!-- the glyph wall: flat DOM layer; the Pixi field paints over it -->
+                <div class="arc-field" id="arc-field" aria-hidden="true"></div>
+
+                <div class="arc-bootlog" id="arc-bootlog" aria-hidden="true"></div>
+                <div class="arc-flatnote" id="arc-flatnote" hidden>flat field — the room runs without canvas</div>
+
+                <!-- ── the menu ─────────────────────────────────────────────────── -->
+                <div class="arc-win win-menu" id="arc-win-menu" role="dialog" aria-label="select an option">
+                  <div class="arc-win-head">
+                    <span class="win-glyph">✦</span>
+                    <span>select an option</span>
+                    <span class="win-spacer"></span>
+                    <button type="button" class="win-x" aria-label="close the menu">×</button>
+                  </div>
+                  <div class="arc-win-body">
+                    <pre class="menu-title" id="arc-title" aria-hidden="true"></pre>
+                    <div class="menu-opts" role="group" aria-label="the three games">
+                      <button type="button" class="menu-opt" data-game="assoc">
+                        <span class="opt-key">[1]</span>
+                        <span class="opt-glyph">≡</span>
+                        <span class="opt-label">free association</span>
+                        <span class="opt-hint">sixty seconds, then the reading</span>
+                      </button>
+                      <button type="button" class="menu-opt" data-game="iching">
+                        <span class="opt-key">[2]</span>
+                        <span class="opt-glyph">☰</span>
+                        <span class="opt-label">i ching</span>
+                        <span class="opt-hint">three coins, six lines, bottom first</span>
+                      </button>
+                      <button type="button" class="menu-opt" data-game="tarot">
+                        <span class="opt-key">[3]</span>
+                        <span class="opt-glyph">✧</span>
+                        <span class="opt-label">tarot</span>
+                        <span class="opt-hint">78 cards, rider–waite–smith</span>
+                      </button>
+                    </div>
+                    <div class="menu-foot">everything you keep lands on the shelf with the rest of the house's artifacts. everything else goes back in the stack.</div>
+                  </div>
+                </div>
+
+                <!-- ── the studies window ───────────────────────────────────────── -->
+                <div class="arc-win win-studies" id="arc-win-studies" role="dialog" aria-label="what this room rests on" hidden inert>
+                  <div class="arc-win-head">
+                    <span class="win-glyph">§</span>
+                    <span>what this room rests on</span>
+                    <span class="win-spacer"></span>
+                    <button type="button" class="win-x" aria-label="close the studies">×</button>
+                  </div>
+                  <div class="arc-win-body" id="arc-studies-body"></div>
+                </div>
+
+                <!-- ── the reading pane (each game writes here) ─────────────────── -->
+                <div class="arc-win win-read" id="arc-win-read" role="dialog" aria-label="the reading" hidden inert>
+                  <div class="arc-win-head">
+                    <span class="win-glyph">☾</span>
+                    <span>the reading</span>
+                    <span class="win-spacer"></span>
+                    <button type="button" class="win-x" aria-label="close the reading">×</button>
+                  </div>
+                  <div class="arc-win-body" id="arc-read-body"></div>
+                </div>
+
+                <!-- ── the work window: slate, input, cast, re-presentations ────── -->
+                <div class="arc-win win-work" id="arc-win-work" role="dialog" aria-label="the table" hidden inert>
+                  <div class="arc-win-head">
+                    <span class="win-glyph">≡</span>
+                    <span>the table</span>
+                    <span class="win-spacer"></span>
+                    <button type="button" class="win-x" aria-label="close the table">×</button>
+                  </div>
+                  <div class="arc-win-body" id="arc-work-body"></div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── the keep prompt (shared, like the tent's) ───────────────────── -->
+            <div class="arc-keep" id="arc-keep" role="dialog" aria-modal="true" aria-labelledby="arc-keep-title" hidden inert>
+              <div class="arc-keep-box">
+                <div class="arc-keep-head" id="arc-keep-title">— keep it? —</div>
+                <div class="arc-keep-body" id="arc-keep-body"></div>
+                <div class="arc-keep-actions">
+                  <button type="button" class="arc-btn" id="arc-keep-keep">keep</button>
+                  <button type="button" class="arc-btn" id="arc-keep-discard">discard</button>
+                  <button type="button" class="arc-btn" id="arc-keep-close" aria-label="cancel">×</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script>
+    /* the shell titlebar leaves; the terminal's own exit is retired */
+    (function () {
+      var exit = document.getElementById('divination-exit');
+      if (exit) exit.addEventListener('click', function () {
+        if (history.length > 1) history.back(); else location.href = 'desktop.html';
+      });
+      var studies = document.getElementById('arc-studies-shell');
+      if (studies) studies.addEventListener('click', function () {
+        // arcana's window manager exposes no global; raise the window the way its own button would
+        var w = document.getElementById('arc-win-studies');
+        if (w) { w.hidden = false; w.removeAttribute('inert'); }
+      });
+    })();
+  </script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/features/arcana/assoc.data.js"></script>
+  <script src="src/features/arcana/studies.data.js"></script>
+  <script src="src/features/arcana/tarot.data.js"></script>
+  <script src="src/features/arcana/iching.data.js"></script>
+  <script src="src/features/arcana/viz.js"></script>
+  <script src="src/features/arcana/arcana.js"></script>
+  <script src="src/features/arcana/tarot.js"></script>
+  <script src="src/features/arcana/iching.js"></script>
+  <script src="src/features/arcana/assoc.js"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'arcana',
+    traveller: 'ARCANA',
+    accent: '#8cc85f',
+    title: 'the arcana table',
+    lines: ['Type a question, then draw. Cards and coins can be kept — a kept draw becomes an artifact, and you can relate it to your poppet.']
+  });
+</script>
+</body>
+</html>

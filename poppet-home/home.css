@@ -1,0 +1,314 @@
+/* Poppet Home — the little room */
+@font-face {
+  font-family: 'Germania';
+  src: url('../fonts/Germania.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Deutsch Gothic';
+  src: url('../fonts/Deutsch.ttf') format('truetype');
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: #0b0906;
+  font-family: 'Germania', 'Courier New', monospace;
+  color: #d8cfc0;
+  overflow: hidden;
+}
+.doorway {
+  position: fixed;
+  inset: 14px;
+  border-radius: 60px 60px 10px 10px;
+  border: 6px solid;
+  border-image: linear-gradient(135deg, #6a4a22 0%, #a87838 25%, #d4af37 45%, #a87838 60%, #5a3a18 100%) 1;
+  background: #0b0906;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 2px rgba(20, 12, 4, 0.8),
+    inset 0 0 40px rgba(0, 0, 0, 0.75),
+    0 20px 60px rgba(0, 0, 0, 0.8);
+}
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#view.grabbing { cursor: grabbing; }
+.plate {
+  position: absolute;
+  top: 22px;
+  left: 26px;
+  font-family: 'Deutsch Gothic', Georgia, serif;
+  font-size: 1.02rem;
+  letter-spacing: 0.24em;
+  color: #e8dcc0;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+.plate .sub {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  color: rgba(232, 220, 192, 0.5);
+  margin-top: 4px;
+}
+.hint {
+  position: absolute;
+  left: 26px;
+  bottom: 16px;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: rgba(216, 207, 192, 0.45);
+  pointer-events: none;
+}
+.artifact-view { font-size: 1.05rem; }
+.keep-count {
+  position: absolute;
+  top: 64px;
+  right: 24px;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  color: rgba(212, 175, 55, 0.75);
+  pointer-events: none;
+}
+.keep-card {
+  position: absolute;
+  right: 24px;
+  bottom: 56px;
+  width: 250px;
+  background: linear-gradient(180deg, #efe6cd 0%, #e2d5b4 100%);
+  border: 2px solid #6a5218;
+  border-radius: 4px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7);
+  padding: 10px 12px;
+  color: #241708;
+  display: none;
+  pointer-events: auto;
+}
+.keep-card.open { display: block; }
+.keep-card b { display: block; font-size: 0.82rem; letter-spacing: 0.12em; color: #6a4a1a; margin-bottom: 6px; }
+.kc-tag {
+  display: inline-block;
+  font-size: 0.5rem;
+  letter-spacing: 0.24em;
+  color: #efe6cd;
+  background: #6a4a1a;
+  border-radius: 2px;
+  padding: 2px 7px 1px;
+  margin-bottom: 6px;
+}
+.kc-tag-divination { background: #4a5a20; color: #cfe89f; }   /* arcana: moonfly ink */
+.kc-tag-crossing { background: #2a4a3a; color: #a8d8c0; }     /* vanir: sealed glass */
+.kc-tag-games { background: #8a3226; color: #f0d8b0; }        /* whimsy wow: ticket red */
+.kc-tag-sea { background: #245a5a; color: #a8dcd8; }
+.kc-quote {
+  font-style: italic;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: #3a2c18;
+  border-left: 2px solid rgba(106, 82, 24, 0.5);
+  padding: 2px 0 2px 7px;
+  margin: 3px 0 5px;
+}
+.kc-relate {
+  margin-top: 7px;
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  padding: 5px 0;
+  border: 1px solid #8a6a2a;
+  background: rgba(212, 175, 55, 0.14);
+  color: #4a3410;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.kc-relate:hover { background: rgba(212, 175, 55, 0.32); }
+.kc-btns { display: flex; gap: 6px; margin-top: 7px; }
+.kc-btns button {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  padding: 5px 0;
+  border: 1px solid #6a5218;
+  background: transparent;
+  color: #241708;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.kc-btns .kc-open { border-color: #8a6a2a; background: rgba(212, 175, 55, 0.14); }
+.kc-btns button:hover { background: rgba(106, 82, 24, 0.15); }
+
+/* ── the artifact window: a large, traveller-themed sheet for reading a keep in full ── */
+.artifact-view {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 5, 2, 0.72);
+  backdrop-filter: blur(2px);
+  font-family: 'Germania', Georgia, serif;
+}
+.artifact-view[hidden] { display: none; }
+.av-sheet {
+  position: relative;
+  width: min(560px, 86%);
+  max-height: 84%;
+  overflow-y: auto;
+  border-radius: 6px;
+  padding: 22px 26px 18px;
+  color: #2a1c0a;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+.av-sheet.vanir    { background: linear-gradient(165deg, #0e2420 0%, #12312a 60%, #0b1d19 100%); color: #cfe6d8; border-color: #2e5a48; }
+.av-sheet.arcana   { background: linear-gradient(165deg, #131009 0%, #1c1810 100%); color: #e3c78a; border-color: #8cc85f; box-shadow: 0 0 40px rgba(140, 200, 95, 0.12), 0 30px 90px rgba(0,0,0,0.85); }
+.av-sheet.whimsy   { background: linear-gradient(165deg, #f3e2b8 0%, #e8d0a0 100%); border-color: #b03a2a; }
+.av-sheet.whimsy b, .av-sheet.whimsy .av-label { color: #7a2a1e; }
+.av-sheet.insight  { background: linear-gradient(165deg, #1a1e30 0%, #232a44 100%); color: #ccd4ee; border-color: #4a5a8a; }
+.av-sheet.ruby     { background: linear-gradient(165deg, #1e2a16 0%, #2a3a20 100%); color: #d0e6c0; border-color: #5a7a3a; }
+.av-sheet.scribe   { background: linear-gradient(178deg, #efe6cd 0%, #e2d5b4 100%); }
+.av-sheet.riason   { background: linear-gradient(165deg, #e8e4da 0%, #d8d2c4 100%); }
+.av-sheet.petey    { background: linear-gradient(165deg, #26221e 0%, #332c24 100%); color: #d8cfc0; border-color: #5a4a38; }
+.av-sheet.wander   { background: linear-gradient(165deg, #241a28 0%, #33243a 100%); color: #e0d0e8; border-color: #7a5a8a; }
+.av-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 1rem; line-height: 1;
+  color: inherit; opacity: 0.6; padding: 4px;
+}
+.av-close:hover { opacity: 1; }
+.av-kind {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  padding: 3px 10px 2px;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.28);
+}
+.av-sheet.whimsy .av-kind, .av-sheet.scribe .av-kind, .av-sheet.riason .av-kind { background: rgba(122, 42, 30, 0.12); }
+.av-sheet h2 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+}
+.av-date { font-size: 0.72rem; opacity: 0.65; letter-spacing: 0.12em; margin-bottom: 16px; display: block; }
+.av-section { margin: 18px 0 8px; }
+.av-label {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.26em;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+.av-text {
+  font-size: 1.08rem;
+  line-height: 1.65;
+  font-style: italic;
+}
+.av-finding {
+  border-left: 2px solid currentColor;
+  padding: 8px 0 8px 14px;
+  margin: 12px 0;
+  opacity: 0.97;
+}
+.av-finding b { display: block; font-size: 1rem; letter-spacing: 0.06em; margin-bottom: 3px; }
+.av-finding .whisper { font-style: italic; font-size: 0.95rem; opacity: 0.9; }
+.av-finding .balm { font-size: 0.9rem; opacity: 0.82; margin-top: 5px; line-height: 1.55; }
+.av-qa { margin: 10px 0; font-size: 0.98rem; line-height: 1.55; }
+.av-qa .q { font-size: 0.64rem; letter-spacing: 0.18em; opacity: 0.65; display: block; margin-bottom: 2px; }
+.av-polaroids { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 4px; }
+.av-polaroid {
+  background: #f4eee0;
+  padding: 8px 8px 26px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+  transform: rotate(-2deg);
+  max-width: 150px;
+}
+.av-polaroid:nth-child(2) { transform: rotate(1.6deg); }
+.av-polaroid:nth-child(3) { transform: rotate(-0.8deg); }
+.av-polaroid img { display: block; width: 132px; height: 132px; object-fit: cover; filter: sepia(0.12) contrast(1.02); }
+.av-polaroid i { display: block; font-style: normal; font-size: 0.72rem; letter-spacing: 0.1em; color: #3a2c18; margin-top: 7px; text-align: center; }
+.av-shot {
+  display: block;
+  width: 100%;
+  border: 3px solid #1a1208;
+  border-radius: 3px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  image-rendering: pixelated;
+}
+.av-glyph {
+  font-size: 2rem;
+  line-height: 1;
+  margin: 6px 0 2px;
+  color: #8cc85f;
+  text-shadow: 0 0 18px rgba(140, 200, 95, 0.45);
+}
+.av-orientation { font-size: 0.74rem; letter-spacing: 0.3em; opacity: 0.8; margin-bottom: 12px; }
+.av-keywords { margin-top: 12px; font-size: 0.8rem; opacity: 0.8; letter-spacing: 0.05em; }
+.av-actions { display: flex; gap: 10px; margin-top: 20px; }
+.av-actions button {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  padding: 11px 0;
+  cursor: pointer;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+}
+.av-actions button:hover { background: rgba(255, 255, 255, 0.08); }
+.av-sheet.whimsy .av-actions button:hover, .av-sheet.scribe .av-actions button:hover, .av-sheet.riason .av-actions button:hover { background: rgba(122, 42, 30, 0.1); }
+.av-actions .av-relate { opacity: 0.92; }
+.kc-row { display: flex; justify-content: space-between; gap: 8px; font-size: 0.68rem; line-height: 1.4; padding: 2px 0; }
+.kc-row span { color: rgba(36, 23, 8, 0.55); letter-spacing: 0.1em; flex-shrink: 0; }
+.kc-swatch { display: inline-block; width: 10px; height: 10px; border: 1px solid rgba(0,0,0,0.4); border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.kc-close {
+  margin-top: 7px;
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  padding: 5px 0;
+  border: 1px solid #6a5218;
+  background: transparent;
+  color: #241708;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.kc-close:hover { background: rgba(106, 82, 24, 0.15); }
+.keep-journal { display: none; }   /* the journal is not on display here — keeps speak from the orbit */
+.keep-journal .kj-head {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: rgba(212, 175, 55, 0.85);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 2px 4px 4px;
+}
+.keep-journal .kj-row {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 4px 4px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.keep-journal .kj-row:hover { background: rgba(212, 175, 55, 0.12); }
+.keep-journal .kj-n {
+  font-size: 0.6rem;
+  color: rgba(212, 175, 55, 0.8);
+  min-width: 14px;
+  text-align: right;
+}
+.keep-journal .kj-main { display: flex; flex-direction: column; }
+.keep-journal .kj-main b { font-size: 0.62rem; color: #e8dcc0; letter-spacing: 0.06em; }
+.keep-journal .kj-main i { font-style: normal; font-size: 0.54rem; color: rgba(232, 220, 192, 0.5); }
+.keep-journal .kj-empty { font-size: 0.58rem; color: rgba(232, 220, 192, 0.5); padding: 6px 4px; line-height: 1.4; }

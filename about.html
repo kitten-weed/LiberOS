@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>About — Iris Mappa</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="src/features/about/about.css"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <div class="about-app" data-state="about">
+
+              <div class="about-slate">
+                <div class="about-graticule">
+                  <svg viewBox="0 0 400 300" preserveAspectRatio="none">
+                    <defs>
+                      <pattern id="about-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(180,200,210,0.15)" stroke-width="0.5"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#about-grid)"/>
+                    <line x1="200" y1="0" x2="200" y2="300" stroke="rgba(180,200,210,0.25)" stroke-width="0.5" stroke-dasharray="2 4"/>
+                    <line x1="0" y1="150" x2="400" y2="150" stroke="rgba(180,200,210,0.25)" stroke-width="0.5" stroke-dasharray="2 4"/>
+                    <circle cx="200" cy="150" r="80" fill="none" stroke="rgba(180,200,210,0.2)" stroke-width="0.5"/>
+                    <circle cx="200" cy="150" r="120" fill="none" stroke="rgba(180,200,210,0.15)" stroke-width="0.5"/>
+                    <text x="206" y="146" fill="rgba(180,200,210,0.5)" font-size="6" font-family="serif">42°N</text>
+                    <text x="206" y="160" fill="rgba(180,200,210,0.5)" font-size="6" font-family="serif">71°W</text>
+                  </svg>
+                </div>
+
+                <div class="about-content">
+                  <div class="about-header">
+                    <div class="about-name">IRIS MAPPA</div>
+                    <div class="about-sub">— a cartographer of the liminal —</div>
+                  </div>
+
+                  <div class="about-body">
+                    <div class="about-section">
+                      <div class="about-section-title">where you are</div>
+                      <div class="about-section-body">liber vacui is a haunted operating system. it lives in a dark room. the room contains one beige CRT monitor. the monitor contains 10 visitors, each with their own material, their own obsession. you have found one of them.</div>
+                    </div>
+
+                    <div class="about-section">
+                      <div class="about-section-title">how to move</div>
+                      <div class="about-section-body">the cartridge dock on the case selects which visitor you are sitting with. seat a cartridge and its lamp burns. the question mark, when present, is a door back to wanderlust.</div>
+                    </div>
+
+                    <div class="about-section">
+                      <div class="about-section-title">what persists</div>
+                      <div class="about-section-body">your artifacts, your cohort, and the state of the room are kept in local storage. there is no account. there is no cloud. there is only this device, in this room.</div>
+                    </div>
+
+                    <div class="about-section">
+                      <div class="about-section-title">who was iris</div>
+                      <div class="about-section-body">iris mappa was a cartographer. she did not own the map. she drew it because it was the only way she had found to look at where she was. she has moved on. the maps remain, and wanderlust paints the borders now.</div>
+                    </div>
+                  </div>
+
+                  <div class="about-footer">
+                    <span class="about-coord">scale: 1:1</span>
+                    <span class="about-coord">datum: local</span>
+                    <span class="about-coord">epoch: now</span>
+                  </div>
+
+                  <div class="about-meta-nav">
+                    <a class="about-nav-link" href="desktop.html">view the constellation →</a>
+                    <a class="about-nav-link" href="settings.html">settings →</a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+</body>
+</html>

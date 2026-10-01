@@ -1,0 +1,1319 @@
+/* ============================================================================
+   poppet-rework.css — THE FORGEWORK. Full replacement of the old rework
+   sheet: the poppet room is Physius's forge-press table, ported 1:1 from
+   the approved forgework study. Two views (the table straight down, the
+   vessel pip), the numeral rail built into the table's top edge, the
+   well deck beneath the vessel, grey industrial palette, Germania voice,
+   Deutsch blackletter numerals.
+
+   Fonts live at ../../../fonts/. The CRT/bezel/machine chrome belongs to
+   styles/machine.css — this sheet styles only the room inside the tube.
+   ============================================================================ */
+
+@font-face {
+  font-family: 'Oceanside Typewriter';
+  src: url('../../../fonts/OceansideTypewriter.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Shine Typewriter';
+  src: url('../../../fonts/ShineTypewriter.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  /* the blackletter: plate numerals + stamped marks of the press */
+  font-family: 'Deutsch Gothic';
+  src: url('../../../fonts/Deutsch.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  /* the app voice: labels, buttons, every user-facing word */
+  font-family: 'Germania';
+  src: url('../../../fonts/Germania.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* the room fills the tube below the titlebar (the machine bezel is machine.css).
+   The !important inset is the app adaptation of the study's 58px header gap:
+   the sigil titlebar is the machine header here, so the table starts under it. */
+.poppet-app { position: absolute !important; inset: 46px 0 0 !important; box-sizing: border-box !important; overflow: hidden !important; padding: 0 !important; background: none !important; }
+
+/* the legacy stone app stays retired: sigil.css's .sigil-frame display rule
+   would otherwise beat the [hidden] attribute */
+.sigil-frame { display: none !important; }
+
+.forge-stage {
+  position: absolute;
+  inset: 0;
+  font-family: 'Germania', 'Oceanside Typewriter', 'VT323', 'Courier New', monospace;
+  color: #c3c9d3;
+  overflow: hidden;
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M2 22l3-7 12-12 4 4-12 12z' fill='%23b6beca' stroke='%233a4048'/><path d='M2 22l3-7 4 4z' fill='%23e6ebf2' stroke='%233a4048'/><path d='M17 3l4 4 2-2-4-4z' fill='%236a7482' stroke='%233a4048'/></svg>") 2 22, auto;
+}
+.forge-stage button { cursor: inherit; }
+.forge-stage ::-webkit-scrollbar { width: 10px; height: 10px; }
+.forge-stage ::-webkit-scrollbar-track { background: rgba(30, 34, 40, 0.4); border-radius: 6px; }
+.forge-stage ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #8a94a2 0%, #3a414c 100%); border-radius: 6px; border: 2px solid rgba(26, 10, 5, 0.6); }
+.forge-stage ::-webkit-scrollbar-thumb:hover { filter: brightness(1.25); }
+.forge-stage, .forge-stage * { scrollbar-width: thin; scrollbar-color: #6a7482 rgba(30, 34, 40, 0.4); }
+
+/* the forge bed: dark stone floor, ember seam under the vessel */
+.forge-bed {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 34% 22% at 76% 78%, rgba(150, 175, 205, 0.10) 0%, rgba(140, 160, 190, 0.04) 55%, rgba(0,0,0,0) 75%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 2px, rgba(0,0,0,0) 2px 56px),
+    linear-gradient(180deg, #121317 0%, #0d0e11 46%, #08090b 100%);
+}
+.forge-bed::after {
+  /* charcoal flecks kicked from the grindstone */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle 2px at 14% 82%, rgba(185, 192, 202, 0.25) 0%, rgba(0,0,0,0) 100%),
+    radial-gradient(circle 1.5px at 22% 90%, rgba(185, 192, 202, 0.2) 0%, rgba(0,0,0,0) 100%),
+    radial-gradient(circle 2px at 84% 30%, rgba(180, 188, 198, 0.16) 0%, rgba(0,0,0,0) 100%),
+    radial-gradient(circle 1.5px at 9% 34%, rgba(180, 188, 198, 0.14) 0%, rgba(0,0,0,0) 100%);
+}
+
+/* the stamped header plate — engraved brass, machine chrome */
+.forge-head {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  text-align: center;
+  pointer-events: none;
+}
+.forge-head b {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  color: #9aa6b5;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.8), 0 0 14px rgba(150, 170, 200, 0.15);
+}
+.forge-head small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  color: rgba(154, 166, 181, 0.55);
+}
+
+/* ── the summon bell + exit tag: system furniture, copper key ────────── */
+.forge-summon {
+  position: absolute;
+  top: 14px;
+  right: 118px;
+  z-index: 40;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #343b45;
+  border-radius: 50%;
+  color: #b6c0cc;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(226, 234, 244, 0.5) 0%, rgba(226, 234, 244, 0) 55%),
+    linear-gradient(180deg, #67717d 0%, #48525e 60%, #2b313a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 226, 180, 0.4),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  padding: 0;
+}
+.forge-summon:hover { color: #e6ebf2; filter: brightness(1.12); }
+.forge-summon:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 3px; }
+.forge-summon[aria-expanded="true"] {
+  color: #f0d6a5;
+  box-shadow: inset 0 1px 0 rgba(255, 226, 180, 0.4), 0 0 12px rgba(150, 175, 205, 0.35), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.forge-summon-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  color: rgba(226, 232, 240, 0);
+  white-space: nowrap;
+  transition: color 0.15s ease;
+  pointer-events: none;
+}
+.forge-summon:hover .forge-summon-label,
+.forge-summon:focus-visible .forge-summon-label { color: rgba(226, 232, 240, 0.8); }
+
+/* the exit: a brass inventory tag on a chain — stamped DESKTOP */
+.forge-exit {
+  position: absolute;
+  top: 8px;
+  right: 34px;
+  z-index: 40;
+  width: 64px;
+  height: 44px;
+  padding: 20px 0 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.forge-exit::before {
+  /* the chain */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 16px;
+  background: repeating-linear-gradient(180deg, #7e8794 0 3px, rgba(0,0,0,0) 3px 5px);
+}
+.forge-exit::after {
+  content: 'desktop';
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 62px;
+  padding: 5px 0 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: #171a20;
+  background: linear-gradient(160deg, #bcc3cd 0%, #8b95a2 70%, #6d7682 100%);
+  border: 1px solid #3c434d;
+  border-radius: 3px;
+  box-shadow:inset 0 1px 0 rgba(240, 244, 250, 0.55), 0 2px 5px rgba(0,0,0,0.6);
+  transition: transform 0.15s ease;
+}
+.forge-exit:hover::after { transform: translateX(-50%) rotate(1deg) translateY(2px); }
+.forge-exit:focus-visible::after { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+
+/* ── the two views ────────────────────────────────────────────────────
+   THE TABLE: seen straight down through its closed glass lid — the
+   numeral rail built into the table's top edge, the parchment on the
+   platen (the drawing surface), the plate rack lying flat below, the
+   status strip along the bed. THE PIP: a locked inspection feed into
+   Vessel 04, where the poppet grows. */
+.forge-app {
+  position: absolute;
+  inset: 58px 10px 8px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+}
+
+.poppet-worktable {
+  width: min(1320px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "table pip"
+    "status actions";
+  gap: 10px 16px;
+  min-height: 0;
+}
+
+/* ── view 1: the table, straight down, lid closed ─────────────────── */
+.forge-tableview {
+  grid-area: table;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "chips"
+    "dr"
+    "platen"
+    "bed";
+  gap: 6px;
+  padding: 8px 12px 8px;
+  border: 1px solid #16100a;
+  border-radius: 6px;
+  background:
+    radial-gradient(ellipse 55% 42% at 42% 40%, rgba(150, 170, 200, 0.05) 0%, rgba(0,0,0,0) 70%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, rgba(0,0,0,0) 1px 42px),
+    linear-gradient(180deg, #1a1d23 0%, #12141a 62%, #0d0e12 100%);
+  box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.6);
+}
+
+/* the closed glass lid: spans the whole table view */
+.forge-lid {
+  position: absolute;
+  inset: 8px;
+  z-index: 9;
+  pointer-events: none;
+  border-radius: 5px;
+  background:
+    radial-gradient(ellipse 58% 38% at 26% 10%, rgba(232, 240, 246, 0.09) 0%, rgba(0,0,0,0) 58%),
+    linear-gradient(115deg, rgba(232, 240, 246, 0.05) 0%, rgba(0,0,0,0) 32%, rgba(232, 240, 246, 0.03) 82%, rgba(232, 240, 246, 0.07) 100%);
+  border: 1px solid rgba(216, 228, 238, 0.16);
+  box-shadow: inset 0 0 46px rgba(6, 10, 14, 0.42);
+}
+.forge-lid::after {
+  /* the numeral rail is the table's header now — the lid keeps its glass,
+     the stamped label retired */
+  display: none;
+}
+
+/* bay 1 (in-table): the platen — parchment under its clamp.
+   A size container so the sheet can size itself from the row height. */
+.forge-platen {
+  grid-area: platen;
+  min-width: 0;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding-top: 6px;
+}
+
+.poppet-clamp {
+  /* rides the sheet: the press grips the parchment, not the bay */
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 112%;
+  height: 26px;
+  z-index: 8;
+  background:
+    linear-gradient(180deg, #454a52 0%, #33373e 55%, #1b1e24 100%);
+  border: 1px solid #120c08;
+  border-radius: 4px 4px 2px 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(226, 232, 240, 0.22),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.55),
+    0 3px 8px rgba(0, 0, 0, 0.6);
+}
+.poppet-clamp i {
+  position: absolute;
+  top: 24px;
+  width: 54px;
+  height: 20px;
+  background: linear-gradient(180deg, #34383f 0%, #1f2228 100%);
+  border: 1px solid #100a06;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.55);
+}
+.poppet-clamp i:first-child { left: 10%; }
+.poppet-clamp i:last-child { right: 10%; }
+.forge-grip {
+  position: absolute;
+  top: 26px;
+  right: 14px;
+  font-family: 'Shine Typewriter', 'Segoe Script', cursive;
+  font-size: 0.95rem;
+  color: rgba(110, 70, 30, 0.8);
+  transform: rotate(3deg);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* the parchment: the canvas IS the sheet */
+.poppet-sheet {
+  position: relative;
+  /* width from the platen row's height: sheet ≈ w·(1224/1080) + 40px inner
+     padding + 24px top margin + 26px clamp overhang must fit 100cqh */
+  width: min(980px, 96%);
+  margin-top: 8px;
+  padding: 10px 10px 22px;
+  background:
+    radial-gradient(circle 240px at 30% 18%, rgba(255, 244, 214, 0.5) 0%, rgba(0,0,0,0) 70%),
+    repeating-linear-gradient(94deg, rgba(120, 84, 40, 0.05) 0 2px, rgba(0,0,0,0) 2px 6px),
+    linear-gradient(180deg, #e8d5a8 0%, #ddc696 62%, #d2b884 100%);
+  border-radius: 2px 2px 6px 6px;
+  box-shadow:
+    inset 0 0 26px rgba(122, 86, 40, 0.22),
+    0 14px 26px rgba(0, 0, 0, 0.62);
+  /* the hang-curl at the foot */
+  transform: perspective(900px) rotateX(1.6deg);
+  transform-origin: top center;
+}
+@supports (width: 1cqh) {
+  .poppet-sheet {
+    /* inside the tube the row height is the binding constraint: size the
+       sheet from the platen row directly, ratio locked 1080:1224 */
+    width: auto;
+    height: min(calc(100cqh - 34px), 1120px);
+    max-width: 96%;
+    aspect-ratio: 1080 / 1224;
+  }
+}
+.poppet-sheet::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: -10px;
+  height: 18px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 0, 0, 0.4) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.poppet-stack {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 480 / 544;
+  margin: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+.poppet-stack canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.poppet-guide { opacity: 0.2; }
+.poppet-template { opacity: 0.95; mix-blend-mode: multiply; }
+.poppet-draw { filter: drop-shadow(0.4px 0.4px 0 rgba(255, 245, 216, 0.4)); }
+
+.forge-presstag {
+  /* rides the parchment's foot: a press stamp in the sheet's own margin */
+  position: absolute;
+  bottom: 5px;
+  right: 14px;
+  z-index: 3;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: rgba(110, 70, 30, 0.55);
+  opacity: 0.85;
+  transform: rotate(-0.5deg);
+  white-space: nowrap;
+}
+
+/* the plate legend rides the table view: chips under the rack */
+.poppet-plates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── the well: instruments + inks — now the deck beneath the locked
+   lens, under the vessel; the whole table belongs to the platen ── */
+.forge-plates {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.forge-plates .forge-well { flex: 0 0 auto; }
+
+/* the short-tube tier: the deck keeps every control, tightly packed */
+@container (max-height: 470px) {
+  .forge-plates { gap: 4px; }
+  .forge-well { gap: 5px; padding: 7px 10px 7px; }
+  .forge-well-label { font-size: 0.6rem; }
+  .forge-ehead b { font-size: 0.95rem; }
+  .poppet-tools { gap: 6px; }
+  .poppet-tool { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+  .poppet-palette { height: 52px; overflow-x: auto; }
+  .forge-ink { width: 34px; height: 44px; flex: 0 0 auto; }
+  .poppet-keep { min-height: 46px; font-size: 1.05rem; }
+  .vessel-controls { min-height: 48px; }
+  .vessel-dream, .vessel-incinerator { min-height: 48px; font-size: 0.9rem; }
+  .vessel-lens { font-size: 0.62rem; }
+}
+
+/* the machine bed furniture: the legend rail is dissolved into the
+   tableview grid — chips across the top edge, doctrine under them,
+   the 3D plate bed below the platen */
+.forge-rackband {
+  display: contents;
+}
+.forge-rackband .forge-plates-dom { grid-area: chips; }
+.forge-rackband .forge-doctrine { grid-area: dr; }
+.forge-rackband .forge-rack3d {
+  grid-area: bed;
+  width: 100%;
+  height: 54px;
+}
+
+/* the active plate's doctrine: stamped directly beneath its numeral chip */
+.forge-doctrine {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+.forge-doctrine .poppet-arch {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: #8fa3bd;
+  text-shadow: 0 0 10px rgba(150, 175, 205, 0.2);
+}
+.forge-doctrine small {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+  line-height: 1.25;
+  color: rgba(195, 201, 211, 0.55);
+}
+
+/* each plate: an etched zinc sheet, raised when active, stamped when laid.
+   With the 3D rack live the DOM legend steps back to a caption row. */
+.poppet-plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 7px 12px 7px 14px;
+  font-family: inherit;
+  font-size: 1.02rem;
+  text-align: left;
+  color: #c3c9d3;
+  background:
+    repeating-linear-gradient(90deg, rgba(226, 232, 240, 0.03) 0 2px, rgba(0,0,0,0) 2px 7px),
+    linear-gradient(180deg, #33373e 0%, #282c33 70%, #1d2026 100%);
+  border: 1px solid #16100a;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 0 rgba(226, 232, 240, 0.14),
+    0 3px 6px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+.poppet-plate .plate-num {
+  flex: 0 0 auto;
+  font-family: 'Deutsch Gothic', Georgia, serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  color: rgba(154, 166, 181, 0.8);
+  width: 2.4em;
+}
+.poppet-plate b {
+  flex: 1 1 auto;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.poppet-plate .plate-state {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: rgba(195, 201, 211, 0.6);
+  white-space: nowrap;
+}
+.forge-3d-live .forge-plates-dom .poppet-door-state { font-size: 0.8rem; opacity: 0.8; }
+.poppet-plate:hover { filter: brightness(1.12); }
+.poppet-plate:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+
+.poppet-plate.active {
+  transform: translateX(10px);
+  color: #e6ebf2;
+  border-color: #6a7482;
+  box-shadow:
+    inset 0 1px 0 rgba(228, 234, 242, 0.22),
+    0 4px 10px rgba(0, 0, 0, 0.55),
+    0 0 14px rgba(150, 175, 205, 0.14);
+}
+.poppet-plate.active::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  width: 4px;
+  height: 60%;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: #6a7482;
+  box-shadow: 0 0 8px rgba(150, 175, 205, 0.5);
+}
+.poppet-plate.saved .plate-state { color: #9aa6b5; }
+.poppet-plate.saved b { color: #dfe4ec; }
+.poppet-plate.locked { opacity: 0.45; cursor: default; filter: saturate(0.6); }
+.poppet-plate.is-others-plate.active { border-color: #a48ad4; }
+.poppet-plate.is-others-plate.active::before { background: #a48ad4; box-shadow: 0 0 8px rgba(164, 138, 212, 0.5); }
+
+/* ── the tool rows: round mechanical push-buttons, labels stamped beside */
+.poppet-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  flex: 0 0 auto;
+}
+.forge-toolrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.poppet-tool {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  min-height: 54px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c3c9d3;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(228, 234, 242, 0.28) 0%, rgba(228, 234, 242, 0) 52%),
+    linear-gradient(180deg, #474d56 0%, #30353d 58%, #1e2228 100%);
+  border: 1px solid #0e0a06;
+  box-shadow:
+    inset 0 2px 0 rgba(226, 232, 240, 0.2),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.55),
+    0 3px 5px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.poppet-tool svg { display: block; }
+.poppet-tool:hover { filter: brightness(1.14); }
+.poppet-tool:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.4); }
+.poppet-tool[aria-pressed="true"] {
+  color: #e6ebf2;
+  border-color: #6a7482;
+  box-shadow:
+    inset 0 2px 0 rgba(228, 234, 242, 0.25),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(150, 175, 205, 0.28),
+    0 3px 5px rgba(0, 0, 0, 0.55);
+}
+.poppet-tool:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 3px; }
+/* the tool names live in the aria-labels — nothing printed on the table */
+.forge-toollabel { display: none; }
+.forge-toolrow { gap: 0; }
+
+/* the ink tray: the plate's pens scattered loose on the bench — pick one
+   up and its ink is chosen (the journal's grammar; no pots, no rows) */
+.poppet-palette {
+  position: relative;
+  height: 70px;
+  overflow: hidden;
+}
+.forge-ink { position: absolute; width: 46px; height: 60px; }
+/* the pot retired: the pen is the ink */
+.poppet-swatch { display: none; }
+.poppet-swatch[aria-pressed="true"] {
+  outline: 2px solid #6a7482;
+  outline-offset: 2px;
+}
+.poppet-swatch:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+.forge-inkpen {
+  background: none;
+  border: none;
+  padding: 2px 1px;
+  cursor: pointer;
+  line-height: 0;
+  filter: drop-shadow(1px 2px 1px rgba(0,0,0,0.5));
+  transition: transform 0.14s ease;
+}
+.forge-inkpen:hover { transform: translateY(-2px); }
+.forge-inkpen:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; border-radius: 4px; }
+.forge-ink.armed .forge-inkpen { transform: translateY(-7px) rotate(-14deg) scale(1.12); filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6)) drop-shadow(0 0 7px rgba(200, 215, 235, 0.6)); }
+.forge-ink.armed::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 5px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #93a4bc;
+  box-shadow: 0 0 8px rgba(150, 175, 205, 0.7);
+}
+.forge-inkpen svg { display: block; }
+@keyframes forge-drift0 { from { translate: 0 0; } to { translate: 3px -2px; } }
+@keyframes forge-drift1 { from { translate: 0 0; } to { translate: -3px 2px; } }
+@keyframes forge-drift2 { from { translate: 0 0; } to { translate: 2px 3px; } }
+@media (prefers-reduced-motion: reduce) {
+  .forge-ink { animation: none !important; }
+}
+
+/* the tool well: two columns — instruments left, inks filling right */
+.forge-well {
+  flex: 0 0 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto auto auto;
+  grid-template-areas:
+    "label head"
+    "tools tools"
+    "inks inks"
+    "spots spots"
+    "keep keep"
+    "hint hint";
+  gap: 8px 14px;
+  padding: 10px 12px 8px;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, rgba(0,0,0,0) 1px 5px),
+    linear-gradient(180deg, #1b1e24 0%, #101318 100%);
+  border: 1px solid #0e0906;
+  border-radius: 4px;
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.forge-well > .forge-well-label { grid-area: label; align-self: start; margin-top: 6px; }
+.forge-well > .forge-ehead { grid-area: head; }
+.forge-well > .poppet-tools { grid-area: tools; display: grid; grid-template-columns: repeat(5, max-content); justify-content: space-between; justify-items: start; gap: 8px 4px; }
+.forge-well > .poppet-palette { grid-area: inks; }
+.forge-well > .forge-spots { grid-area: spots; }
+.forge-well > .poppet-keep { grid-area: keep; width: 100%; }
+.forge-well > .forge-hint { grid-area: hint; display: none; }
+.forge-well-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: rgba(154, 166, 181, 0.55);
+}
+/* the face spots: named regions for the doll's animatable face */
+.forge-spots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.forge-spots-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.26em;
+  color: rgba(201, 228, 165, 0.6);
+  margin-right: 2px;
+}
+.forge-spot {
+  font-family: inherit;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  background: rgba(26, 29, 36, 0.9);
+  color: #c3c9d3;
+  border: 1px solid #3a424e;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.forge-spot i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px dashed rgba(201, 228, 165, 0.7);
+  background: transparent;
+}
+.forge-spot:hover { border-color: #6a7482; color: #e6ebf2; }
+.forge-spot[aria-pressed="true"] {
+  border-color: #dfe4ec;
+  color: #f0f3f7;
+  background: #232a34;
+}
+.forge-spot[aria-pressed="true"] i { background: rgba(232, 240, 248, 0.8); border-style: solid; }
+.forge-spot.has-ink i { background: rgba(201, 228, 165, 0.85); border-style: solid; }
+.forge-ehead { display: block; }
+.forge-ehead b { display: block; font-size: 1.02rem; font-weight: 700; letter-spacing: 0.14em; color: #e6ebf2; }
+.forge-ehead .poppet-arch { display: block; margin-top: 2px; font-size: 0.78rem; font-style: italic; line-height: 1.35; color: #8fa3bd; }
+.poppet-keep {
+  min-height: 58px;
+  padding: 8px 20px;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #e6ebf2;
+  background: linear-gradient(180deg, #48525e 0%, #333c46 100%);
+  border: 1px solid #6a7482;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(228, 234, 242, 0.3), 0 3px 8px rgba(0,0,0,0.55);
+}
+.poppet-keep:hover { filter: brightness(1.15); }
+.poppet-keep:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+
+.forge-hint {
+  margin: 0;
+  font-family: 'Shine Typewriter', 'Segoe Script', cursive;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  color: rgba(195, 201, 211, 0.55);
+}
+
+/* ── bay 2 (3D): the plate rack — canvas host on the machine bed ── */
+.forge-rack3d {
+  position: relative;
+  width: 100%;
+  height: 54px;
+}
+.forge-rack3d canvas { pointer-events: none; }
+/* the legend: a full-width rail of plates, one per quarter — built
+   into the table's top edge */
+.forge-3d-live .forge-plates-dom {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.forge-3d-live .forge-plates-dom .poppet-plate {
+  min-height: 56px;
+  padding: 6px 8px;
+  font-size: 1.02rem;
+  gap: 6px;
+  justify-content: center;
+  transform: none;
+}
+/* the plate names must never truncate — small caps stay readable on the rail */
+.forge-3d-live .forge-plates-dom .poppet-plate b {
+  letter-spacing: 0.04em;
+  font-size: 0.92rem;
+  text-overflow: clip;
+  overflow: visible;
+}
+.forge-3d-live .forge-plates-dom .poppet-plate.active { transform: translateY(-2px); }
+.forge-3d-live .forge-plates-dom .poppet-plate.active::before { display: none; }
+.forge-3d-live .forge-plates-dom .plate-num { width: auto; font-size: 1.7rem; }
+.forge-3d-live .forge-plates-dom .poppet-door-state { font-size: 0.72rem; }
+
+/* ── bay 3: vessel 04 — the 3D jar over its lens caption ──────────── */
+/* the pip frame: the jar fills the feed. A size container so the deck can
+   compact itself when the tube runs short. */
+.forge-vessel {
+  container-type: size;
+  overflow: hidden;
+}
+.vessel-jar {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 44px;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.65));
+}
+/* the pip's 3D feed fills the jar frame; CSS jar is fallback-only */
+#vessel-jar3d {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+#vessel-jar3d canvas { pointer-events: none; }
+.forge-3d-live .vessel-jar-css,
+.forge-3d-live .vessel-plinth { visibility: hidden; }
+.forge-3d-live .vessel-jar::before,
+.forge-3d-live .vessel-jar::after { display: none; }
+/* the 3D feed streams the composite; the flat DOM copy steps aside
+   (visibility keeps the canvases drawable for the CanvasTexture) */
+.forge-3d-live .poppet-comp { visibility: hidden; }
+
+.vessel-lens {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: rgba(154, 166, 181, 0.6);
+}
+.vessel-lens::before { content: '◌ '; color: #6a7482; }
+
+/* ── view 2: the pip — a locked inspection feed into Vessel 04 ────── */
+.forge-vessel {
+  grid-area: pip;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 10px;
+  border: 1px solid #16100a;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #15171d 0%, #0e0f13 100%);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.65);
+}
+/* glass: two shells, mouth ring, foot ring */
+.vessel-jar::before {
+  content: '';
+  position: absolute;
+  inset: 6% 10% 7%;
+  border-radius: 14% 14% 20% 20% / 8% 8% 12% 12%;
+  background:
+    radial-gradient(ellipse 60% 34% at 50% 4%, rgba(232, 240, 248, 0.30) 0%, rgba(0,0,0,0) 60%),
+    linear-gradient(100deg, rgba(220, 230, 240, 0.10) 0%, rgba(220, 230, 240, 0.02) 22%, rgba(0,0,0,0) 40%, rgba(220, 230, 240, 0.05) 78%, rgba(220, 230, 240, 0.12) 100%);
+  border: 1px solid rgba(214, 226, 236, 0.22);
+  box-shadow:
+    inset 0 0 30px rgba(10, 20, 26, 0.5),
+    inset -8px 0 14px rgba(214, 226, 236, 0.05),
+    inset 8px 0 14px rgba(214, 226, 236, 0.06);
+  pointer-events: none;
+  z-index: 6;
+}
+.vessel-jar::after {
+  /* brass mouth ring */
+  content: '';
+  position: absolute;
+  top: 2.5%;
+  left: 14%;
+  right: 14%;
+  height: 6%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #b6bfca 0%, #767f8b 55%, #4c545e 100%);
+  border: 1px solid #3a2608;
+  box-shadow: inset 0 1px 0 rgba(240, 244, 250, 0.5), 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 7;
+}
+.vessel-foot {
+  position: absolute;
+  bottom: 0;
+  left: 16%;
+  right: 16%;
+  height: 5%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #9aa3ae 0%, #6b747f 60%, #454d57 100%);
+  border: 1px solid #3a2608;
+  box-shadow: inset 0 1px 0 rgba(240, 244, 250, 0.45), 0 3px 6px rgba(0,0,0,0.6);
+  z-index: 7;
+}
+.vessel-plinth {
+  width: min(300px, 76%);
+  height: 16px;
+  margin-top: -4px;
+  background: linear-gradient(180deg, #1b1e24 0%, #0e1014 100%);
+  border: 1px solid #060402;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(226, 232, 240, 0.1), 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* the live composite inside the jar */
+.poppet-comp {
+  position: absolute;
+  left: 13%;
+  right: 13%;
+  top: 12%;
+  bottom: 10%;
+  z-index: 3;
+}
+.poppet-comp canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.poppet-ghost { position: absolute; inset: 0; opacity: 0.45; }
+.poppet-comp.dream .poppet-ghost { opacity: 1; mix-blend-mode: screen; filter: brightness(1.3) hue-rotate(20deg); }
+.poppet-comp.is-complete { filter: drop-shadow(0 0 10px rgba(150, 175, 205, 0.25)); }
+
+.vessel-dream {
+  min-height: 54px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #c3c9d3;
+  background: none;
+  border: 1px solid rgba(164, 138, 212, 0.5);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.vessel-dream[aria-pressed="true"] { color: #e8dcf8; border-color: #a48ad4; box-shadow: 0 0 10px rgba(164, 138, 212, 0.25); }
+.vessel-dream:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+
+/* the incinerator: scrap a half-made poppet — only before it is saved */
+.vessel-incinerator {
+  min-height: 54px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: rgba(195, 201, 211, 0.65);
+  background: linear-gradient(180deg, #181b21 0%, #0f1116 100%);
+  border: 1px solid rgba(170, 60, 48, 0.55);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.vessel-incinerator:disabled { opacity: 0.38; cursor: default; }
+.vessel-incinerator:not(:disabled):hover {
+  color: #f2e2d8;
+  border-color: #c04838;
+  box-shadow: 0 0 12px rgba(192, 72, 56, 0.35), inset 0 0 8px rgba(192, 72, 56, 0.2);
+}
+.vessel-incinerator:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+.vessel-incinerator.is-armed {
+  color: #f2e2d8;
+  border-color: #c04838;
+  box-shadow: 0 0 14px rgba(192, 72, 56, 0.5), inset 0 0 10px rgba(192, 72, 56, 0.25);
+}
+.vessel-controls { display: flex; gap: 10px; align-items: stretch; }
+.vessel-controls .vessel-dream { flex: 1 1 auto; }
+.vessel-controls .vessel-incinerator { flex: 0 0 auto; }
+
+/* the status strip: the press's own gauge, under the table view */
+.forge-statusband { grid-area: status; min-width: 0; display: flex; align-items: center; }
+.forge-actionsband { grid-area: actions; min-width: 0; display: flex; align-items: center; justify-content: flex-end; }
+.forge-status {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 14px;
+  border: 1px solid rgba(122, 134, 150, 0.4);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(36, 40, 48, 0.55), rgba(15, 17, 21, 0.55));
+}
+.forge-count {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #dfe4ec;
+  white-space: nowrap;
+}
+.forge-pips {  letter-spacing: 0.35em; font-size: 0.95rem; color: #6a7482; }
+.forge-pips .pip { color: rgba(195, 201, 211, 0.35); }
+.forge-pips .pip.on { color: #9fb2cc; text-shadow: 0 0 6px rgba(150, 175, 205, 0.5); }
+.forge-next {
+  font-family: 'Shine Typewriter', 'Segoe Script', cursive;
+  font-size: 1rem;
+  color: rgba(195, 201, 211, 0.75);
+}
+
+.forge-actions { display: flex; align-items: center; gap: 10px; }
+.poppet-save-desktop, .poppet-discard {
+  min-height: 58px;
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+  color: #dfe4ec;
+  background: linear-gradient(180deg, #33373e 0%, #1b1e24 100%);
+  border: 1px solid #6a7482;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(226, 232, 240, 0.14), 0 3px 7px rgba(0,0,0,0.5);
+}
+.poppet-save-desktop:disabled, .poppet-discard:disabled { opacity: 0.4; cursor: default; }
+.poppet-save-desktop:not(:disabled):hover, .poppet-discard:not(:disabled):hover { filter: brightness(1.18); }
+.poppet-save-desktop:focus-visible, .poppet-discard:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+.poppet-save-desktop:not(:disabled) {
+  color: #e6ebf2;
+  background: linear-gradient(180deg, #48525e 0%, #333c46 100%);
+  box-shadow: inset 0 1px 0 rgba(228, 234, 242, 0.3), 0 3px 8px rgba(0,0,0,0.55), 0 0 12px rgba(150, 175, 205, 0.14);
+}
+
+/* ── the seal: appears when all four plates are laid ─────────────────── */
+/* a wax-seal coin: deep gold, letterpressed, breathing quietly */
+.poppet-seal {
+  min-height: 58px;
+  padding: 8px 26px;
+  font-family: 'Deutsch Gothic', Georgia, serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #1a1206;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 236, 170, 0.85) 0%, rgba(255, 236, 170, 0) 42%),
+    radial-gradient(circle at 50% 50%, #e8c565 0%, #c9a13c 55%, #8a6a2a 100%);
+  border: 1px solid #5a3a10;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: inset 0 2px 0 rgba(255, 244, 200, 0.65), inset 0 -4px 8px rgba(60, 40, 8, 0.55), 0 3px 10px rgba(0,0,0,0.6);
+  animation: seal-breathe 2.6s ease-in-out infinite;
+}
+.poppet-seal[hidden] { display: none; }
+.poppet-seal:hover { filter: brightness(1.12); }
+.poppet-seal:focus-visible { outline: 2px solid #f5d76e; outline-offset: 3px; }
+@keyframes seal-breathe {
+  0%, 100% { box-shadow: inset 0 2px 0 rgba(255, 244, 200, 0.65), inset 0 -4px 8px rgba(60, 40, 8, 0.55), 0 3px 10px rgba(0,0,0,0.6), 0 0 0 rgba(232, 197, 101, 0); }
+  50% { box-shadow: inset 0 2px 0 rgba(255, 244, 200, 0.65), inset 0 -4px 8px rgba(60, 40, 8, 0.55), 0 3px 10px rgba(0,0,0,0.6), 0 0 16px rgba(232, 197, 101, 0.35); }
+}
+
+/* the seal ceremony: the tube's picture collapses through an iris around
+   the stamped quadrant mark — the machine itself swallows the poppet.
+   The iris is a transparent hole whose black shadow closes in (clip-path
+   on a full-cover layer hid the ceremony instead of the room). */
+.forge-seal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+.fso-iris {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 250vmax;
+  height: 250vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 250vmax #050505;
+  animation: fso-close 1.5s cubic-bezier(0.65, 0, 0.55, 1) forwards;
+}
+@keyframes fso-close {
+  0% { width: 250vmax; height: 250vmax; }
+  58% { width: 12vmax; height: 12vmax; }
+  72% { width: 12vmax; height: 12vmax; }
+  100% { width: 0vmax; height: 0vmax; }
+}
+.fso-seal {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%) scale(0.4) rotate(-18deg);
+  opacity: 0;
+  text-align: center;
+  animation: fso-stamp 1.5s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+.fso-seal svg {
+  display: block;
+  width: 108px;
+  height: 108px;
+  filter: drop-shadow(0 6px 18px rgba(212, 175, 101, 0.35));
+}
+.fso-seal span {
+  display: block;
+  margin-top: 10px;
+  font-family: 'Deutsch Gothic', Georgia, serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  color: #d4af65;
+  text-shadow: 0 0 12px rgba(212, 175, 101, 0.5);
+}
+@keyframes fso-stamp {
+  0% { transform: translate(-50%, -50%) scale(0.4) rotate(-18deg); opacity: 0; }
+  58% { transform: translate(-50%, -50%) scale(1.06) rotate(2deg); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  92% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fso-iris, .fso-seal { animation-duration: 0.2s !important; }
+}
+.poppet-discard { border-color: rgba(122, 134, 150, 0.5); }
+.poppet-drawer-toggle {
+  width: 58px;
+  height: 58px;
+  min-height: 58px;
+  padding: 0;
+  background: transparent;
+  color: #9aa6b5;
+  border: 1px solid rgba(122, 134, 150, 0.55);
+  border-radius: 3px;
+  font: 16px Georgia, serif;
+  cursor: pointer;
+}
+.poppet-drawer-toggle[aria-expanded="true"] { background: #767e8a; color: #0e1014; }
+.poppet-drawer-toggle:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+
+/* the laid clothes wait on the table beside the platen as a cut piece of
+   cloth until dragged onto the doll */
+.poppet-cloth-piece {
+  position: absolute;
+  z-index: 8;
+  border-radius: 4px;
+  outline: 1px dashed rgba(110, 70, 30, 0.45);
+  outline-offset: 3px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
+  cursor: grab;
+  touch-action: none;
+}
+.poppet-cloth-piece.is-held { cursor: grabbing; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.55)); transform: scale(1.04); }
+.poppet-cloth-piece.is-placed { outline: none; cursor: default; }
+
+/* the transfer beat: the sheet's ghost flies platen → vessel (the one
+   earned motion; the strip steps instantly — no information lives only
+   in the motion) */
+.forge-transfer {
+  position: absolute;
+  z-index: 70;
+  width: 84px;
+  height: 95px;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(232, 213, 168, 0.95) 0%, rgba(210, 184, 132, 0.95) 100%);
+  border-radius: 2px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  opacity: 0.95;
+  animation: forge-fly 0.62s cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+@keyframes forge-fly {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.95; }
+  70%  { opacity: 0.9; }
+  100% { transform: translate(var(--fly-x), var(--fly-y)) rotate(14deg) scale(0.42); opacity: 0; }
+}
+
+/* ── the table drawer: tags + binds + the home-screen quadrant icon ──── */
+.poppet-rail {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  z-index: 45;
+}
+.poppet-minimenu {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 54px;
+  width: 250px;
+  padding: 12px;
+  background: linear-gradient(180deg, #1b1e24, #101318);
+  border: 1px solid rgba(122, 134, 150, 0.65);
+  border-radius: 3px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.poppet-rail.is-open .poppet-minimenu,
+.poppet-rail:hover .poppet-minimenu,
+.poppet-rail:focus-within .poppet-minimenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.poppet-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  color: rgba(154, 166, 181, 0.6);
+  margin: 8px 0 6px;
+}
+.poppet-label:first-child { margin-top: 0; }
+.poppet-chips, .poppet-binds { display: flex; flex-wrap: wrap; gap: 5px; }
+.poppet-chip, .poppet-binds button {
+  min-height: 44px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.15;
+  color: #c3c9d3;
+  background: linear-gradient(180deg, #33373e, #1b1e24);
+  border: 1px solid #120c08;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.poppet-chip.on, .poppet-binds button.on {
+  color: #e6ebf2;
+  border-color: #6a7482;
+  box-shadow: 0 0 8px rgba(150, 175, 205, 0.25);
+}
+.poppet-chip:focus-visible, .poppet-binds button:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+.poppet-icon-live { display: flex; justify-content: center; margin-top: 8px; }
+
+/* ── Physius's chat box: the tutorial's speaker grammar, in serif ────── */
+.journal-chat {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5%;
+  transform: translateX(-50%) rotate(-0.3deg);
+  width: min(660px, 92%);
+  z-index: 80;
+  background:
+    radial-gradient(circle 12px at 18% 12%, rgba(140, 90, 40, 0.14) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #20232b 0%, #15171d 100%);
+  border: 1px solid #6a7482;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px rgba(30, 36, 46, 0.8),
+    0 14px 30px rgba(0, 0, 0, 0.7);
+  padding: 10px 14px 12px;
+  color: #ccd3dd;
+}
+.journal-chat[hidden] { display: none; }
+.journal-chat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(122, 134, 150, 0.55);
+  padding-bottom: 4px;
+  margin-bottom: 7px;
+}
+.journal-chat-voice {
+  font-size: 1rem;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #8fa3bd;
+  text-shadow: 0 0 10px rgba(150, 175, 205, 0.3);
+}
+.journal-chat-skip {
+  font-family: inherit;
+  font-size: 1rem;
+  font-style: italic;
+  color: #a8b2c0;
+  background: none;
+  border: 1px solid rgba(122, 134, 150, 0.7);
+  border-radius: 2px;
+  padding: 5px 12px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.journal-chat-skip:hover { color: #e6ebf2; background: rgba(122, 134, 150, 0.2); }
+.journal-chat-skip:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+.journal-chat-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.22rem;
+  line-height: 1.55;
+  min-height: 3.2em;
+  color: #d5dce6;
+}
+.journal-chat-gate {
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #93a7c4;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  margin: 4px 0 0 auto;
+  display: block;
+  cursor: pointer;
+  min-height: 44px;
+  animation: forge-gate-pulse 1.4s ease-in-out infinite;
+}
+.journal-chat-gate:hover { color: #e6ebf2; }
+.journal-chat-gate:focus-visible { outline: 2px solid #dfe4ec; outline-offset: 2px; }
+@keyframes forge-gate-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* ── the recall: type the stone's line back ───────────────────────────── */
+.journal-recall {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  width: min(680px, 94%);
+  z-index: 82;
+  text-align: center;
+}
+.journal-recall[hidden] { display: none; }
+.journal-recall-label {
+  font-size: 1.02rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: rgba(214, 220, 230, 0.75);
+  margin-bottom: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.journal-recall-line {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.42rem;  color: #d5dce6;
+  background: linear-gradient(180deg, #20232b 0%, #15171d 100%);
+  border: 1px solid #6a7482;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(30, 36, 46, 0.8), 0 10px 24px rgba(0,0,0,0.65);
+  padding: 14px 18px;
+  display: inline-block;
+  transform: rotate(-0.4deg);
+  min-height: 1.4em;
+}
+.journal-recall-done {
+  color: #b8c4d6;
+  text-decoration: underline;
+  text-decoration-color: rgba(150, 175, 205, 0.75);
+  text-underline-offset: 5px;
+}
+.journal-recall .journal-chat-skip { margin-top: 10px; }
+
+/* ── motion law ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .poppet-plate, .poppet-clamp, .journal-chat-gate,
+  .poppet-rail .poppet-minimenu, .forge-exit::after { transition: none; animation: none; }
+  .forge-transfer { display: none; }
+}

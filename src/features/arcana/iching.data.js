@@ -1,0 +1,78 @@
+// iching.data.js — the 64 hexagrams, King Wen order, patterns read bottom-up
+// (row 1 = bottom line). Judgement and Image are faithful compressions of the
+// classic public-domain renderings (Wilhelm/Baynes via Legge's Son of Heaven
+// lineages — the 1899 Sacred Books of the East translation is public domain),
+// kept to a breath each and in the house's own register.
+// Rows: [pattern, name, judgement, image]
+window.LIBER_ARCANA_DATA = window.LIBER_ARCANA_DATA || {};
+(function () {
+  var H = [
+    ['111111', 'the creative', 'supreme success through perseverance. the dragon works in the dark and does not force the light.', 'heaven moves: the strong one spends itself without pause and so endures.'],
+    ['000000', 'the receptive', 'supreme success through the perseverance of a mare. lead, and it is lost; follow, and it is found.', 'earth carries everything: the receptive one serves, and outlasts.'],
+    ['100010', 'difficulty at the beginning', 'the sprout is through the soil but the rain has not come. do not press; ask for help.', 'clouds and thunder: a tangled knot is braided, not cut.'],
+    ['010001', 'youthful folly', 'the young are not refused — only the ones who come with their answer already made.', 'a spring under the mountain: the well is dark until the rope is thrown.'],
+    ['111010', 'waiting', 'sincerity and light. wait — the storm crosses the table if you do not walk into it.', 'clouds rise to heaven: feed the body, and keep the mind on the crossing.'],
+    ['010111', 'conflict', 'you are met by an opposing force that is, in one way, in the right. stop halfway.', 'heaven and water part ways: keep the quarrel from the bone.'],
+    ['010000', 'the army', 'the many moved by one just will. order in the ranks; the spoils are not the point.', 'water gathers in the earth: hold the people, not the prize.'],
+    ['000010', 'holding together', 'they come to you first. the water sits on the ground because it finds a low place to rest in.', 'water over earth: the one who was uncertain arrives early and settles it.'],
+    ['111011', 'small taming', 'the clouds are full but not yet over the hills. small restraints now make the great crossing possible later.', 'heaven in the mountain: the small leash tames the great force.'],
+    ['110111', 'treading', 'tread on the tail of the tiger. it does not bite.', 'heaven over the marsh: walk on the toes of the dance; the floor remembers.'],
+    ['111000', 'peace', 'the small go, the great come. good fortune — the gate opens because the keeper was ready.', 'heaven and earth meet: heaven below, earth above, and everything moves between them.'],
+    ['000111', 'standstill', 'the great go, the small come. nothing answers. wood rots when it cannot move.', 'heaven and earth do not meet: withdraw into worth, and wait out the season.'],
+    ['101111', 'fellowship', 'fellowship in the open, not in the clan. crossing the great water is possible with company.', 'fire under heaven: the circle is stronger than any spoke.'],
+    ['111101', 'great possession', 'great holdings, and the hour to use them. the sun high in the sky.', 'fire in heaven: the cup overflows; carry the spillage well and it stays a blessing.'],
+    ['001000', 'modesty', 'the mountain hides beneath the hill. success in what is undertaken.', 'a mountain under the earth: lessen what is full; add to what is low.'],
+    ['000100', 'enthusiasm', 'the drums bring the helpers. do not be the drums.', 'thunder out of the earth: the spring rises without being asked.'],
+    ['011001', 'following', 'firm within, yielding without. to influence others, first be led by something worth following.', 'thunder under the lake: the reed bends; the oak does not.'],
+    ['100110', 'work on what has been spoiled', 'the bowl is spoiled from within. three days\u2019 thought before the repair; three days\u2019 after.', 'wind under the mountain: mend the raft before the river rises.'],
+    ['110000', 'approach', 'the tide comes in. it will recede in the seventh month — bring something to its shore.', 'earth over the lake: the advance is joyful and must be watched.'],
+    ['000011', 'contemplation', 'the wind blows over the earth and everything bends a little. look, and be worth looking at.', 'wind over earth: the watcher sees more than the actor.'],
+    ['100101', 'biting through', 'there is a piece of gristle between the jaws. bite through it, and the matter settles.', 'thunder with lightning: justice needs teeth.'],
+    ['101001', 'grace', 'form is the courtesy the soul pays the world — small adornment on real bone.', 'fire under the mountain: the light shows the shape, not the stuff.'],
+    ['000001', 'splitting apart', 'the leaf returns to the loam. unlucky to act; lucky to eat.', 'the mountain rests on the earth: what rises is stripped away from beneath.'],
+    ['100000', 'return', 'the seventh day: the turning comes back of itself. going out and coming in without error.', 'thunder in the earth: at the solstice the wheel comes around. step off, or step on.'],
+    ['100111', 'innocence', 'unplanned, upright, and it succeeds — but the unpainted picture is already true; do not paint on it.', 'thunder under heaven: the ten thousand things follow their natures.'],
+    ['111001', 'great taming', 'the great river crosses because the axle is true. hold the way and the strength obeys it.', 'heaven inside the mountain: the ox is yoked; the bite is in reserve.'],
+    ['100001', 'nourishment', 'watch the mouth: what goes in, and what comes out. what you feed, grows.', 'mountain over thunder: nourish the low and the large alike.'],
+    ['011110', 'great preponderance', 'the ridgepole sags. the bowl that is too straight snaps. this is not an hour to stand under beams.', 'wind rises over the lake: the bent reed holds the roof; the rigid beam breaks it.'],
+    ['010010', 'the abysmal', 'water, again and again. if the heart is honest the crossing holds. no second try at the same hole.', 'water flowing on: listen for the current beneath the quiet.'],
+    ['101101', 'the clinging', 'fire needs something to burn in. what burns away is not lost.', 'light doubled: what burns away is not lost; what clings needs a wick.'],
+    ['001110', 'influence', 'the moon draws the tide without touching it. the young two take the first place.', 'the lake on the mountain: the draw is silent and mutual.'],
+    ['011100', 'duration', 'the stone forgets the river; the river forgets the stone. last, and change inside the lasting.', 'thunder and wind: neither moves, and neither stops.'],
+    ['001111', 'retreat', 'the mountain does not chase the cloud. withdrawal is the hour\u2019s virtue, not a failure of it.', 'heaven under the mountain: the small persists; the great withdraws in good order.'],
+    ['111100', 'great power', 'the great axle turns because the bearings are true. stop at the goat\u2019s horn; do not butt.', 'thunder in heaven: vigour kept in check by right.'],
+    ['000101', 'progress', 'the small door opens onto a great room. the sun rises; feed the horse.', 'the sun over the earth: the advance is bright, and day is not forever.'],
+    ['101000', 'darkening of the light', 'the light hidden underground. in crossing the great water, harm the feathers.', 'the earth covers the sun: hide the brightness in the breast.'],
+    ['101011', 'the family', 'the hearth is the first altar: each in the true place, and the fire stays in.', 'wind from fire: words have substance; deeds have duration.'],
+    ['110101', 'opposition', 'two stones strike; the spark is the third thing. small matters go well; great matters need the meeting.', 'fire above, water below: they pull apart, and their pulling makes the third thing.'],
+    ['001010', 'obstruction', 'the river meets the rock, southwest instead. first a curse, then a nod — the rock is patient.', 'water on the mountain: turn the back on the difficulty and find it again, faced.'],
+    ['010100', 'deliverance', 'the knot undone is not undone — it is remembered as undone. go home; rest; the thunder rains.', 'thunder and rain rise: the spring breaks the ice because the ice forgot to move.'],
+    ['110001', 'decrease', 'to empty is to fill; to fill is to spill. sincerity carries even a pair of bowls.', 'the lake under the mountain: lessen the low to feed the high, and both grow.'],
+    ['100011', 'increase', 'the vine climbs the wall. cross the great water — the hour favours it.', 'wind and thunder: add to what is below, and the whole tree rises.'],
+    ['111110', 'breakthrough', 'the spring breaks the ice — loudly, and in the open court. the strong rise; the crooked are named.', 'water high in heaven: announce the truth in the court before it breaks.'],
+    ['011111', 'coming to meet', 'the meeting at the crossroads. the one first met takes the seat; do not seat the strong.', 'heaven under the wind: the first meeting decides the room.'],
+    ['000110', 'gathering together', 'many small fires make a great warmth. bring the offering; the gathering holds while the water is crossed.', 'water over the earth: gather, and arm the gathering.'],
+    ['011000', 'pushing upward', 'the shoot does not hurry; the light is patient. see the great one; the crossing is easy.', 'wind grows out of wood: the bamboo bends first, then rises.'],
+    ['010110', 'oppression', 'even the mountain crumbles under its own weight. the great one\u2019s word breaks; keep the faith anyway.', 'the lake without water: the mouth speaks and nothing comes.'],
+    ['011010', 'the well', 'the well does not move; the village comes to it. the rope is short — the jug breaks before the water does.', 'wind over water: the well is drawn from and does not diminish.'],
+    ['101110', 'revolution', 'your own day is believed only after it is done. the tiger changes its stripes when the season changes.', 'fire in the lake: the season turns; what was solid becomes air.'],
+    ['011101', 'the cauldron', 'the cauldron does not boil itself. the legs hold, the filling is fresh, and the food reaches the mouth.', 'fire over wood: the vessel cooks — the wise feed the worthy.'],
+    ['100100', 'the arousing', 'thunder does not apologise. a hundred thousand things come with it. do not drop the sacrificial spoon.', 'thunder doubled: shock — and the traveller finds the road again in it.'],
+    ['001001', 'keeping still', 'the mountain does not think; it knows. still the back, and the whole body rests.', 'mountains joined: still each thing in its own place, and leave it there.'],
+    ['110100', 'development', 'the bamboo bends first, then rises. the marriage goes ahead by the proper steps.', 'wind on the mountain: the tree grows where the wind lets it, and so it lasts.'],
+    ['001011', 'the marrying maiden', 'the second marriage is the practical one. what is begun in the wrong place ends in the right one, or ends.', 'thunder over the lake: the match made by convenience carries its own term.'],
+    ['101100', 'abundance', 'the cup brims but does not spill. be like the sun at noon: spend the light while the light is yours.', 'thunder and lightning arrive together: the abundant hour is spent deciding, not hoarding.'],
+    ['001101', 'the wanderer', 'the wanderer keeps no hearth but carries the fire. abroad, be sparing and careful; the small roof holds.', 'fire on the mountain: the traveller\u2019s fire — brief, and it must move on.'],
+    ['110110', 'the gentle', 'the lake yields to the wind; the wind remembers the lake. small affairs go well; the great one must be seen.', 'wind following wind: the command repeated, like the wind that comes and comes again.'],
+    ['011011', 'the joyous', 'the lake reflects the sky without keeping it. two lakes meet, and neither keeps the other.', 'lakes joined: the talk of friends — shared, and kept in common.'],
+    ['110010', 'dispersion', 'the salt returns to the sea that gave it. dissolve the knot by gathering at the temple, not at the door.', 'wind over water: the flood scatters the standing pools.'],
+    ['010011', 'limitation', 'the cup without a bottom cannot hold. bitter limitation in the first place; none in the last.', 'water in the lake: the banks hold the water, and so it deepens.'],
+    ['110011', 'inner truth', 'the inner and outer meet without negotiation. the lowly pit cries in the dark night; there is a drum at dawn.', 'wind over the lake: the inside is worth more than the speech.'],
+    ['001100', 'small preponderance', 'the grain of sand is heavier than the wave. in small matters, grace; in great matters, weight.', 'thunder on the mountain: the bird flies low, and lands.'],
+    ['010101', 'after completion', 'the after-state, the slow exhale. the small fox nearly wet — steer the ferry past the last sandbank.', 'water over fire: everything in its place; watch the places.'],
+    ['101010', 'before completion', 'the before-state, the held breath. the young fox crosses and wets its tail — finish the crossing before drinking.', 'fire on the water: the crossing is not done; the order is not yet the meal.']
+  ];
+  window.LIBER_ARCANA_DATA.iching = H.map(function (r) {
+    return { pattern: r[0], name: r[1], judgement: r[2], image: r[3] };
+  });
+})();

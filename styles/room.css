@@ -1,0 +1,302 @@
+/* ============================================================================
+   room.css — the dark room
+   The viewport IS the room. The CRT is a physical object in the middle of
+   the void. Dust particles drift like stars. Everything sits on a table
+   implied by a soft shadow under the monitor.
+   ============================================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --scan-vignette: 0.7;      /* corner darkening, 0..1 */
+  --crt-glass: 0.6;          /* restrained phosphor-glass overlay strength, 0..1 */
+
+  /* THE SHELL'S TWO VOICES (aesthetic sweep §1).
+     This used to be an accident: `html, body` set `'Times New Roman', Times,
+     serif` — one blanket browser default under every room in the machine, so
+     the baseline voice of the whole OS was whatever serif the traveller's
+     operating system happened to own. Each room then declared richer faces on
+     select elements, which meant the *floor* of every room's grammar was the
+     stock serif and drifted per platform.
+     The shell now names its two voices and says which is which. A room keeps
+     its own register; the shell stops pretending to have one.
+       --face-machine  the tube speaking — the one face the machine ships
+       --face-paper    the traveller's prose — the shell's declared default,
+                       which a room overrides in its own stylesheet
+     Remaining risk, stated rather than hidden: Georgia is a platform font and
+     is not shipped. Self-hosting a prose face beside vt323-latin.woff2 is the
+     next step; until then this is a decision instead of an accident. */
+  --face-machine: 'VT323', 'Courier New', Courier, monospace;
+  --face-paper: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+}
+
+/* VT323 self-hosted (audit minor / plan WS7). Shell infrastructure —
+   room.css is loaded by every page; per-persona stylesheets keep their
+   own font-family stacks but now resolve to this local face. No network
+   fetch at runtime; file://-safe relative path. */
+@font-face {
+  font-family: 'VT323';
+  src: url('../fonts/vt323-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── THE NARROW TITLEBAR (aesthetic sweep §4) ──────────────────────────
+   Every room's titlebar carries a name and a subtitle in one fixed-height
+   bar. Below 560px the pair plus the room's own help and exit fittings stop
+   fitting, and the subtitle was being squeezed into a sliver inside
+   `overflow:hidden`: 10px wide on learn, 19px on trash, 52px on cohort — a
+   single orphan letter — while sea, garden and buddy kept their whole line.
+   Same breakage, different treatment, room to room.
+   Now it is one rule for the whole machine. Past the threshold the subtitle
+   steps out of the bar instead of being crushed, and the name keeps the
+   room. The subtitle is the room's aside; the name is its label, and the
+   label is what has to survive.
+   Keyed to the naming convention every room already follows, so a room
+   that invents its own titlebar simply does not opt in. */
+@media (max-width: 560px) {
+  [class$="-titlebar-sub"] { display: none; }
+  [class$="-titlebar-name"] { letter-spacing: 0.12em; }
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  color: #c0b090;
+  font-family: var(--face-paper);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Run 5: pixel register ───────────────────────────────────────────────
+   External surfaces use hard 64px stepping and restrained nearest-neighbour
+   treatment. Copy, controls, and the CRT screen remain crisp DOM surfaces;
+   the room and shell read as one block-built object around them. */
+html.pixel-register .room,
+html.pixel-register .house-scene {
+  image-rendering: pixelated;
+}
+html.pixel-register .house-scene { --house-pixel-step: 64px; }
+html.pixel-register .pixi-runtime-canvas { image-rendering: pixelated; }
+
+/* Run 10: Pixi owns the house architecture once its canvas mounts. The
+   original elements stay in the DOM as an immediate fallback and as anchors
+   for the room's state-fed furniture, but they must not paint a second wall
+   over the authored pixel scene. */
+/* (pixi-house-owned retired with the Run 10 painter) */
+/* (.pixi-house-scene retired) */
+/* (pixi-house-owned retired with the Run 10 painter) */
+
+/* The room itself — center the machine horizontally, sit it on a virtual
+   table. We use a flex column to align top/bottom: monitor centered
+   vertically but with extra space at the top to suggest the table's
+   edge, and a small shadow strip at the bottom to ground the machine.
+
+   Layered radial gradients build a sense of depth:
+   1) Faint warm pool at the bottom-center (candlelight from the monitor
+      reflected on the table).
+   2) Slightly cooler ambient behind the CRT.
+   3) Wall hint: subtle blue-gray bloom at the upper-center that suggests
+      a distant wall and stops the void from feeling flat.
+   4) Faint floor pool: warm amber rise from the bottom edge to imply a
+      table surface.
+   5) Deep black base. */
+.room {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Transparent on purpose. This was four stacked radial gradients over
+     #000000 — the same room that the GPU layer now draws for real. It was
+     also the reason the earlier Pixi layer was invisible: an opaque .room
+     at z-index 4 sat directly on top of a canvas at z-index 3. */
+  background: transparent;
+}
+
+/* ── SHARED GPU CANVAS ───────────────────────────────────────────────────
+   The runtime owns one page canvas; the room atmosphere is its first layer.
+   pixi-layer.js places that shared canvas in the existing room stack so the
+   authored house remains below it and the machine remains DOM foreground:
+
+     0  .house-scene          the authored room (absent in rooms that have none)
+     1  .pixi-runtime-canvas  shared, inert GPU surface
+    10  .machine              the physical CRT
+
+   Authored rooms mark the canvas as light-only, so browser compositing uses the
+   former screen blend instead of placing an opaque render over DOM furniture. */
+.room > .pixi-runtime-canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  z-index: 1 !important;
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+  pointer-events: none !important;
+  touch-action: none;
+}
+.room > .pixi-runtime-canvas.pixi-room-light-only { mix-blend-mode: screen; }
+
+/* Whispers — the machine's phrases leaking into the room as barely
+   visible words drifting up behind the monitor. Ghosts in the dark,
+   never in front of the computer. Fragment timing comes from
+   src/whispers.js; the drift is one slow rise and fade. */
+.whispers {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.whisper {
+  position: absolute;
+  font-family: 'VT323', 'Courier New', Courier, monospace;
+  font-size: clamp(0.85rem, 1.3vw, 1.15rem);
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  color: rgba(214, 186, 148, 0.5);
+  text-shadow: 0 0 8px rgba(214, 186, 148, 0.18);
+  filter: blur(0.8px);
+  opacity: 0;
+  animation: whisper-drift var(--drift-dur, 11s) ease-out both;
+}
+
+@keyframes whisper-drift {
+  0%   { opacity: 0;    transform: translate(0, 0); }
+  18%  { opacity: 0.08; }
+  62%  { opacity: 0.06; }
+  100% { opacity: 0;    transform: translate(var(--drift-x, 0px), -9vh); }
+}
+
+/* The room stays a warm-black void around the machine. The old cyan cold
+   spot was an unrelated second light source: it pulled the eye into the
+   lower-right corner and fought the monitor's brass / red register. */
+.room::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .room::before { animation: cold-spot 47s ease-in-out infinite; }
+  @keyframes cold-spot {
+    0%, 100% { opacity: 0.45; }
+    46%      { opacity: 0.85; }
+  }
+}
+
+/* The passing whisper — once in a long while a half-line of italic text
+   crosses the deep red of the tube. Drawn from the same pool the status
+   line and the room whispers share (src/whispers.js), but it is not a
+   message: a trace. It never repeats back-to-back and never runs during
+   the cutscene. Element is mounted by src/whispers.js inside .screen. */
+.room-whisper {
+  position: absolute;
+  z-index: 40;
+  font-family: 'VT323', 'Courier New', Courier, monospace;
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(196, 166, 224, 0.72);
+  filter: blur(0.25px);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.machine.whisper-cross .room-whisper { animation: whisper-cross 9s ease-in-out forwards; }
+.room-whisper.astral-trace { text-shadow:0 0 7px rgba(196,166,224,.34); font-style:normal; }
+.room-whisper.astral-trace[data-trace-slot="0"] { color:rgba(246,231,196,.68); }
+.room-whisper.astral-trace[data-trace-slot="1"] { color:rgba(199,174,235,.64); }
+.room-whisper.astral-trace[data-trace-slot="2"] { color:rgba(228,111,158,.58); }
+@keyframes whisper-cross {
+  0%   { opacity: 0;    transform: translateX(4%); }
+  18%  { opacity: 0.42; }
+  55%  { opacity: 0.34; }
+  100% { opacity: 0;    transform: translateX(-3%); }
+}
+
+
+
+/* CRT scanlines removed (plan 2026-09-04 D0002) — the old body::after
+   repeating-linear-gradient overlay is gone. The vignette below and the
+   static/dust canvases carry the CRT feel now. */
+
+/* Vignette — now drawn by the camera shader in pixi-layer.js, weighted by
+   the same curvature term that bends the room, so the darkening follows the
+   lens instead of a fixed ellipse. --scan-vignette still drives the shadow
+   theme's own overlay in shadow.css. */
+
+/* Keep the authored room colours literal. Global filters blur/tint the boot
+   canvas and create a stacking context around every page in the machine. */
+
+/* The machine sits in the center of the room, above the dust. */
+.machine {
+  position: relative;
+  z-index: 10;
+}
+
+/* Soft contact shadow below the monitor — the table surface itself,
+   including the warm pool the tube throws onto it, is drawn in the GPU
+   room. Only the tight shadow that sells the machine as a resting object
+   stays here. */
+.machine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 62%;
+  height: 18px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0) 72%
+  );
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── MOTION WITH CONSENT (covenant, rule 3) ────────────────────────────────
+   The shell's authoritative gesture, and the reason it lives here rather
+   than in each room: every page loads room.css, so consent is structural
+   instead of a per-room selector list. A list is a thing that silently
+   stops covering the next animation someone adds in a room nobody
+   revisited; this cannot fall behind.
+
+   0.01ms rather than `animation: none` on purpose. An animation that ends
+   in a state the room needs — a fade held by `forwards`, a wipe that sets
+   the transform that gets it out of the way — still lands on that state
+   instead of snapping back to its 0% and leaving the thing invisible or
+   on top of the room. The journey is gone; the arrival is not.
+
+   Rooms that need a different resolution keep their own blocks: they load
+   after this file, and a later !important at equal specificity wins. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Respect reduced motion — kill dust animation, keep state still. */
+@media (prefers-reduced-motion: reduce) {
+  .whispers { display: none; }
+  .room-whisper { display: none; }
+}

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Liber Vacui — Desktop</title>
+  <link rel="stylesheet" href="styles/room.css?v=cleanup-20260921"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/wallpaper.css"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/desktop.css"/>  <link rel="stylesheet" href="styles/constellation.css" />
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13"/>
+  <link rel="stylesheet" href="styles/shadow.css" />
+  <link rel="stylesheet" href="styles/cutscene.css?v=v5a"/>
+  <link rel="stylesheet" href="styles/cutscene-stage.css?v=cleanup-20260921"/>
+  <link rel="stylesheet" href="styles/enter-rite.css?v=sign1"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/frame-room.css?v=slot1"/>
+  <link rel="stylesheet" href="src/features/sigil/poppet.css"/>
+  <link rel="stylesheet" href="src/features/sigil/poppet-rework.css?v=forge1"/>
+  <link rel="stylesheet" href="styles/poppet-readback.css"/>
+  <link rel="stylesheet" href="styles/poppet-loop.css?v=slot2"/>
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+              <div class="state-desktop" data-state="desktop" id="desktop">
+
+              <div class="wallpaper" id="wallpaper" aria-hidden="true"></div>
+
+              <!-- The orbit rail and the spoken line sit on the DESKTOP, not
+                   inside the barycenter. Nested in the constellation they were
+                   unclickable: an ancestor there swallows pointer events, so
+                   every click on a row fell through to #desktop. They are also
+                   positioned against the whole surface here, which is what the
+                   rail wanted anyway.
+                   Neither is a dialog. The rail is the belt, opened by touching
+                   what it circles; the line is the machine speaking while a
+                   traveller is in it. -->
+              <div class="poppet-orbit" id="poppet-orbit" data-open="no"></div>
+              <div class="poppet-spoken" id="poppet-spoken" data-spoken="no" aria-live="polite"></div>
+
+              <div class="sigil-overlay" id="sigil-overlay" aria-hidden="true">
+                <img id="sigil-overlay-img" alt="" />
+              </div>
+
+              <div class="home-room-frame-wrap" id="home-room-frame-wrap" role="group" aria-label="the poppet's home room">
+                <!-- the home room IS the desktop now: the cozy 3D room where the
+                     kept poppet lives, framed in place of the old barycenter.
+                     A poke inside the room asks the desktop to open the orbit
+                     rail — the same gesture touching the old poppet was. -->
+                <iframe id="home-room-frame" class="home-room-frame" src="poppet-home.html?v=home16" title="the poppet's home room"></iframe>
+              </div>
+
+              <div class="status-line">
+                <span class="status-phrase">liber.os is listening.</span>
+              </div>
+
+              <button class="settings-cog" id="settings-cog" type="button" aria-label="settings" title="settings">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="cog-grad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#c8a878"/>
+                      <stop offset="60%" stop-color="#8a6a40"/>
+                      <stop offset="100%" stop-color="#4a3018"/>
+                    </radialGradient>
+                  </defs>
+                  <g class="settings-cog-gear">
+                    <path fill="url(#cog-grad)" stroke="#2a1408" stroke-width="1.5" d="M50 8 L58 8 L60 20 Q66 22 71 26 L82 20 L88 26 L82 37 Q86 42 88 50 L100 50 L100 58 L88 60 Q86 66 82 71 L88 82 L82 88 L71 82 Q66 86 60 88 L58 100 L50 100 L42 100 L40 88 Q34 86 29 82 L18 88 L12 82 L18 71 Q14 66 12 60 L0 58 L0 50 L12 50 Q14 42 18 37 L12 26 L18 20 L29 26 Q34 22 40 20 L42 8 Z"/>
+                    <circle cx="50" cy="50" r="16" fill="#0a0503" stroke="#2a1408" stroke-width="1.5"/>
+                  </g>
+                </svg>
+                <span class="settings-cog-label">settings</span>
+              </button>
+
+              <div class="constellation-mini" id="constellation-mini" inert>
+                <div class="constellation-mini-inner">
+                  <div class="constellation-mini-header">
+                    <span class="constellation-mini-label" id="constellation-mini-label">— artifact —</span>
+                    <button class="constellation-mini-close" id="constellation-mini-close" type="button" aria-label="close">×</button>
+                  </div>
+                  <div class="constellation-mini-text" id="constellation-mini-text"></div>
+                  <div class="constellation-mini-row">
+                    <span class="constellation-mini-arrow">—</span>
+                    <input type="text" class="constellation-mini-verb" id="constellation-mini-verb" maxlength="40" spellcheck="false" list="verb-families" />
+                    <datalist id="verb-families">
+                      <option value="protects"></option>
+                      <option value="carries"></option>
+                      <option value="holds"></option>
+                      <option value="witnesses"></option>
+                      <option value="guards"></option>
+                      <option value="feeds"></option>
+                      <option value="releases"></option>
+                      <option value="hides"></option>
+                      <option value="names"></option>
+                      <option value="follows"></option>
+                    </datalist>
+                    <span class="constellation-mini-arrow constellation-mini-sigil">★</span>
+                  </div>
+                  <div class="constellation-mini-row">
+                    <label class="constellation-mini-bind-label" for="constellation-mini-target">bind to</label>
+                    <select class="constellation-mini-target" id="constellation-mini-target"></select>
+                  </div>
+                  <div class="constellation-mini-actions">
+                    <button type="button" class="constellation-mini-save" id="constellation-mini-save">bind to buddy</button>
+                    <button type="button" class="constellation-mini-open" id="constellation-mini-open">open in room</button>
+                    <button type="button" class="constellation-mini-journal" id="constellation-mini-journal">open in journal</button>
+                    <button type="button" class="constellation-mini-release" id="constellation-mini-release">release</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="enter-rite" id="enter-rite" hidden>
+                <button class="enter-box" id="enter-box" type="button" aria-label="enter the liber vacui">
+                  <svg viewBox="0 0 120 132" aria-hidden="true">
+                    <line x1="60" y1="6" x2="60" y2="52" />
+                    <circle cx="60" cy="94" r="30" />
+                  </svg>
+                </button>
+                <div class="enter-backdrop" id="enter-backdrop" hidden></div>
+                <div class="enter-popup" id="enter-popup" role="dialog" aria-modal="true" aria-label="enter your name" hidden>
+                  <button class="enter-close" id="enter-close" type="button" aria-label="close">×</button>
+                  <p class="enter-prompt">(Enter your name)</p>
+                  <input class="enter-name" id="enter-name" type="text" maxlength="40" autocomplete="off" spellcheck="false" aria-label="your name" />
+                  <button class="enter-proceed" id="enter-proceed" type="button" disabled>[proceed]</button>
+                </div>
+                <div class="enter-build" id="enter-build" hidden aria-live="polite">
+                  <span class="enter-build-box" id="enter-build-box" aria-hidden="true"></span>
+                  <span class="enter-build-name" id="enter-build-name"></span>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/sound.js"></script>
+  <script src="data/tarot.data.js"></script>
+  <script src="data/prompt-templates.data.js"></script>
+  <script src="src/prompt-engine.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/prompt-surface.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="src/enter-rite.js?v=sign1"></script>
+  <script src="src/cutscene-v2.data.js?v=v5a"></script>
+  <script src="src/cutscene.js?v=v5d"></script>
+  <script src="src/features/sigil/poppet.js"></script>
+  <script src="data/prompts.data.js"></script>
+  <script src="src/poppet-readback.js"></script>
+  <script src="src/poppet-loop.js?v=slot2"></script>
+  <script src="data/citations.data.js"></script>
+  <script src="src/constellation.js?v=slot2"></script>
+  <script>
+    (function () {
+      var cog = document.getElementById('settings-cog');
+      if (cog) cog.addEventListener('click', function () {
+        window.location.href = 'settings.html';
+      });
+    })();
+  </script>
+  <script>
+    /* the home room speaks to the desktop: a poke on the doll opens the
+       orbit rail through the same poppet-loop the old readback used;
+       TO THE LAB asks the dock to seat the poppet cartridge (the lab lives
+       framed inside sigil.html) */
+    (function () {
+      window.addEventListener('message', function (ev) {
+        if (!ev.data) return;
+        if (ev.data.type === 'poppet-home-poke') {
+          var loop = window.LiberPoppetLoop;
+          if (loop && loop.open) { loop.open(); return; }
+          var rail = document.getElementById('poppet-orbit');
+          if (rail) rail.setAttribute('data-open', 'yes');
+        }
+        /* poppet-home-openlab retired with the home room's TO THE LAB button:
+           the lab is reached through the TraveROM cartridge, not a home-room
+           shortcut. */
+      });
+    })();
+  </script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/wanderlust-checkins.js"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <!-- The GPU room-atmosphere layer (pixi-layer.js) was retired on the
+       desktop: behind the monitor it drew a pixelated parallax room the
+       author read as a janky second scene. The runtime stays loaded for
+       the trave-rom console and the cutscene cast, which register their
+       own layers when they run. -->
+  <script src="src/trave-rom.js?v=run13"></script>
+  <!-- The cast stage. src/pixi-cutscene.js used to live here: it replaced the
+       speaker plates with canvas-drawn boxes and measured WORSE than the CSS it
+       would have replaced (3 tonal bands against 7), so it was never enabled
+       and has been deleted rather than kept warm.
+
+       src/pixi-cast.js does the opposite and is why a GPU layer belongs in the
+       cutscene at all. The plates stay DOM — materials, seals, ink trails and
+       type are authored in cutscene.css and are better there. The canvas owns
+       what the DOM cannot do: real physics between the plates, a projected
+       shadow per plate that moves and softens with its elevation, a dust field
+       that inherits their velocity, motion wakes, and a key light taken from
+       the room's own authored lamp. Take the canvas away and the cast still
+       reads; it just stops being alive. -->
+  <script src="src/pixi-cast.js?v=cleanup-20260922"></script>
+</body>
+</html>

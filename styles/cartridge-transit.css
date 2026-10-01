@@ -1,0 +1,194 @@
+/* cartridge-transit.css — P1 cartridge transit + tutorial handshake dressing.
+   Pitch §03/§04 (next-sweep-pitch.html, archive read-only): every arrival
+   gets a 2–4s screen-bound cognitive portrait. One shared timing and
+   accessibility contract; per-room pixel vignette identity.
+   Screen-bound: the overlay lives inside .screen-stage, dims the tube only,
+   never room chrome. Bezel/wall furniture stays anchored (nothing here
+   positions outside the glass).
+   Motion budget (this surface): ONE motion (the single ct-beat keyframe
+   family driving portrait assemble + bar fill + wipe) and ONE hover
+   (skip brightens). GPU props only (opacity, transform). The faux bar's
+   width travels by transition under the same beat — same motion, not a
+   second one. Reduced motion: instant readable portrait + complete bar. */
+
+.cartridge-transit {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 4, 3, 0.88);
+  pointer-events: none;
+  opacity: 0;
+  --ct-acc: #d4af65;
+  --ct-ink: #eadfc6;
+  --ct-dim: #b19a78;
+}
+
+.cartridge-transit.go { opacity: 1; }
+/* The veil covers the glass while it plays; the moment it starts wiping
+   it releases the glass, so room controls hit-test clean underneath. */
+.cartridge-transit.wipe {
+  opacity: 0;
+  transform: translateX(4%);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  pointer-events: none;
+}
+.cartridge-transit.wipe .ct-skip { pointer-events: none; }
+.cartridge-transit.gone { display: none; }
+
+.ct-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 26px;
+  max-width: 82%;
+}
+
+.ct-portrait {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  opacity: 0;
+  transform: scale(0.86);
+  filter: drop-shadow(0 0 10px rgba(212, 175, 101, 0.25));
+}
+.cartridge-transit.go .ct-portrait {
+  animation: ct-assemble 2s steps(6) forwards;
+  animation-delay: 0.4s;
+}
+.ct-portrait svg { width: 100%; height: 100%; display: block; }
+
+@keyframes ct-assemble {
+  0% { opacity: 0; transform: scale(0.86); }
+  60% { opacity: 1; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.ct-room {
+  font-size: 1.125rem;
+  letter-spacing: 0.3em;
+  text-transform: lowercase;
+  color: var(--ct-ink);
+}
+.ct-traveller {
+  font-size: 0.875rem;
+  font-style: italic;
+  letter-spacing: 0.18em;
+  color: var(--ct-dim);
+}
+.ct-bar {
+  width: 180px;
+  max-width: 60vw;
+  height: 8px;
+  border: 1px solid var(--ct-acc);
+  padding: 1px;
+  background: rgba(7, 4, 3, 0.6);
+}
+.ct-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--ct-acc);
+  transition: width 0.8s linear;
+}
+.cartridge-transit.go .ct-bar i { width: 100%; }
+.ct-line {
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  color: var(--ct-dim);
+  min-height: 1.4em;
+}
+.ct-skip {
+  pointer-events: auto;
+  margin-top: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 22px;
+  background: transparent;
+  border: 1px solid var(--ct-acc);
+  color: var(--ct-ink);
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
+.ct-skip:hover { background: rgba(212, 175, 101, 0.16); }
+.ct-skip:focus-visible { outline: 2px solid var(--ct-acc); outline-offset: 2px; }
+
+/* per-room vignette identity: the same contract, twelve little worlds.
+   Each motif tints the portrait ring only — no layout, no motion. */
+.ct-portrait {
+  border: 2px solid var(--ct-acc);
+  border-radius: 4px;
+  background: rgba(7, 4, 3, 0.7);
+  padding: 8px;
+}
+.ct-motif-tide .ct-portrait { border-style: double; border-width: 4px; }
+.ct-motif-magic .ct-portrait { border-radius: 50%; }
+.ct-motif-flowers .ct-portrait { border-radius: 12px 2px 12px 2px; }
+.ct-motif-chisel .ct-portrait { border-width: 3px; }
+.ct-motif-fog .ct-portrait { border-style: dashed; }
+.ct-motif-bulbs .ct-portrait { border-radius: 50% 50% 4px 4px; }
+.ct-motif-reactions .ct-portrait { border-radius: 2px 12px 2px 12px; }
+.ct-motif-signal .ct-portrait { border-radius: 50%; border-style: dotted; }
+.ct-motif-pages .ct-portrait { border-width: 2px 4px 2px 2px; }
+.ct-motif-falling .ct-portrait { border-width: 2px 2px 4px 2px; }
+.ct-motif-colour .ct-portrait { border-width: 3px; border-style: double; }
+.ct-motif-calibration .ct-portrait { border-radius: 50%; border-width: 3px; }
+
+/* tutorial handshake reuses the transit dressing: the cartridge arrives,
+   warms, and projects its portrait before any verb is taught. */
+.cutscene.handshake .cutscene-box,
+.cutscene.verbs .cutscene-box,
+.cutscene.orbit .cutscene-box,
+.cutscene.naming .cutscene-box,
+.cutscene.reentry .cutscene-box {
+  border-color: var(--ct-acc, #8a6a20);
+}
+.cutscene .ct-handshake-portrait {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  border: 2px solid #8a6a20;
+  padding: 6px;
+  margin-bottom: 8px;
+  background: rgba(7, 4, 3, 0.7);
+}
+.cutscene .ct-handshake-portrait svg { width: 100%; height: 100%; display: block; }
+.cutscene .alias-row { display: flex; gap: 8px; margin-top: 10px; }
+.cutscene .alias-row input {
+  flex: 1;
+  min-height: 44px;
+  background: rgba(7, 4, 3, 0.7);
+  border: 1px solid #8a6a20;
+  color: #eadfc6;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 8px 10px;
+}
+.cutscene .alias-row input:focus-visible { outline: 2px solid #d4af65; outline-offset: 2px; }
+.cutscene .cutscene-option {
+  min-height: 44px;
+  min-width: 44px;
+}
+.cutscene .cutscene-option:focus-visible { outline: 2px solid #d4af65; outline-offset: 2px; }
+
+/* reduced motion: instant readable portrait + complete faux bar.
+   The global room.css wildcard already collapses the CSS journey to
+   0.01ms; the JS path below renders the arrival state with no waits. */
+@media (prefers-reduced-motion: reduce) {
+  .cartridge-transit.go .ct-portrait { animation: none; opacity: 1; transform: none; }
+  .cartridge-transit.go .ct-bar i { transition: none; width: 100%; }
+  .cartridge-transit.wipe { transition: none; transform: none; }
+  .ct-skip:hover { background: transparent; }
+}
+
+/* 439px: the portrait stays small, the bar fits the glass. */
+@media (max-width: 439px) {
+  .ct-portrait { width: 72px; height: 72px; }
+  .ct-bar { width: 140px; }
+  .ct-room { font-size: 1rem; }
+}

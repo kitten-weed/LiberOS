@@ -1,0 +1,355 @@
+/* poppet.css — the Poppet worktable: one bench, an alchemical ring, four substances.
+   Covenant palette; motion authored always-on (MOTION IS PART OF THE VACUI —
+   zero reduced-motion gates). The others-layer keeps a no-figure guide;
+   marks on its worktable stay visible. */
+
+.poppet-titlebar .sigil-titlebar-name { letter-spacing: 0.22em; }
+
+.poppet-app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px 0;
+  align-items: start;
+  align-content: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100%;
+  width: 100%;
+  padding: 4px 6px 8px;
+}
+.poppet-worktable { grid-column: 1; min-width: 0; }
+.poppet-screen { padding: 6px 8px; }
+
+/* rail: live stack + icon + minimenu — one row beside the bench at tube width */
+.poppet-rail {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+  grid-column: 1;
+  grid-row: auto;
+  grid-template-columns: 1.3fr 0.5fr 1.1fr;
+  align-items: start;
+  min-width: 0;
+}
+
+/* ── the bench: ring instrument left, canvas right, one continuous table ── */
+.poppet-bench {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid #8a6a20;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse 60% 30% at 50% 0%, rgba(212, 175, 101, 0.09), transparent 70%),
+    linear-gradient(160deg, #1c1310, #100a08 70%);
+  box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.65);
+}
+.poppet-instrument { display: grid; gap: 3px; justify-items: stretch; min-width: 0; align-content: start; }
+
+/* the alchemical ring: brass, stitched, quartered — a thing in the world */
+.poppet-ring { width: 44px; height: 44px; display: block; justify-self: center; }
+.poppet-ring-brass {
+  fill: #1a1210;
+  stroke: #d4af65;
+  stroke-width: 5;
+}
+.poppet-ring-stitch {
+  fill: none;
+  stroke: rgba(238, 228, 208, 0.7);
+  stroke-width: 1.6;
+  stroke-dasharray: 4 6;
+}
+.poppet-ring-cross { stroke: #eadfc6; stroke-width: 5; }
+.poppet-ring-pin { fill: #d4af65; stroke: #140d18; stroke-width: 1.5; }
+.poppet-ring-hub { fill: #d4af65; stroke: #140d18; stroke-width: 2; }
+.poppet-ring-rotor { transform-origin: 60px 60px; transition: transform 0.55s ease-in-out; }
+
+/* four stations: four substances, four temperatures — not four labels */
+.poppet-station {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 38px;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px;
+  color: #eadfc6;
+}
+.poppet-station b { display: block; font-size: 10px; letter-spacing: 0.08em; }
+.poppet-station small { display: block; margin-top: 1px; font-size: 10px; }
+.poppet-station .poppet-door-state { float: right; font-size: 10px; }
+.poppet-door[data-layer="outline"] {
+  background: linear-gradient(150deg, #232b3a, #10141c);
+  border: 2px solid #5a6a86;
+  border-radius: 3px;
+  color: #dfe4ee;
+}
+.poppet-door[data-layer="outline"] b { color: #a9bce0; }
+.poppet-door[data-layer="outline"] small { color: #8d99b2; }
+.poppet-door[data-layer="clothes"] {
+  background: linear-gradient(135deg, #7fd7d0, #f6c6d9 48%, #f8e5a6);
+  border: 2px solid #f1c879;
+  border-radius: 22px;
+  color: #332549;
+}
+.poppet-door[data-layer="clothes"] b { color: #4a3660; }
+.poppet-door[data-layer="clothes"] small { color: #5a4a66; }
+.poppet-door[data-layer="traits"] {
+  background: linear-gradient(150deg, #1d2b1a, #0e150d);
+  border: 2px dashed #9baf5a;
+  border-radius: 14px 4px 14px 4px;
+  color: #dce8c8;
+}
+.poppet-door[data-layer="traits"] b { color: #9baf5a; }
+.poppet-door[data-layer="traits"] small { color: #8ba06a; }
+.poppet-door[data-layer="others"] {
+  background: radial-gradient(circle at 50% 36%, #241640, #07040d 80%);
+  border: 2px solid #a99bff;
+  border-radius: 50%;
+  color: #d8ccf8;
+  text-align: center;
+  padding-bottom: 10px;
+}
+.poppet-door[data-layer="others"] b { color: #a99bff; }
+.poppet-door[data-layer="others"] small { color: #8d7fc8; }
+.poppet-door.active { outline: 2px solid #d4af65; outline-offset: 2px; }
+.poppet-door[data-layer="others"].active { box-shadow: 0 0 22px rgba(169, 155, 255, 0.6); }
+.poppet-door[data-layer="clothes"].active { box-shadow: 0 0 18px rgba(241, 200, 121, 0.55); }
+.poppet-door[data-layer="traits"].active { box-shadow: 0 0 18px rgba(155, 175, 90, 0.5); }
+.poppet-door[data-layer="outline"].active { box-shadow: 0 0 18px rgba(169, 188, 224, 0.5); }
+.poppet-door:hover, .poppet-door:focus-visible { border-color: #d4af65; }
+.poppet-door:focus-visible { outline: 2px solid #d4af65; outline-offset: 2px; }
+.poppet-door .poppet-door-state { color: #8f8b86; }
+.poppet-door.saved .poppet-door-state { color: #d4af65; }
+
+.poppet-actions { display: grid; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #8a6a20; }
+
+.poppet-save-desktop, .poppet-discard {
+  min-height: 44px;
+  background: #1a1415;
+  color: #d4af65;
+  border: 2px solid #8a6840;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+.poppet-save-desktop:disabled, .poppet-discard:disabled { opacity: 0.38; cursor: not-allowed; border-style: dashed; }
+.poppet-discard { color: #eadfc6; border-color: #8a6a20; }
+
+/* editor lives on the bench now — always open, never a second screen */
+.poppet-editor { min-width: 0; }
+
+.poppet-ehead { margin-bottom: 6px; }
+.poppet-ehead b { font-size: 12px; letter-spacing: 0.14em; color: #d4af65; }
+.poppet-ehead small { display: block; font-size: 12px; color: #b19a78; margin-top: 2px; }
+.poppet-arch { font-size: 11px; color: #a99bff; letter-spacing: 0.16em; }
+
+.poppet-stack {
+  position: relative;
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 480 / 544;
+  border: 1px solid #8a6a20;
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 40%, #171020, #0b0710 78%);
+  overflow: hidden;
+  transition: background 0.55s ease-in-out;
+}
+.poppet-stack canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.poppet-guide { opacity: 0; pointer-events: none; }
+.poppet-template { opacity: 1; pointer-events: none; }
+.poppet-draw { opacity: 1; touch-action: none; }
+.poppet-editor.is-others { background: radial-gradient(circle at 50% 36%, #1b1030, #07040d 80%); }
+
+/* the room light follows the active substance */
+#poppet-worktable[data-active="outline"] .poppet-stack { background: radial-gradient(circle at 50% 40%, #1c2233, #0a0d14 78%); border-color: #5a6a86; }
+#poppet-worktable[data-active="clothes"] .poppet-stack { background: radial-gradient(circle at 50% 40%, #2b2226, #141012 78%); border-color: #f1c879; }
+#poppet-worktable[data-active="traits"] .poppet-stack { background: radial-gradient(circle at 50% 40%, #16240f, #090d07 78%); border-color: #9baf5a; }
+#poppet-worktable[data-active="others"] .poppet-stack { background: radial-gradient(circle at 50% 36%, #1b1030, #07040d 80%); border-color: #a99bff; }
+
+/* loud discard: the bench shakes off the wipe */
+.poppet-shake .poppet-bench { animation: poppet-bench-shake 0.6s ease-in-out; }
+@keyframes poppet-bench-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px) rotate(-0.6deg); }
+  45% { transform: translateX(8px) rotate(0.6deg); }
+  70% { transform: translateX(-5px); }
+}
+
+.poppet-side { margin-top: 8px; }
+
+.poppet-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.poppet-tool {
+  min-width: 44px;
+  min-height: 44px;
+  background: #1a1415;
+  color: #d4af65;
+  border: 2px solid #8a6840;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+.poppet-tool[aria-pressed="true"] { background: #d4af65; color: #140d18; }
+.poppet-tool:focus-visible { outline: 2px solid #d4af65; outline-offset: 2px; }
+
+.poppet-palette { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; min-height: 26px; }
+.poppet-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  min-width: 24px;
+  min-height: 24px;
+}
+.poppet-swatch[aria-pressed="true"] { border-color: #d4af65; box-shadow: 0 0 10px rgba(212, 175, 101, 0.55); }
+
+.poppet-eactions { display: flex; gap: 8px; margin-top: 8px; }
+.poppet-keep {
+  min-height: 44px;
+  background: #1a1415;
+  color: #d4af65;
+  border: 2px solid #8a6840;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* instructions: upright, 16px floor — the bench speaks plainly */
+.poppet-hint { font-size: 16px; font-style: normal; color: #eadfc6; margin-top: 8px; }
+
+.poppet-label { font-size: 11px; letter-spacing: 0.18em; color: #eadfc6; margin-bottom: 8px; }
+
+.poppet-comp { position: relative; width: 100%; max-width: 170px; aspect-ratio: 480 / 544; }
+.poppet-comp canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.poppet-ghost { position: absolute; inset: 0; animation: poppet-ghost-float 5.2s ease-in-out infinite; }
+.poppet-ghost canvas { filter: drop-shadow(0 0 12px rgba(169, 155, 255, 0.55)); }
+@keyframes poppet-ghost-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+.poppet-comp.dream #poppet-c-outline { opacity: 0.16; }
+.poppet-comp.dream #poppet-c-clothes { opacity: 0.28; }
+.poppet-comp.dream #poppet-c-traits { opacity: 0.95; animation: poppet-dream-rise 6.5s ease-in-out infinite; }
+@keyframes poppet-dream-rise { 0%, 100% { filter: drop-shadow(0 0 3px rgba(155, 175, 90, 0.2)); } 50% { filter: drop-shadow(0 0 14px rgba(155, 175, 90, 0.5)); } }
+
+.poppet-dream {
+  min-height: 44px;
+  margin-top: 8px;
+  background: transparent;
+  color: #eadfc6;
+  border: 1px solid #8a6a20;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.poppet-dream[aria-pressed="true"] { border-color: #d4af65; color: #d4af65; }
+
+.poppet-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.poppet-chip {
+  border: 1px solid #7a6a4a;
+  background: #1a1415;
+  color: #e8d1ae;
+  border-radius: 20px;
+  padding: 6px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.poppet-chip.on { background: #d4af65; color: #140d18; border-color: #d4af65; }
+
+.poppet-binds { display: flex; flex-wrap: wrap; gap: 6px; }
+.poppet-binds button {
+  border: 1px dashed #8a6a20;
+  background: transparent;
+  color: #eadfc6;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.poppet-binds button.on { border-style: solid; border-color: #ff8fb8; color: #ff8fb8; }
+.poppet-binds button:focus-visible, .poppet-chip:focus-visible, .poppet-dream:focus-visible,
+.poppet-keep:focus-visible,
+.poppet-save-desktop:focus-visible, .poppet-discard:focus-visible {
+  outline: 2px solid #d4af65;
+  outline-offset: 2px;
+}
+
+/* narrow room: one column — bench above, rail below */
+@media (max-width: 900px) {
+  .poppet-app { grid-template-columns: minmax(0, 1fr); }
+  .poppet-rail { grid-column: 1; grid-row: auto; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+}
+
+/* narrow bench: ring above, canvas below — still one table */
+@media (max-width: 640px) {
+  .poppet-bench { grid-template-columns: minmax(0, 1fr); }
+  .poppet-instrument { grid-template-columns: 72px minmax(0, 1fr); align-items: center; }
+  .poppet-ring { justify-self: center; }
+}
+
+/* The old stone editor is retired; the poppet is the room. */
+.sigil-frame[hidden], .sigil-frame { display: none !important; }
+
+/* sewn body / pattern table */
+.poppet-bench { position:relative; border:0; border-radius:2px; padding:14px; background:repeating-linear-gradient(8deg,rgba(185,137,74,.045) 0 1px,transparent 1px 7px),linear-gradient(145deg,#342319,#1b110d 62%,#0c0807); box-shadow:inset 0 0 0 1px rgba(212,175,101,.35),inset 0 0 30px #050303,0 8px 20px rgba(0,0,0,.35); }
+.poppet-bench::before { content:'✦  ·  ·  ·  ✦'; position:absolute; right:14px; top:5px; color:rgba(232,209,174,.28); letter-spacing:.7em; font:10px monospace; }
+.poppet-stack { max-width:250px; border:1px solid #b99362; border-radius:1px; background:radial-gradient(circle at 50% 42%,rgba(237,216,177,.14),transparent 42%),repeating-linear-gradient(0deg,rgba(104,74,45,.08) 0 1px,transparent 1px 5px),#c9b184; box-shadow:5px 7px 0 rgba(42,22,12,.35),inset 0 0 24px rgba(78,47,23,.24); transform-origin:50% 88%; }
+.poppet-stack::before { content:''; position:absolute; inset:10px; border:1px dashed rgba(91,62,38,.35); pointer-events:none; }
+.poppet-stack.poppet-arrive { animation:poppet-piece-arrive .65s cubic-bezier(.18,.8,.24,1); }
+@keyframes poppet-piece-arrive { 0%{opacity:0;transform:translateY(18px) rotate(-2deg) scale(.94)} 72%{transform:translateY(-3px) rotate(1deg)} 100%{opacity:1;transform:translateY(0) rotate(0)} }
+.poppet-guide { opacity:.24; mix-blend-mode:multiply; filter:sepia(.25); }
+.poppet-template { opacity:.9; mix-blend-mode:multiply; }
+.poppet-draw { filter:drop-shadow(.5px .5px 0 rgba(255,245,216,.35)); }
+.poppet-editor.is-others .poppet-stack { background:radial-gradient(circle at 50% 38%,#34224c,#130c1d 78%); border-color:#a99bff; cursor:crosshair; }
+.poppet-editor.is-others .poppet-stack::after { content:'✧  ·  ✧  ·  ✧'; position:absolute; inset:0; display:grid; place-items:center; color:rgba(205,185,255,.5); font:18px serif; letter-spacing:1.2em; animation:blind-constellation 2.8s ease-in-out infinite; pointer-events:none; }
+@keyframes blind-constellation { 0%,100%{opacity:.2;transform:scale(.84)} 50%{opacity:.75;transform:scale(1.08)} }
+
+/* Stations are points around the ring, not four unrelated cards. */
+.poppet-bench { grid-template-columns:220px minmax(0,1fr); }
+.poppet-instrument { position:relative; min-height:230px; display:block; padding:12px 4px; }
+.poppet-ring { position:absolute; left:50%; top:8px; width:124px; height:124px; transform:translateX(-50%); opacity:.95; }
+.poppet-station { position:absolute; width:96px; min-height:44px; padding:5px; font-size:10px; z-index:2; box-shadow:0 3px 0 rgba(0,0,0,.24); }
+.poppet-station b { font-size:9px; }.poppet-station small { font-size:8px; }
+.poppet-station[data-layer="outline"] { left:0; top:26px; }.poppet-station[data-layer="clothes"] { right:0; top:26px; }.poppet-station[data-layer="traits"] { left:0; bottom:18px; }.poppet-station[data-layer="others"] { right:0; bottom:18px; }
+.poppet-ring-rotor { transition:transform .7s cubic-bezier(.2,.9,.2,1); }.poppet-door.active { z-index:3; transform:translateY(-2px) rotate(-1deg); }.poppet-door[data-layer="clothes"].active { transform:translateY(-2px) rotate(1deg); }.poppet-door[data-layer="others"].active { transform:translateY(-2px) rotate(2deg); }
+
+/* Pins, thread, and physical little objects on the table. */
+.poppet-side { position:relative; }.poppet-side::before { content:'●  ●  ●  ●'; display:block; color:#d4af65; letter-spacing:1.1em; margin-bottom:4px; font-size:9px; }
+.poppet-hint { font-size:11px; color:#bda987; }.poppet-tools { border-top:1px solid rgba(212,175,101,.25); padding-top:6px; }.poppet-keep { border-radius:1px; box-shadow:3px 3px 0 rgba(0,0,0,.28); }.poppet-save-desktop,.poppet-discard { border-radius:1px; }.poppet-rail { border-top:1px dashed rgba(212,175,101,.35); padding-top:10px; }.poppet-comp { filter:drop-shadow(3px 4px 0 rgba(0,0,0,.28)); }.poppet-ghost { filter:drop-shadow(0 0 8px rgba(169,155,255,.7)); }
+@media (max-width:640px) { .poppet-instrument{min-height:190px}.poppet-ring{width:108px;height:108px}.poppet-station{width:94px} }
+
+/* Material changes are carried by the room, not a caption. */
+.poppet-editor[data-material="outline"] .poppet-stack { background-color:#a8b0bf; }
+.poppet-editor[data-material="clothes"] .poppet-stack { background-color:#e6cdd2; background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 5px); }
+.poppet-editor[data-material="traits"] .poppet-stack { background-color:#526342; background-image:radial-gradient(circle at 25% 30%,rgba(201,228,165,.25) 0 2px,transparent 3px),radial-gradient(circle at 75% 62%,rgba(0,0,0,.18) 0 3px,transparent 4px); }
+.poppet-editor[data-material="others"] .poppet-stack { background-color:#171127; background-image:radial-gradient(circle at 50% 40%,rgba(169,155,255,.18),transparent 48%); }
+.poppet-editor.tag-persona .poppet-stack::after,.poppet-editor.tag-ego .poppet-stack::after,.poppet-editor.tag-shadow .poppet-stack::after { content:'✦'; position:absolute; left:50%; top:18%; color:#d4af65; text-shadow:0 0 8px currentColor; animation:tag-pin-breathe 2.5s ease-in-out infinite; pointer-events:none; }
+.poppet-editor.tag-shadow .poppet-stack::after { left:78%; top:66%; color:#a99bff; }
+@keyframes tag-pin-breathe { 50%{opacity:.35;transform:scale(1.35)} }
+.poppet-app[data-kept-count="1"] .poppet-save-desktop::before,.poppet-app[data-kept-count="2"] .poppet-save-desktop::before,.poppet-app[data-kept-count="3"] .poppet-save-desktop::before { content:'◌ '; color:#d4af65; }
+.poppet-app[data-kept-count="4"] .poppet-save-desktop { box-shadow:0 0 18px rgba(212,175,101,.35),3px 3px 0 rgba(0,0,0,.28); animation:save-gate-glow 2.8s ease-in-out infinite; }
+@keyframes save-gate-glow { 50%{border-color:#f1c879;color:#f8e5a6} }
+
+/* Unsettling pass: the layers do not behave like four flat image slots. */
+.poppet-comp.has-outline #poppet-c-outline { filter:contrast(1.04) drop-shadow(1px 1px 0 rgba(33,20,13,.3)); }
+.poppet-comp.has-clothes #poppet-c-clothes { animation:poppet-cloth-breathe 6s ease-in-out infinite; transform-origin:50% 74%; }
+.poppet-comp.has-traits #poppet-c-traits { animation:poppet-trait-underlight 4.8s ease-in-out infinite; }
+.poppet-comp.has-others .poppet-ghost { animation:poppet-other-drift 5.7s ease-in-out infinite; }
+.poppet-comp.is-complete { animation:poppet-complete-weight 7s ease-in-out infinite; }
+.poppet-comp.is-complete::after { content:''; position:absolute; left:18%; right:18%; bottom:3%; height:4px; border-radius:50%; background:rgba(15,5,18,.28); filter:blur(3px); animation:poppet-shadow-breathe 7s ease-in-out infinite; }
+@keyframes poppet-cloth-breathe { 50%{transform:translateX(.6px) rotate(.35deg);opacity:.94} }
+@keyframes poppet-trait-underlight { 50%{filter:drop-shadow(0 0 8px rgba(155,175,90,.32));opacity:.82} }
+@keyframes poppet-other-drift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(2px,-3px)} }
+@keyframes poppet-complete-weight { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(2px) rotate(-.4deg)} }
+@keyframes poppet-shadow-breathe { 50%{transform:scaleX(.78);opacity:.5} }
+.poppet-saved-flash .poppet-bench { animation:poppet-saved-collapse 1.2s cubic-bezier(.18,.8,.25,1); }
+@keyframes poppet-saved-collapse { 0%{filter:brightness(1.8);transform:scale(1.01)} 30%{filter:brightness(.62);transform:scale(.995)} 100%{filter:brightness(1);transform:scale(1)} }

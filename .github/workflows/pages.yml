@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Stamp deploy SHA into api/health.json
+        run: |
+          SHORT="${GITHUB_SHA:0:7}"
+          node -e "const fs=require('fs');const p='api/health.json';const d=JSON.parse(fs.readFileSync(p,'utf8'));d.sha='$SHORT';fs.writeFileSync(p,JSON.stringify(d,null,2)+'\n')"
+          cat api/health.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4

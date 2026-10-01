@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <script src="src/desktop-gate.js"></script>
+  <title>Dreams — Insightful Inquiry</title>
+  <link rel="stylesheet" href="styles/room.css"/>
+  <link rel="stylesheet" href="styles/machine.css?v=big1"/>
+  <link rel="stylesheet" href="styles/bezel.css"/>
+  <link rel="stylesheet" href="styles/scars.css"/>
+  <link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+  <link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+  <link rel="stylesheet" href="styles/house.css"/>
+  <link rel="stylesheet" href="src/features/dreams/dreams.css"/>
+  <link rel="stylesheet" href="src/features/dreams/house.css"/>
+  <link rel="stylesheet" href="styles/shadow.css"/>
+  <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+  <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
+</head>
+<body>
+
+  <div class="room">
+    <div class="machine">
+      <div class="bezel">
+        <div class="carvings" id="carvings"></div>
+        <div class="vent-slits" aria-hidden="true"></div>
+        <div class="corruption-scars" aria-hidden="true">
+          <div class="scar scar-1"></div>
+          <div class="scar scar-2"></div>
+          <div class="scar scar-3"></div>
+          <div class="scar scar-4"></div>
+          <div class="scar scar-5"></div>
+          <div class="scar scar-6"></div>
+        </div>
+        <div class="led" aria-hidden="true"></div>
+        <div class="liber-plate">LIBER · VACUI</div>
+        <div class="power-button" aria-hidden="true"></div>
+        <div class="screw" aria-hidden="true"></div>
+
+        <div class="screen">
+          <div class="screen-stage">
+            <header class="dreams-titlebar">
+              <span class="dreams-titlebar-name">dreams</span>
+              <span class="dreams-titlebar-sub">insightful inquiry keeps the reading room</span>
+              <button class="dreams-help" type="button" id="dreams-help" aria-label="how this room works">?</button>
+              <button class="dreams-exit" type="button" id="dreams-exit" aria-label="leave">×</button>
+            </header>
+            <div class="dreams-app" data-state="dreams">
+
+              <div class="dreams-raison" id="dreams-raison" inert>
+                <div class="dreams-raison-inner">
+                  <div class="dreams-raison-head">
+                    <span class="dreams-raison-name">riason</span>
+                    <button class="dreams-raison-close" type="button" id="dreams-raison-close" aria-label="close">×</button>
+                  </div>
+                  <div class="dreams-raison-body">
+                    two doors, then. the journal keeps the dream. when you open an entry, it can offer a possible association tied to words you actually wrote — a cultural lens, not a verdict or diagnosis. the folios hold the sources and explain the method. your own associations come first; skip anything that does not fit.
+                  </div>
+                </div>
+              </div>
+
+              <div class="dreams-cite" id="dreams-cite" inert>
+                <div class="dreams-cite-inner">
+                  <div class="dreams-cite-head">
+                    <span class="dreams-cite-topic" id="dreams-cite-topic"></span>
+                    <button class="dreams-cite-close" type="button" id="dreams-cite-close" aria-label="close citation">×</button>
+                  </div>
+                  <div class="dreams-cite-body" id="dreams-cite-body"></div>
+                </div>
+              </div>
+
+              <div class="dreams-room">
+
+                <div class="dreams-head">
+                  <svg class="dreams-glove" viewBox="0 0 40 56" aria-hidden="true">
+                    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 44 L29 44 L28 52 L14 52 Z"/>
+                      <path d="M15 44 L15 40 C13 35 13 29 14 24 L15 17 C15.4 15 18.5 15 18.8 17 L19.5 22 L19.5 10 C19.5 7.5 23 7.5 23 10 L23.5 21 L24 6.5 C24.2 4 27.5 4 27.7 6.5 L28 20 L29.5 13 C30.2 10.8 33.4 11.6 33 14 L31.5 26 C31 31 29 34 28.6 38 L28.6 44"/>
+                      <path d="M15 40 C12.5 38 10.5 35 10 31.5 C9.8 29.6 12.4 29.2 13.4 30.8 L15 34"/>
+                    </g>
+                    <text class="dreams-glove-q" x="31" y="7" text-anchor="middle">?</text>
+                  </svg>
+                  <div class="dreams-title">dreams</div>
+                  <div class="dreams-sub">the dream belongs to you. this room offers one optional symbolic lens, never a verdict.</div>
+                </div>
+
+                <nav class="dreams-doors" aria-label="the reading room's two doors">
+                  <button class="dreams-door is-open" type="button" data-door="journal">
+                    <span class="dreams-door-num">i</span>
+                    <span class="dreams-door-name">the journal</span>
+                  </button>
+                  <button class="dreams-door" type="button" data-door="folios">
+                    <span class="dreams-door-num">ii</span>
+                    <span class="dreams-door-name">the folios</span>
+                  </button>
+                </nav>
+
+                <section class="dreams-pane" id="dreams-pane-journal">
+                  <div class="dreams-desk" id="dreams-desk">
+                    <form class="dreams-record" id="dreams-record" autocomplete="off">
+                      <label class="dreams-field">
+                        <span class="dreams-field-label">the dream's name</span>
+                        <input type="text" id="dreams-title-input" maxlength="80"/>
+                      </label>
+                      <label class="dreams-field">
+                        <span class="dreams-field-label">the dream itself</span>
+                        <textarea id="dreams-text-input" rows="4"></textarea>
+                      </label>
+                      <div class="dreams-record-actions">
+                        <button type="submit" id="dreams-record-btn" class="dreams-record-btn">record the dream</button>
+                        <span class="dreams-record-note" id="dreams-record-note" role="status" aria-live="polite">it goes in the ledger. open an entry when you want a possible association.</span>
+                      </div>
+                    </form>
+
+                    <div class="dreams-ledger" id="dreams-ledger"></div>
+                  </div>
+
+                  <div class="dreams-reading" id="dreams-reading" hidden>
+                    <div class="dreams-spread" id="dreams-spread">
+                      <div class="dreams-leaf dreams-leaf-left" id="dreams-leaf-left">
+                        <div class="dreams-paper dreams-plate" id="dreams-plate">
+                          <div class="dreams-read-title" id="dreams-read-title"></div>
+                          <div class="dreams-read-date" id="dreams-read-date"></div>
+                          <div class="dreams-read-text" id="dreams-read-text"></div>
+                        </div>
+                      </div>
+                      <div class="dreams-spine">
+                        <span class="dreams-stitch" aria-hidden="true"></span><span class="dreams-stitch" aria-hidden="true"></span>
+                        <span class="dreams-stitch" aria-hidden="true"></span><span class="dreams-stitch" aria-hidden="true"></span>
+                        <span class="dreams-stitch" aria-hidden="true"></span>
+                        <div class="dreams-fittings">
+                          <button type="button" class="dreams-read-keep dreams-fitting" id="dreams-read-keep">keep to the book</button>
+                          <button type="button" class="dreams-read-keep dreams-fitting" id="dreams-read-plant">plant as a seed</button>
+                        </div>
+                      </div>
+                      <div class="dreams-paper dreams-leaf dreams-leaf-right" id="dreams-leaf-right">
+                        <div class="dreams-ornament" aria-hidden="true"><span>☿</span></div>
+                        <div class="dreams-read-body" id="dreams-read-body"></div>
+                        <div class="dreams-assoc">
+                          <div class="dreams-assoc-head">
+                            <span class="dreams-assoc-name">associations</span>
+                            <span class="dreams-assoc-hint">what the image stirs — ringed words ride along</span>
+                          </div>
+                          <div class="dreams-keep-row" id="dreams-keep-row" hidden>
+                            <button type="button" class="dreams-read-keep" id="dreams-keep-delete">remove from the book</button>
+                            <label class="dreams-keep-attach">attach to <select id="dreams-keep-attach"><option value="">— pick an artifact —</option></select></label>
+                            <span class="dreams-keep-attach-status" id="dreams-keep-attach-status" role="status" aria-live="polite"></span>
+                          </div>
+                          <form class="dreams-assoc-form" id="dreams-assoc-form" autocomplete="off">
+                            <textarea id="dreams-assoc-input" rows="2"></textarea>
+                            <button type="submit" id="dreams-assoc-btn" class="dreams-assoc-btn">add association</button>
+                          </form>
+                          <div class="dreams-assoc-list" id="dreams-assoc-list"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <button class="dreams-back" type="button" id="dreams-back">← back to the ledger</button>
+                  </div>
+                </section>
+
+                <section class="dreams-pane" id="dreams-pane-folios" hidden>
+                  <div class="dreams-folios">
+                    <div class="dreams-drawers" id="dreams-drawers"></div>
+                    <div class="dreams-folio" id="dreams-folio">
+                      <div class="dreams-folio-empty">pull a folio from the shelf.</div>
+                    </div>
+                  </div>
+                </section>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-base" aria-hidden="true">
+        <span class="base-heart"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/boot-gate.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/stage.js?v=big1"></script>
+  <script src="src/room-shell.js"></script>
+  <script src="data/rooms.data.js"></script>
+  <script src="src/house.js"></script>
+  <script src="src/sound.js"></script>
+  <script src="src/shadow.js"></script>
+  <script src="src/apply-theme.js"></script>
+  <script src="src/carvings.js"></script>
+  <script src="data/citations.data.js"></script>
+  <script src="data/dreams.data.js"></script>
+  <script src="src/features/dreams/dreams.js"></script>
+  <script src="src/cartridge-transit.js?v=off1"></script>
+  <script src="src/crt-bay.js?v=mem7"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="src/pixi-runtime.js"></script>
+  <script src="src/pixi-palette.js?v=cleanup-20260922"></script>
+  <script src="src/trave-rom.js?v=run13"></script>
+<script src="src/app-tutorial.js?v=at3"></script>
+<script>
+  if (window.AppTutorial) window.AppTutorial.mount({
+    id: 'dreams',
+    traveller: 'INSIGHTFUL INQUIRY',
+    accent: '#a48ad4',
+    title: 'the dream desk',
+    helpButton: '#dreams-help',
+    lines: ['Write down a dream before it fades. Dreams can grow into garden seeds, and kept dreams orbit the poppet like everything else.']
+  });
+</script>
+</body>
+</html>

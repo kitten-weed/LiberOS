@@ -1,0 +1,451 @@
+/* ============================================================================
+   house.css — the room the machine stands in.
+
+   Liber is a house. The machine sits in a different room of it depending on
+   whose room you are standing in; the main menu keeps the house's own room
+   (src/features/crt-room/, "look behind").
+
+   THIS FILE IS THE BUILDING, NOT THE FURNITURE. It carries the architecture
+   every room of the house shares — the wall, the floor, the skirting, the
+   door to the hall, the window opening, and the geometry of the lamp. The
+   finish (substrate, palette, light, furniture, tells) is declared by each
+   room in its own stylesheet, src/features/<room>/house.css, which is the
+   only place that room's material is written down. If a rule in this file
+   names a colour, it is a default for a room that has not declared one yet,
+   and every room here declares one.
+
+   WHAT IT REMEMBERS (covenant rule 4). The machine's memory is re-made in
+   the room's own material rather than copied: the session light of
+   gamification.js (state.sessionStart) burns down as you sit, and the shelf
+   holds one volume per journal keep (state.journal) — the same two hooks
+   named in liberdev/room-hooks.md, expressed in this room's substrate. A
+   page shows one room, so nothing is ever rendered twice.
+
+   MOTION. Nothing here is timed that carries meaning. The lamp's breath and
+   the room's drift are CSS and are covered, like every other animation in
+   the machine, by the consent rule in styles/room.css.
+
+   Reads state only through window.Liber.state. No shared imports.
+   ============================================================================ */
+
+.house-scene {
+  /* defaults — a room that declares nothing gets an unlit spare room, which
+     is its own kind of honest. Every room in this house declares its own. */
+  --house-horizon: 32%;
+  --house-ceiling: 7%;
+  --house-lamp-cord: 14;
+  --house-wall-hi: #241b14;
+  --house-wall: #17110c;
+  --house-wall-lo: #0b0806;
+  --house-floor-lit: #2a2018;
+  --house-floor: #150f0a;
+  --house-line: rgba(0, 0, 0, 0.62);
+  --house-frame: #2a1c12;
+  --house-brass: #8a6a38;
+  --house-glass: #141a26;
+  --house-door: #221610;
+  --house-door-frame: #170e07;
+  /* the lamp hangs in the band, in machine units, like the furniture — a
+     light the room never shows is a light that is not lit */
+  --house-lamp-x: 7;
+  --house-lamp-y: 2;
+  --house-lamp-core: #ffd9a0;
+  --house-lamp-wash: rgba(255, 198, 128, 0.16);
+  --house-accent: #d4af65;
+  --house-grain: rgba(255, 255, 255, 0.02);
+  --house-burn: 1;
+
+  /* ── THE SEEN BAND ────────────────────────────────────────────────────────
+     The room is only visible where the machine is not. src/house.js measures
+     .machine and the desk tube on load and on every resize and writes these
+     four, so furniture is placed against the part of the room that is
+     actually seen instead of against the window. This is the fix for
+     furniture that slid behind the machine whenever the window changed: the
+     band is a property of the desk, not of the window.
+
+     --house-band-x  px  the band's left edge: the machine's right edge
+     --house-band-w  px  the band's width, to the window's right edge
+     --house-above   px  the band's clear height: the tube's top edge
+     --house-unit    px  the machine's width. Furniture is sized against the
+                         machine and not against the leftover band, so a room
+                         keeps its proportion to the desk at every window
+                         shape. The band is whatever is left over and grows
+                         or shrinks wildly with the window; the machine is
+                         the one thing in the room that does not.
+
+     The fallbacks describe the fluid layout before the desk is measured, and
+     are what runs if the machine is ever absent. */
+  --house-band-x: 72vw;
+  --house-band-w: 28vw;
+  --house-above: 40vh;
+  --house-unit: 72vw;
+
+  /* ── THE GLASS ────────────────────────────────────────────────────────────
+     One opening in the house, in the same place in every room: the weather
+     behind it is the room's, the opening is the building's. It is measured
+     from the band's right edge in machine units, not from the window's edge
+     in percentages, so the wall it leaves for furniture is a known width at
+     every window shape instead of a number that drifts with the browser.
+     --house-glass-x is that opening's left edge, from the band's left edge;
+     furniture that hangs at the near side of the glass reads it. */
+  --house-window-r: 2;
+  --house-window-w: 12;
+  --house-window-h: 15;
+  --house-window-t: 2;
+  --house-glass-x: calc(var(--house-band-w) - (var(--house-window-r) + var(--house-window-w)) * var(--house-unit) / 100);
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #050403;
+}
+
+/* ── the ceiling: a dark band, so the lamp has something to hang from ────── */
+.house-ceiling {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--house-ceiling);
+  background: linear-gradient(180deg, #040302 0%, rgba(0, 0, 0, 0.55) 74%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* ── the wall: the lamp's wash over the room's own substrate ─────────────── */
+.house-wall {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: var(--house-horizon);
+  background-color: var(--house-wall);
+  background-image:
+    radial-gradient(ellipse 34% 46% at
+      calc(var(--house-band-x) + var(--house-lamp-x) * var(--house-unit) / 100)
+      calc(var(--house-lamp-y) * var(--house-unit) / 100),
+      var(--house-lamp-wash) 0%, rgba(0, 0, 0, 0) 68%),
+    var(--house-wall-sheen, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 42%)),
+    var(--house-wall-pattern, none),
+    linear-gradient(180deg, var(--house-wall-hi) 0%, var(--house-wall) 58%, var(--house-wall-lo) 100%);
+}
+
+/* ── the floor ───────────────────────────────────────────────────────────── */
+.house-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--house-horizon);
+  background-color: var(--house-floor);
+  background-image:
+    radial-gradient(ellipse 42% 120% at
+      calc(var(--house-band-x) + var(--house-lamp-x) * var(--house-unit) / 100) -30%,
+      var(--house-lamp-wash) 0%, rgba(0, 0, 0, 0) 62%),
+    var(--house-floor-pattern, none),
+    linear-gradient(180deg, var(--house-floor-lit) 0%, var(--house-floor) 52%, #030201 100%);
+}
+
+/* the boards: the skirting where wall meets floor, and a light line on the
+   near edge — one line, because a second one turns the room into a diagram */
+.house-skirting {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--house-horizon);
+  height: clamp(6px, 0.9vh, 12px);
+  background: linear-gradient(180deg, var(--house-line) 0%, rgba(0, 0, 0, 0) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ── no door in here ─────────────────────────────────────────────────────
+   There was a shut door to the hall on the left wall, and it was honest —
+   you do not leave a room by its door here, you leave by its own exit. It is
+   retired because the only wall this room has is the band above the desk
+   tube, and a door whose top half hangs there while its bottom half is
+   behind the monitor is not a door, it is a piece of a door. A room that
+   shows what it can show beats a room that shows the tops of things. */
+
+/* ── the window: same opening in every room, different weather in it ─────── */
+.house-window {
+  position: absolute;
+  right: auto;
+  left: calc(var(--house-band-x) + var(--house-glass-x));
+  top: calc(var(--house-window-t) * var(--house-unit) / 100);
+  width: calc(var(--house-window-w) * var(--house-unit) / 100);
+  height: calc(var(--house-window-h) * var(--house-unit) / 100);
+  background: var(--house-glass);
+  border: clamp(4px, 0.5vw, 8px) solid var(--house-frame);
+  box-shadow:
+    inset 0 0 34px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 0 1px var(--house-line);
+}
+
+/* the glazing bars: one upright, one transom — the method is joinery */
+.house-window::before,
+.house-window::after { content: ''; position: absolute; background: var(--house-frame); }
+.house-window::before { left: 50%; top: 0; bottom: 0; width: clamp(3px, 0.4vw, 6px); transform: translateX(-50%); }
+.house-window::after  { top: 46%; left: 0; right: 0; height: clamp(3px, 0.4vw, 6px); }
+
+.house-sill {
+  position: absolute;
+  left: -9%;
+  right: -9%;
+  bottom: -7px;
+  height: clamp(5px, 0.7vh, 10px);
+  background: linear-gradient(180deg, var(--house-frame) 0%, rgba(0, 0, 0, 0.75) 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ── the light: named as an object, hung where the room declares it ───────
+   The cord is real, so the lamp is a thing in the room and not a gradient
+   that happens to sit there. Its glow carries --house-burn, which the
+   session clock writes as the sitting goes on. */
+.house-lamp {
+  position: absolute;
+  left: calc(var(--house-band-x) + var(--house-lamp-x, 7) * var(--house-unit) / 100);
+  top: calc(var(--house-lamp-y, 2) * var(--house-unit) / 100);
+  width: 0;
+  height: 0;
+}
+/* the lamp is light, not furniture: it stays in every tier, because the wash
+   it throws on the wall is the room's only guarantee that it is lit at all */
+
+/* the cord climbs to the ceiling band, so the lamp is hung and not a shape
+   that happens to sit on the wall. Heights are in machine units, like the
+   furniture, so the lamp keeps its proportion to the desk. */
+.house-lamp-cord {
+  position: absolute;
+  left: -1px;
+  top: calc(-1 * var(--house-lamp-cord, 14) * var(--house-unit) / 100);
+  height: calc(var(--house-lamp-cord, 14) * var(--house-unit) / 100);
+  width: 2px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(60, 46, 30, 0.9) 100%);
+}
+
+.house-lamp-body {
+  position: absolute;
+  left: calc(-1.6 * var(--house-unit) / 100);
+  top: calc(-0.8 * var(--house-unit) / 100);
+  width: calc(3.2 * var(--house-unit) / 100);
+  height: calc(3.2 * var(--house-unit) / 100);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 34%, #fff6e0 0%, var(--house-lamp-core) 42%, #6a4a20 100%);
+  box-shadow:
+    0 0 10px 2px color-mix(in srgb, var(--house-lamp-core) 60%, transparent),
+    0 0 40px 12px var(--house-lamp-wash);
+  opacity: calc(0.3 + 0.7 * var(--house-burn));
+}
+/* the memory room keeps one lamp only: the toy desk lamp standing in the
+   sand. The shell's pendant is retired here. */
+.house-scene[data-house="memory"] .house-lamp { display: none; }
+
+/* ── the shelf: the machine's ledger, in this room's shelf ───────────────
+   Placed in the band like a prop, in machine units, for the same reason. */
+.house-shelf {
+  position: absolute;
+  left: calc(var(--house-band-x) + var(--house-shelf-x, 1.2) * var(--house-unit) / 100);
+  top: calc(var(--house-shelf-y, 1.2) * var(--house-unit) / 100);
+  width: calc(var(--house-shelf-w, 6) * var(--house-unit) / 100);
+  height: calc(var(--house-shelf-h, 5) * var(--house-unit) / 100);
+}
+
+/* two uprights, so a shelf is joinery and not three planks in the air */
+.house-shelf::before,
+.house-shelf::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(4px, 0.45vw, 8px);
+  background: linear-gradient(180deg, var(--house-shelf-lit, #6a5230) 0%, var(--house-shelf-wood, #3a2a16) 100%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+.house-shelf::before { left: -1px; }
+.house-shelf::after  { right: -1px; }
+
+.house-shelf-board {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: clamp(5px, 0.9vh, 11px);
+  background: linear-gradient(180deg, var(--house-shelf-lit, #6a5230) 0%, var(--house-shelf-wood, #3a2a16) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* one volume per keep; the row rides on the board it stood on */
+.house-row {
+  position: absolute;
+  bottom: 100%;
+  left: 5%;
+  right: 5%;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* the board: one pinned card per relation — a pinboard, a chart wall, a
+   card index. The room decides the surface; this decides only the pins. */
+.house-pins {
+  position: absolute;
+  left: calc(var(--house-band-x) + var(--house-pins-x, 14) * var(--house-unit) / 100);
+  top: calc(var(--house-pins-y, 2) * var(--house-unit) / 100);
+  width: calc(var(--house-pins-w, 10) * var(--house-unit) / 100);
+  height: calc(var(--house-pins-h, 12) * var(--house-unit) / 100);
+}
+
+.house-pin {
+  position: absolute;
+  width: clamp(7px, 0.8vw, 13px);
+  height: clamp(9px, 1vw, 16px);
+  background: linear-gradient(180deg, #e8e0cc 0%, #b8ad92 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* ── the house yields while the gaze is open ──────────────────────────────
+   The machine's backdrop is opaque, and the room behind the CRT is the one
+   that must be seen when the traveller looks behind it (COVENANT, rule 4:
+   "a feature that changes it must yield while the gaze is open"). Without
+   this the house is a sheet painted over the very room it stands in. The
+   transition matches the gaze's own recede; under reduced motion the global
+   consent rule in styles/room.css makes it the instant state change it is. */
+/* (the crt-room gaze reveal retired; the Look Behind world owns gaze) */
+
+/* the water table, in the one room of the house that has one. It is on the
+   boards, so it takes the floor slot, and it is seen through the gap under
+   the machine, which is the room's one level sightline. */
+.house-pool {
+  position: absolute;
+  overflow: hidden;
+  left: calc(var(--house-band-x) + var(--house-pool-x, 2) * var(--house-unit) / 100);
+  bottom: calc(var(--house-pool-y, 1) * var(--house-unit) / 100);
+  width: calc(var(--house-pool-w, 18) * var(--house-unit) / 100);
+  height: calc(var(--house-pool-h, 5) * var(--house-unit) / 100);
+}
+.house-pool-water {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6%;
+  background: linear-gradient(180deg, rgba(90, 150, 150, 0.5) 0%, rgba(30, 70, 74, 0.85) 100%);
+  box-shadow: inset 0 2px 0 rgba(190, 226, 226, 0.4);
+}
+
+.house-volume {
+  display: block;
+  border-radius: 1px 2px 0 0;
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.45), inset 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── the props: the room's furniture, positioned by the room's own file ───
+   Two slots, and nothing else — the two regions of the room that survive
+   every window shape:
+
+     band   the clear wall above the desk tube
+     floor  the boards below the machine, in the band
+
+   And one unit. A prop says which slot it stands in and then only where it
+   sits and how big it is, both measured in MACHINE UNITS — hundredths of the
+   machine's own width. Position and size therefore stay in proportion to the
+   desk instead of stretching with the leftover space, which is the whole
+   reason furniture used to slide: the band grows and shrinks wildly with the
+   window, the machine does not.
+
+     --x  across the slot from its left edge, in units
+     --y  down the slot from its top edge (band) / up from its foot (floor)
+     --w  width in units    --h  height in units (so it squares)
+
+   A prop that declares no slot is not built. That is deliberate: a prop a
+   slot cannot hold is furniture the traveller cannot see, and the covenant
+   does not ask a room to be full, it asks it to be a room. Two or three
+   telling things on a wall beat eleven standing behind a monitor. */
+.house-prop {
+  position: absolute;
+  pointer-events: none;
+  display: none;
+}
+
+.house-prop[data-place="band"] {
+  display: block;
+  left: calc(var(--house-band-x) + var(--x, 2) * var(--house-unit) / 100);
+  top: calc(var(--y, 2) * var(--house-unit) / 100);
+  width: calc(var(--w, 12) * var(--house-unit) / 100);
+  height: calc(var(--h, 12) * var(--house-unit) / 100);
+}
+
+.house-prop[data-place="floor"] {
+  display: block;
+  left: calc(var(--house-band-x) + var(--x, 2) * var(--house-unit) / 100);
+  bottom: calc(var(--y, 1) * var(--house-unit) / 100);
+  width: calc(var(--w, 10) * var(--house-unit) / 100);
+  height: calc(var(--h, 6) * var(--house-unit) / 100);
+}
+
+/* ── the capacity tiers ───────────────────────────────────────────────────
+   The band is not the same room at 439px and at 2560px. src/house.js measures
+   how many machine units of wall it actually got and stamps `data-band`:
+
+     none   no wall worth furnishing — substrate and light only
+     tight  the wall takes the two or three things that carry the room
+     roomy  the wall takes everything the room declares
+
+   A room keeps its own opinion about which of its things are the load-bearing
+   ones: it hides the rest in a tight band by naming them (see any
+   src/features/<room>/house.css). Nothing here decides a room's essentials. */
+.house-scene[data-band="none"] .house-prop { display: none; }
+/* Hooks are structural room furniture, not optional wall decoration. Keep
+   the shelf/pool/board present at the compact supported sizes so their
+   declared memory remains visible instead of silently collapsing to 0×0. */
+
+/* a wall-mounted prop casts nothing on the boards; only a prop that stands
+   on the floor gets a contact shadow (covenant, drawn-prop rule 6) */
+.house-prop[data-place="band"]::after { display: none; }
+
+/* a contact shadow, so nothing in the house floats (drawn-prop rule 6) */
+.house-prop::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: calc(-0.5 * var(--house-unit) / 100);
+  height: calc(1.1 * var(--house-unit) / 100);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0) 72%);
+  filter: blur(2px);
+  z-index: -1;
+}
+
+/* a prop that stands on the floor gets its shadow on the floor; props that
+   hang (a curtain, a chart) declare no-shadow instead */
+.house-prop[data-shadow="none"]::after { display: none; }
+
+/* ── the dust: presence settles on a room, it does not brighten it ──────── */
+.house-dust {
+  position: absolute;
+  inset: 0;
+  opacity: calc(0.1 + 0.16 * var(--house-tier, 0));
+  background:
+    radial-gradient(circle at 18% 74%, rgba(255, 246, 224, 0.05) 0%, rgba(0, 0, 0, 0) 22%),
+    radial-gradient(circle at 72% 40%, rgba(255, 246, 224, 0.04) 0%, rgba(0, 0, 0, 0) 26%),
+    radial-gradient(circle at 46% 88%, rgba(255, 246, 224, 0.035) 0%, rgba(0, 0, 0, 0) 20%);
+  background-size: 320px 240px, 260px 300px, 220px 200px;
+}
+
+/* ── the lamp's breath: one slow flicker, and the room's own quiet ──────── */
+@keyframes house-lamp-breath {
+  0%, 100% { opacity: calc(0.3 + 0.7 * var(--house-burn)); }
+  47%      { opacity: calc(0.26 + 0.7 * var(--house-burn)); }
+  73%      { opacity: calc(0.32 + 0.68 * var(--house-burn)); }
+}
+
+.house-lamp-body { animation: house-lamp-breath 7.5s ease-in-out infinite; }
+
+/* the window's weather: rain on the glass, only when the machine says so */
+.house-scene[data-weather="rain"] .house-window::after {
+  background:
+    repeating-linear-gradient(96deg, rgba(210, 226, 240, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 7px),
+    var(--house-frame);
+}

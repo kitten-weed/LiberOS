@@ -1,0 +1,133 @@
+/* ============================================================================
+   divination/house.css — the observatory.
+
+   Arcana's room of the house. Plaster and felt and chalk, brass and night air;
+   the meridian chalked on the wall and redrawn rather than rubbed out; a red
+   darkroom lamp, low, because anything brighter would ruin the seeing.
+
+   COMPOSITION. Band above the tube, boards below the machine, machine units.
+   The telescope and the table are not built — a telescope is a floor and a
+   ceiling and this room has neither. What is left is what the observer
+   actually reads: the meridian, the chart with one star too many, the drape
+   at the slit, the chair left facing the dark.
+
+   SUBSTRATE  plaster, chalk, felt, brass, night air
+   LIGHT      one red darkroom lamp, low, warm; the dome slit open on the cold
+   TELLS      the meridian chalked and redrawn, a chart of a sky with one star
+              too many, the chair turned to face the slit and not the table
+   ============================================================================ */
+
+.house-scene[data-house="divination"] {
+  --house-wall-hi: #2e2a33;
+  --house-wall: #1d1a22;
+  --house-wall-lo: #0d0b10;
+  --house-wall-pattern:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.26) 0 1px, rgba(255, 255, 255, 0.016) 1px 2px, rgba(0, 0, 0, 0) 2px 40px),
+    radial-gradient(ellipse 46% 40% at 22% 12%, rgba(150, 130, 180, 0.10) 0%, rgba(0, 0, 0, 0) 68%),
+    radial-gradient(ellipse 30% 34% at 74% 78%, rgba(180, 70, 50, 0.12) 0%, rgba(0, 0, 0, 0) 72%);
+  --house-wall-sheen: linear-gradient(180deg, rgba(226, 220, 236, 0.05) 0%, rgba(0, 0, 0, 0) 44%);
+
+  --house-floor-lit: #2a2630;
+  --house-floor: #151318;
+  --house-floor-pattern: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.34) 0 2px, rgba(0, 0, 0, 0) 2px 44px);
+
+  --house-frame: #3a3038;
+  --house-glass: #0a0c18;
+  --house-door: #241f2a;
+  --house-door-frame: #121016;
+  --house-brass: #8a7a52;
+
+  --house-lamp-x: 8.2;
+  --house-lamp-y: 1.2;
+  --house-lamp-cord: 4;
+  --house-lamp-core: #ff7a58;
+  --house-lamp-wash: rgba(220, 84, 60, 0.26);
+  --house-accent: #c8b8d8;
+
+  --house-shelf-x: 1.2;
+  --house-shelf-y: 1.2;
+  --house-shelf-w: 5;
+  --house-shelf-h: 5;
+  --house-shelf-wood: #3a3038;
+  --house-shelf-lit: #6a5c68;
+
+  /* the chart wall: a pinned star chart, one card per relation */
+  --house-pins-x: 12.4;
+  --house-pins-y: 1.2;
+  --house-pins-w: 5;
+  --house-pins-h: 5;
+
+  /* in machine units, like every other measure in the house — see
+     src/features/journal/house.css for why a percentage is wrong here */
+  --house-window-h: 17;
+  --house-window-t: 2;
+}
+
+/* ── the glass: the dome slit, and the cold stars past it ───────────────── */
+.house-scene[data-house="divination"] .house-window {
+  background-image:
+    radial-gradient(circle at 22% 18%, rgba(240, 244, 255, 0.9) 0 1.5%, rgba(0, 0, 0, 0) 4.4%),
+    radial-gradient(circle at 62% 32%, rgba(226, 236, 255, 0.6) 0 1.1%, rgba(0, 0, 0, 0) 3.6%),
+    radial-gradient(circle at 78% 68%, rgba(226, 236, 255, 0.5) 0 0.9%, rgba(0, 0, 0, 0) 3%),
+    radial-gradient(circle at 38% 74%, rgba(226, 236, 255, 0.4) 0 0.8%, rgba(0, 0, 0, 0) 2.6%),
+    linear-gradient(180deg, #0b1024 0%, #070a1a 62%, #04050d 100%);
+  box-shadow:
+    inset 0 0 46px rgba(0, 0, 0, 0.8),
+    inset 0 0 0 1px rgba(150, 170, 220, 0.08),
+    0 0 0 1px var(--house-line);
+}
+
+/* the red darkroom lamp: a ruby bulb with a shade over the top of it */
+.house-scene[data-house="divination"] .house-lamp-body {
+  border-radius: 46% 46% 40% 40% / 22% 22% 78% 78%;
+  background: linear-gradient(180deg, #7a2418 0%, var(--house-lamp-core) 58%, #3a0e08 100%);
+  box-shadow:
+    inset 0 -4px 8px rgba(0, 0, 0, 0.5),
+    0 0 12px 3px color-mix(in srgb, var(--house-lamp-core) 46%, transparent),
+    0 0 44px 16px var(--house-lamp-wash);
+}
+
+/* ── the chart wall: a star chart with one star too many ────────────────── */
+.house-scene[data-house="divination"] .house-pins {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 1px 12px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 1px 12px),
+    linear-gradient(180deg, #d8d2c0 0%, #b0a894 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5), 0 3px 8px rgba(0, 0, 0, 0.6);
+}
+.house-scene[data-house="divination"] .house-pin {
+  background: radial-gradient(circle at 36% 30%, #f4f0e0 0%, #a89c80 70%);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* ── the meridian, chalked on the plaster and redrawn, not rubbed out ───── */
+.house-scene[data-house="divination"] .house-prop[data-prop="chalkline"] {
+  --x: 1.2; --y: 6.8; --w: 5; --h: 5;
+  background:
+    linear-gradient(90.8deg, rgba(0, 0, 0, 0) 0 46%, rgba(232, 228, 214, 0.46) 46% 47%, rgba(0, 0, 0, 0) 47% 100%),
+    linear-gradient(178.4deg, rgba(0, 0, 0, 0) 0 22%, rgba(232, 228, 214, 0.3) 22% 23.4%, rgba(0, 0, 0, 0) 23.4% 100%),
+    radial-gradient(circle at 84% 26%, rgba(232, 228, 214, 0.5) 0 3%, rgba(0, 0, 0, 0) 5%);
+  opacity: 0.78;
+}
+
+/* ── the drape at the slit, tied back and left hanging ─────────────────── */
+.house-scene[data-house="divination"] .house-prop[data-prop="drape"] {
+  /* hangs at the near edge of the glass, wherever the glass is */
+  --y: 0; --h: 9;
+  left: calc(var(--house-band-x) + var(--house-glass-x) - 1.3 * var(--house-unit) / 100);
+  width: calc(1.3 * var(--house-unit) / 100);
+  background: repeating-linear-gradient(90deg, #2a2438 0 5px, #1e1a2a 5px 12px);
+  border-radius: 0 0 3px 3px;
+  box-shadow: inset -2px 0 0 rgba(0, 0, 0, 0.5), 4px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ── the chair, turned to face the dark instead of the table ───────────── */
+.house-scene[data-house="divination"] .house-prop[data-prop="chair"] {
+  --x: 2; --y: 0; --w: 3.2; --h: 4;
+  border-radius: 4px 4px 2px 2px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0) 26%),
+    linear-gradient(180deg, #3a3442 0%, #241f2a 62%, #14111a 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}

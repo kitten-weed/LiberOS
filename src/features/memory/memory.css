@@ -1,0 +1,392 @@
+/* memory.css — the sand tray room, inside the machine's glass.
+   A 3d basin of sand fills the screen; a box of toys stands beside it; four
+   machines wait along the back wall; three empty photo frames hang above.
+   Everything readable is real DOM text; the canvas is the room itself. */
+
+.memory {
+  --fg: #d8cdbb;
+  --dim: #8a7c68;
+  --dimmer: #4a4034;
+  --sand: #d8b877;
+  --sand-dim: #a8884e;
+  --amber: #e3c78a;
+  --red: #b03030;
+  --photo: #ece4d2;
+  --panel: rgba(24, 19, 14, 0.92);
+  --line: rgba(216, 184, 119, 0.4);
+  --mono: "Fira Code", "Cascadia Mono", "VT323", ui-monospace, Menlo, Consolas, monospace;
+  font-family: var(--mono);
+  color: var(--fg);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ── the stage: fills the machine's glass, under the room's own header ── */
+.mem-statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  white-space: nowrap;
+  font-size: 1.02rem;
+  color: var(--dim);
+  background: linear-gradient(180deg, rgba(16, 12, 8, 0.92), rgba(16, 12, 8, 0.6));
+  border-bottom: 1px solid rgba(216, 184, 119, 0.2);
+}
+.mem-statusbar .st-name { color: var(--amber); letter-spacing: 0.14em; transform: rotate(-1.2deg); }
+.mem-statusbar .st-sub { overflow: hidden; text-overflow: ellipsis; font-style: normal; transform: rotate(-0.4deg); }
+.mem-statusbar .st-spacer { flex: 1; }
+.mem-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--dimmer);
+  border-radius: 4px;
+  padding: 5px 9px 6px;
+  cursor: pointer;
+}
+.mem-btn:hover, .mem-btn:focus-visible { border-color: var(--line); color: var(--amber); outline: none; }
+.mem-btn:active { transform: translateY(1px); }
+.mem-btn.mem-x { min-width: 32px; }
+
+.mem-stage {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: radial-gradient(ellipse 90% 70% at 50% 30%, #1c1610 0%, #0e0b08 70%);
+}
+/* ── the field: the 3d room fills the stage ────────────────────────── */
+.mem-field { position: absolute; inset: 0; }
+.mem-field canvas { display: block; }
+.mem-field.mem-paint { cursor: crosshair; }
+.mem-field.mem-pour { cursor: grabbing; }
+.mem-field.mem-drag { cursor: grabbing; }
+.mem-flatnote {
+  position: absolute; inset: auto 0 12px 0; text-align: center;
+  color: var(--dimmer); font-size: 0.95rem;
+}
+
+/* ── the photograph string: polaroids hung from a wire under the plate ─ */
+.mem-string {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  padding-top: 3px;
+  pointer-events: none;
+  z-index: 7;
+}
+.mem-string::before {
+  /* the wire itself */
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 420px;
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(216, 184, 119, 0.55) 12%, rgba(216, 184, 119, 0.55) 88%, transparent);
+}
+.mem-polaroid {
+  position: relative;
+  width: 84px;
+  padding: 5px 5px 14px;
+  background: linear-gradient(180deg, #efe6d2, #ddd2ba);
+  border: 1px solid rgba(40, 28, 16, 0.4);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
+  transform-origin: 50% -14px;
+  animation: mem-sway 5.5s ease-in-out infinite;
+}
+.mem-polaroid:nth-child(2) { animation-delay: -1.9s; margin-top: 10px; }
+.mem-polaroid:nth-child(3) { animation-delay: -3.4s; margin-top: 4px; }
+.mem-polaroid:nth-child(1) { transform: rotate(-3deg); }
+.mem-polaroid:nth-child(2) { transform: rotate(1.6deg); }
+.mem-polaroid:nth-child(3) { transform: rotate(3.4deg); }
+@keyframes mem-sway {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 4px; }
+}
+.mem-polaroid img {
+  display: block;
+  width: 74px;
+  height: 55px;
+  object-fit: cover;
+  filter: sepia(0.18) contrast(1.04);
+  background: #241c12;
+}
+.mem-polaroid::after {
+  /* the tape that holds it to the wire */
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 26px;
+  height: 9px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(216, 184, 119, 0.35);
+  border: 1px solid rgba(216, 184, 119, 0.5);
+}
+.mem-polaroid .p-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: #3a2c1a;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mem-polaroid { animation: none; }
+}
+.mem-polaroid.empty { visibility: hidden; }
+.mem-polaroid:not(.empty) {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.mem-polaroid:not(.empty):hover {
+  transform: translateY(-6px) rotate(0deg) scale(1.06);
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.65);
+  z-index: 9;
+}
+.mem-polaroid:not(.empty):hover::after { background: rgba(216, 184, 119, 0.55); }
+
+/* ── projected labels over the figures ─────────────────────────────── */
+.mem-labels { position: absolute; inset: 0; pointer-events: none; z-index: 6; }
+.mem-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: rgba(16, 13, 10, 0.85);
+  border: 1px solid var(--line);
+  color: var(--amber);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  padding: 2px 7px 3px;
+  border-radius: 3px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.mem-label::after {           /* the little stick into the sand */
+  content: "";
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 1px; height: 9px;
+  background: var(--line);
+}
+.mem-label.picked { color: #100d0a; background: var(--amber); border-color: var(--amber); }
+.mem-label.adding { color: #b0e090; border-color: rgba(176, 224, 144, 0.6); }
+
+/* ── the tool rail ─────────────────────────────────────────────────── */
+.mem-tools {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid rgba(216, 184, 119, 0.28);
+  border-radius: 8px;
+}
+.mem-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 62px;
+  min-height: 48px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 4px 6px 2px;
+  cursor: pointer;
+}
+.mem-tool:hover, .mem-tool:focus-visible { border-color: var(--line); outline: none; }
+.mem-tool.on {
+  border-color: var(--amber);
+  background: rgba(227, 199, 138, 0.12);
+  color: var(--amber);
+  box-shadow: 0 0 14px -4px var(--amber);
+}
+.mem-tool svg { width: 22px; height: 22px; }
+.mem-tool .t-sub { font-size: 0.82rem; color: var(--dimmer); min-height: 1em; }
+
+/* ── the paint palette ─────────────────────────────────────────────── */
+.mem-palette {
+  position: absolute;
+  bottom: 74px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid rgba(216, 184, 119, 0.28);
+  border-radius: 6px;
+}
+.mem-paint {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.mem-palette[hidden] { display: none; }
+.mem-paint.on { border-color: #fff; box-shadow: 0 0 10px -2px currentColor; }
+
+/* ── the red photo button ──────────────────────────────────────────── */
+.mem-shutter {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 4px;
+}
+.mem-shutter i {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #e06a5a, var(--red) 55%, #601414 90%);
+  border: 3px solid #3a1210;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+.mem-shutter:hover i, .mem-shutter:focus-visible i { box-shadow: 0 4px 14px rgba(176, 48, 48, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3); outline: none; }
+.mem-shutter:active i { transform: scale(0.92) translateY(2px); }
+
+/* ── the photo preview / story card ────────────────────────────────── */
+.mem-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 4, 0.72);
+}
+.mem-photo[hidden] { display: none; }
+.mem-photo-card {
+  width: min(480px, 92%);
+  max-height: 92%;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid rgba(216, 184, 119, 0.4);
+  border-radius: 6px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+.mem-photo-head { color: var(--amber); letter-spacing: 0.14em; font-size: 1.05rem; text-align: center; }
+.mem-photo-img {
+  width: 100%;
+  border: 6px solid var(--photo);
+  border-bottom-width: 24px;
+  border-radius: 2px;
+  background: #111;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  transform: rotate(-0.6deg);
+}
+.mem-photo-img[hidden] { display: none; }
+.mem-photo-label-row { display: flex; flex-direction: column; gap: 4px; }
+.mem-photo-label-text { color: var(--dim); font-size: 0.95rem; }
+.mem-photo-label {
+  font-family: inherit;
+  font-size: 1.05rem;
+  color: var(--fg);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--dimmer);
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+.mem-photo-label:focus { border-color: var(--line); outline: none; }
+.mem-photo-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.mem-photo-actions .mem-x { margin-left: auto; }
+.mem-photo-story { text-align: center; color: var(--fg); font-size: 1rem; line-height: 1.6; }
+.mem-photo-story .frame {
+  display: block;
+  margin: 6px auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(216, 184, 119, 0.3);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  max-width: 92%;
+}
+.mem-photo-story .frame b { color: var(--amber); font-weight: normal; letter-spacing: 0.08em; }
+.mem-photo-story .frame img { width: 128px; border: 4px solid var(--photo); border-bottom-width: 14px; border-radius: 2px; margin-bottom: 6px; }
+
+/* ── the studies / raison panel ────────────────────────────────────── */
+.mem-raison {
+  position: absolute;
+  inset: 0;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 4, 0.74);
+}
+.mem-raison[hidden] { display: none; }
+.mem-raison-inner {
+  width: min(560px, 92%);
+  max-height: 88%;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid rgba(216, 184, 119, 0.4);
+  border-radius: 6px;
+  padding: 14px 18px 18px;
+}
+.mem-raison-head {
+  display: flex;
+  align-items: center;
+  color: var(--amber);
+  letter-spacing: 0.14em;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+.mem-raison-head .mem-x { margin-left: auto; }
+.mem-raison-body p { margin: 0 0 10px; font-size: 1rem; line-height: 1.65; color: var(--fg); }
+.mem-raison-body p:last-child { margin-bottom: 0; color: var(--dim); }
+
+/* ── narrow glass ──────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .mem-shutter i, .mem-btn, .mem-tool { transition: none; }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .mem-shutter i, .mem-btn, .mem-tool { transition: none; }
+}
