@@ -83,7 +83,7 @@ export function beginKeeping(durationMs) {
         seated = true;
       }
     } catch (err) { /* cross-origin or standalone */ }
-    if (!seated) location.href = '../poppet-home.html?v=home17';
+    if (!seated) location.href = '../desktop.html';
   }, DUR + 120);
 }
 

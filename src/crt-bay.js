@@ -19,7 +19,7 @@
   // cart-summon/cart-hover, per-room dock-cart gradients, vacui-seat drop).
   var CARTS = [
     { id: 'home', label: 'home', page: null, acc: '#d6ae5d', home: true, mat: 'starfield' },
-    { id: 'sigil', label: 'poppet', page: 'poppet-lab.html?v=lab53', acc: '#aa5a18', mat: 'stone' },
+    { id: 'sigil', label: 'poppet', page: 'sigil.html', acc: '#aa5a18', mat: 'stone' },
     { id: 'vanir', label: 'sea', page: 'vanir.html', acc: '#7ab8a8', mat: 'water' },
     { id: 'journal', label: 'journal', page: 'journal.html', acc: '#aa7838', mat: 'vellum' },
     { id: 'games', label: 'games', page: 'games.html', acc: '#d4af37', mat: 'marquee' },

@@ -312,3 +312,49 @@ body {
 .keep-journal .kj-main b { font-size: 0.62rem; color: #e8dcc0; letter-spacing: 0.06em; }
 .keep-journal .kj-main i { font-style: normal; font-size: 0.54rem; color: rgba(232, 220, 192, 0.5); }
 .keep-journal .kj-empty { font-size: 0.58rem; color: rgba(232, 220, 192, 0.5); padding: 6px 4px; line-height: 1.4; }
+
+/* ── machine framing (2026-10-01): a room like any other by default.
+   Bare (?embed=rug, inside the desktop rug): wrappers dissolve, doorway
+   keeps its original full-viewport look — one frame, never two. */
+body.in-machine .doorway {
+  position: absolute;
+  inset: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+body.in-machine .door-leave {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 30;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(232, 200, 144, 0.75);
+  background: rgba(10, 6, 4, 0.72);
+  border: 1px solid rgba(212, 175, 101, 0.45);
+  border-radius: 4px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+body.in-machine .door-leave:hover { color: #eadfc6; border-color: #d4af65; }
+html.bare-frame body.in-machine .room,
+html.bare-frame body.in-machine .room .machine,
+html.bare-frame body.in-machine .room .machine .bezel,
+html.bare-frame body.in-machine .room .machine .bezel .screen,
+html.bare-frame body.in-machine .room .machine .bezel .screen .screen-stage { display: contents; }
+html.bare-frame .monitor-base,
+html.bare-frame .crt-bay,
+html.bare-frame #crt-bay-tray,
+html.bare-frame .door-leave { display: none !important; }
+html.bare-frame .bezel > :not(.screen) { display: none !important; }
+html.bare-frame body.in-machine .doorway {
+  position: fixed;
+  inset: 14px;
+  border-radius: 60px 60px 10px 10px;
+  border: 6px solid;
+  border-image: linear-gradient(135deg, #6a4a22 0%, #a87838 25%, #d4af37 45%, #a87838 60%, #5a3a18 100%) 1;
+  background: #0b0906;
+  overflow: hidden;
+}

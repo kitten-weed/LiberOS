@@ -4,11 +4,46 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="icon" href="data:,">
+<script src="src/desktop-gate.js"></script>
 <title>Poppet Home — the little room</title>
+<link rel="stylesheet" href="styles/room.css"/>
+<link rel="stylesheet" href="styles/machine.css?v=big1"/>
+<link rel="stylesheet" href="styles/bezel.css"/>
+<link rel="stylesheet" href="styles/scars.css"/>
+<link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+<link rel="stylesheet" href="styles/cartridge-transit.css?v=off1"/>
+<link rel="stylesheet" href="styles/house.css"/>
+<link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
+<link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
 <link rel="stylesheet" href="./poppet-home/home.css?v=home16">
 <script src="src/boot-gate.js"></script>
+<script>
+  // Framed by default like any room. Embedded (?embed=rug, the desktop rug's
+  // iframe) stays bare — the desktop owns the bevel there.
+  if (/[?&]embed=rug/.test(location.search)) document.documentElement.classList.add('bare-frame');
+</script>
 </head>
-<body>
+<body class="in-machine">
+<div class="room">
+  <div class="machine">
+    <div class="bezel">
+      <div class="carvings" id="carvings"></div>
+      <div class="vent-slits" aria-hidden="true"></div>
+      <div class="corruption-scars" aria-hidden="true">
+        <div class="scar scar-1"></div>
+        <div class="scar scar-2"></div>
+        <div class="scar scar-3"></div>
+        <div class="scar scar-4"></div>
+        <div class="scar scar-5"></div>
+        <div class="scar scar-6"></div>
+      </div>
+      <div class="led" aria-hidden="true"></div>
+      <div class="liber-plate">LIBER · VACUI</div>
+      <div class="power-button" aria-hidden="true"></div>
+      <div class="screw" aria-hidden="true"></div>
+
+      <div class="screen">
+        <div class="screen-stage">
 <div class="doorway">
   <canvas id="view"></canvas>
   <div class="plate">POPPET<span class="sub">HOME · LIVES HERE NOW</span></div>
@@ -19,6 +54,18 @@
   <div class="hint">click the floor and it walks there · poke it · flick the yarn ball · drag to orbit, wheel to zoom</div>
   <a class="door-leave" id="door-leave" href="desktop.html" hidden>leave — back to the machine</a>
 </div>
+        </div>
+      </div>
+    </div>
+    <div class="monitor-base" aria-hidden="true">
+      <span class="base-heart"></span>
+    </div>
+  </div>
+</div>
+<script src="src/state.js"></script>
+<script src="src/stage.js?v=big1"></script>
+<script src="src/room-shell.js"></script>
+<script src="src/carvings.js"></script>
 <script type="module" src="./poppet-home/home.js?v=home18"></script>
 <script>
   // standalone visits (not the desktop rug) get a door out.
@@ -27,5 +74,7 @@
     if (door) door.hidden = false;
   }
 </script>
+<script src="src/cartridge-transit.js?v=off1"></script>
+<script src="src/crt-bay.js?v=mem7"></script>
 </body>
 </html>

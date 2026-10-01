@@ -2,9 +2,55 @@
 <html lang="en">
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lost — Liber Vacui</title>
-<style>body{background:#0e1116;color:#e8e6df;font:16px/1.5 system-ui,sans-serif;margin:0}main{max-width:560px;margin:0 auto;padding:64px 20px}a{color:#7dd3a8}</style></head>
-<body><main>
-<h1>This page wandered off.</h1>
-<p>The rite you seek is not at this address. <a href="./">Return to the boot.</a></p>
-</main></body>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles/room.css"/>
+<link rel="stylesheet" href="styles/machine.css?v=big1"/>
+<link rel="stylesheet" href="styles/bezel.css"/>
+<link rel="stylesheet" href="styles/scars.css"/>
+<link rel="stylesheet" href="styles/crt-bay.css?v=pass11"/>
+<style>
+  .lost-card { text-align: center; color: #eadfc6; font-family: Georgia, 'Times New Roman', serif; padding: 24px; }
+  .lost-card h1 { font-size: 1.6rem; letter-spacing: 0.12em; margin: 0 0 12px; }
+  .lost-card p { color: #b19a78; margin: 0 0 8px; }
+  .lost-card a { color: #d4af65; }
+</style>
+</head>
+<body>
+<div class="room">
+  <div class="machine">
+    <div class="bezel">
+      <div class="carvings" id="carvings"></div>
+      <div class="vent-slits" aria-hidden="true"></div>
+      <div class="corruption-scars" aria-hidden="true">
+        <div class="scar scar-1"></div>
+        <div class="scar scar-2"></div>
+        <div class="scar scar-3"></div>
+        <div class="scar scar-4"></div>
+        <div class="scar scar-5"></div>
+        <div class="scar scar-6"></div>
+      </div>
+      <div class="led" aria-hidden="true"></div>
+      <div class="liber-plate">LIBER · VACUI</div>
+      <div class="power-button" aria-hidden="true"></div>
+      <div class="screw" aria-hidden="true"></div>
+
+      <div class="screen">
+        <div class="screen-stage">
+          <main class="lost-card">
+            <h1>This page wandered off.</h1>
+            <p>The rite you seek is not at this address. <a href="./">Return to the boot.</a></p>
+          </main>
+        </div>
+      </div>
+    </div>
+    <div class="monitor-base" aria-hidden="true">
+      <span class="base-heart"></span>
+    </div>
+  </div>
+</div>
+<script src="src/state.js"></script>
+<script src="src/stage.js?v=big1"></script>
+<script src="src/carvings.js"></script>
+<script src="src/crt-bay.js?v=mem7"></script>
+</body>
 </html>

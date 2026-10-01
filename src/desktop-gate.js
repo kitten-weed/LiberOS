@@ -8,6 +8,11 @@
 (function () {
   'use strict';
 
+  // Frames never gate: the top-level page owns the small-screen decision.
+  // (The sigil shell and desktop rug embed rooms as iframes; a gate inside
+  // the frame would double-gate and trap workshops behind a card.)
+  if (window.top !== window) return;
+
   var KEY = 'liber_vacui_gate';
   // narrow width OR short landscape: both crush the composition
   var QUERY = '(max-width: 899px), (max-height: 599px)';
