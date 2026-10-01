@@ -1439,7 +1439,7 @@
       else fn();
     }
     if (effect === 'save-desktop') {
-      sayThen('There. She is on the desktop now — kept, real, yours.', function () {
+      sayThen('There. On the desktop now — kept, real, yours.', function () {
         setTimeout(function () {
           if (poppetApi.keep) poppetApi.keep();
           if (poppetApi.save) poppetApi.save();

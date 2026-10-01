@@ -1,19 +1,18 @@
-// poppet-rite.js — the tutorial's first making: paint a little of the doll
-// HERE, on the desktop, instead of navigating the lab for the first pass.
-//
-// Four tabs, each a subsection of the REAL texture canvases (face / hair /
-// clothes hull / chest sigil), full tools (brush + bucket + undo), and a
-// small live 3D buddy beside the canvas sharing the same texture objects —
-// a stroke lands in the same pixels the preview wears. Keeping writes a
-// real keepsake + buddy mirror, which is what lifts the handoff lock.
+// poppet-rite.js — the tutorial's first making: the FULL doll, major pieces.
+// Six guided pieces (face, hair, chest mark, an arm, a leg, clothes) painted
+// on the doll's own texture canvases, camera pushing into each piece while a
+// small live buddy turns beside the sheet. Afterwards the workshop opens:
+// keep and rest, or keep and walk into the lab to finish every piece.
+// Both paths keep first — unfinished work never travels. The doll takes no
+// pronouns anywhere in this flow.
 //
 // Classic script (desktop loads no module graph for this); three.js and the
 // lab modules arrive via dynamic import on first open.
 (function () {
   'use strict';
 
-  var MOD = null;          // lazily imported modules
-  var session = null;      // live rite session or null
+  var MOD = null;
+  var session = null;
 
   var INKS = ['#2b2016', '#b03a2a', '#c9962e', '#7fb069'];
   var SIZES = [6, 10, 18];
@@ -27,7 +26,20 @@
     thoughts: { fears: [], wishes: [], likes: [], dislikes: [], thoughts: [] }
   };
 
-  function el(id) { return document.getElementById(id); }
+  // Step → surface + camera push (pos/look) + guide box (% of shown canvas).
+  // Boxes are suggestions ("a mark here") — paint anywhere counts.
+  var STEPS = [
+    { id: 'face', label: 'face', surf: 'face', hint: 'eyes, mouth — whatever it should be', cam: [[0, 1.55, 1.9], [0, 1.45, 0]], box: null },
+    { id: 'hair', label: 'hair', surf: 'hair', hint: 'crown it — wild, sleek, or gone', cam: [[0, 1.6, 2.0], [0, 1.5, 0]], box: null },
+    { id: 'chest', label: 'the chest mark', surf: 'body', hint: 'a sigil over the heart', cam: [[0, 1.15, 2.6], [0, 1.05, 0]], box: [35, 1.5, 31, 30] },
+    { id: 'arm', label: 'an arm', surf: 'body', hint: 'sleeves of scars or stars', cam: [[1.0, 1.0, 2.6], [0.5, 0.95, 0]], box: [1.5, 61, 11.5, 37] },
+    { id: 'leg', label: 'a leg', surf: 'body', hint: 'stockings, wounds, maps', cam: [[0.6, 0.45, 2.8], [0.25, 0.4, 0]], box: [49, 61, 11.5, 37] },
+    { id: 'clothes', label: 'clothes', surf: 'clothes', hint: 'the hulls appear where you paint them', cam: [[0, 1.0, 4.6], [0, 0.95, 0]], box: null }
+  ];
+
+  function inkName(hex) {
+    return { '#2b2016': 'ink', '#b03a2a': 'blood', '#c9962e': 'gold', '#7fb069': 'moss' }[hex] || 'ink';
+  }
 
   function loadModules() {
     if (MOD) return Promise.resolve(MOD);
@@ -45,16 +57,11 @@
     });
   }
 
-  function inkName(hex) {
-    return { '#2b2016': 'ink', '#b03a2a': 'blood', '#c9962e': 'gold', '#7fb069': 'moss' }[hex] || 'ink';
-  }
-
   function open(opts) {
     opts = opts || {};
     if (session) { return session; }
     var stage = document.querySelector('.screen-stage');
     if (!stage) { if (opts.onDismiss) opts.onDismiss(); return null; }
-    // Loading veil while the modules arrive — never a dead screen.
     var shell = document.createElement('div');
     shell.className = 'rite';
     shell.id = 'poppet-rite';
@@ -78,8 +85,8 @@
     // ── the doll: real textures, owned by this rite ──
     var atlasCv = document.createElement('canvas');
     atlasCv.width = atlasCv.height = 1024;
+    atlasCv.getContext('2d', { willReadFrequently: true });
 
-    // Mini preview scene — house grade, one warm key, one cool rim.
     var pvRenderer, pvScene, pvCamera, doll;
     try {
       var pvCanvas = document.createElement('canvas');
@@ -102,31 +109,27 @@
         rng: null, brush: function () { return { ink: s.ink, size: s.size }; }
       });
       doll.setParams(JSON.parse(JSON.stringify(DEFAULT_P)));
-      // the preview always wears its shells — the rite paints all four and
-      // the small one must show every stroke live, no layer gating.
-      // rebuild() assembles the meshes (createDoll alone builds none).
-      try { doll.rebuild('stand'); } catch (e) {}
+      doll.rebuild('stand');
+      // the preview always wears its shells — every stroke shows live.
       try { doll.setFaceShell(true); doll.setHulls(true); } catch (e) {}
       pvCamera = new THREE.PerspectiveCamera(38, 1, 0.05, 60);
-      pvCamera.position.set(0, 1.2, 5.4);
-      pvCamera.lookAt(0, 0.9, 0);
+      pvCamera.position.set(0, 1.55, 1.9);
+      pvCamera.lookAt(0, 1.45, 0);
       s.pvCanvas = pvCanvas;
-    } catch (e) {
-      doll = null;
-    }
+    } catch (e) { doll = null; }
 
     // ── worksurfaces on the doll's own canvases ──
-    // NOTE: ws.el (the DISPLAY canvas for pointer mapping) must be set —
-    // without it pos() collapses to 0,0 and every stroke lands in a corner.
-    function wsFor(key) {
+    // ws.el (the DISPLAY canvas for pointer mapping) must be set — without
+    // it pos() collapses to 0,0 and every stroke lands in a corner.
+    function wsFor(surf) {
       var made;
-      if (key === 'face') {
+      if (surf === 'face') {
         var fm = doll.faceMaps.face;
         made = surfaceMod.makeWorksurface({ cv: fm.cv, tex: fm.tex, key: 'face' });
-      } else if (key === 'hair') {
+      } else if (surf === 'hair') {
         var hm = doll.faceMaps.hair;
         made = surfaceMod.makeWorksurface({ cv: hm.cv, tex: hm.tex, key: 'hair' });
-      } else if (key === 'clothes') {
+      } else if (surf === 'clothes') {
         made = surfaceMod.makeWorksurface({ cv: doll.hullCanvas, tex: doll.hullTex, key: 'clothes', panels: doll.hullRects });
       } else {
         made = surfaceMod.makeWorksurface({ cv: atlasCv, tex: doll.bodyTex, key: 'body', panels: doll.ATLAS });
@@ -136,38 +139,44 @@
     }
 
     s.ink = INKS[0]; s.size = SIZES[1]; s.tool = 'brush';
-    s.sheets = { face: wsFor('face'), hair: wsFor('hair'), clothes: wsFor('clothes'), sigil: wsFor('body') };
-    s.touched = { face: 0, hair: 0, clothes: 0, sigil: 0 };
-    s.strokes = 0;
-    s.tab = 'face';
+    s.sheets = { face: wsFor('face'), hair: wsFor('hair'), body: wsFor('body'), clothes: wsFor('clothes') };
+    s.touched = {}; s.idx = 0; s.strokes = 0; s.kept = false;
+    STEPS.forEach(function (st) { s.touched[st.id] = 0; });
 
     // ── the panel ──
+    var tabsHtml = STEPS.map(function (st, i) {
+      return '<button class="rite-tab' + (i === 0 ? ' is-on' : '') + '" data-i="' + i + '" role="tab">' + st.label + '</button>';
+    }).join('');
     shell.innerHTML =
       '<div class="rite-card" role="document">'
       + '<div class="rite-head"><span class="rite-title">the first making</span>'
       + '<button class="rite-x" type="button" aria-label="close">×</button></div>'
-      + '<p class="rite-line">a little of each — face, hair, clothes, a mark on the chest. the small one wears it live.</p>'
+      + '<p class="rite-line">the whole doll, piece by piece. the small one wears every stroke live.</p>'
       + '<div class="rite-body">'
       + '<div class="rite-canvas-col">'
-      + '<div class="rite-tabs" role="tablist">'
-      + '<button class="rite-tab is-on" data-tab="face" role="tab">face</button>'
-      + '<button class="rite-tab" data-tab="hair" role="tab">hair</button>'
-      + '<button class="rite-tab" data-tab="clothes" role="tab">clothes</button>'
-      + '<button class="rite-tab" data-tab="sigil" role="tab">sigil</button>'
-      + '</div>'
+      + '<p class="rite-progress" id="rite-progress"></p>'
+      + '<div class="rite-tabs" role="tablist">' + tabsHtml + '</div>'
       + '<div class="rite-sheet-wrap" id="rite-sheet"></div>'
       + '<div class="rite-tools">'
       + '<div class="rite-inks" id="rite-inks"></div>'
       + '<div class="rite-sizes" id="rite-sizes"></div>'
-      + '<button class="rite-tool" data-tool="brush">brush</button>'
+      + '<button class="rite-tool is-on" data-tool="brush">brush</button>'
       + '<button class="rite-tool" data-tool="bucket">bucket</button>'
       + '<button class="rite-tool" id="rite-undo">undo</button>'
+      + '</div>'
+      + '<p class="rite-hint" id="rite-hint"></p>'
+      + '<div class="rite-nav">'
+      + '<button id="rite-back" type="button">← back</button>'
+      + '<button id="rite-next" type="button">next →</button>'
       + '</div>'
       + '</div>'
       + '<div class="rite-pv-col">'
       + '<div class="rite-pv" id="rite-pv"></div>'
-      + '<p class="rite-hint" id="rite-hint">touch each of the four — then keep.</p>'
-      + '<button class="rite-keep" id="rite-keep" type="button" disabled>keep the poppet</button>'
+      + '<div class="rite-reveal" id="rite-reveal" hidden>'
+      + '<p class="rite-workshop-line">safe. the workshop is open — every piece lives there. return anytime.</p>'
+      + '<button class="rite-keep" id="rite-keep" type="button">keep</button>'
+      + '<button class="rite-refine" id="rite-refine" type="button">keep &amp; open the workshop</button>'
+      + '</div>'
       + '</div>'
       + '</div>'
       + '</div>';
@@ -175,27 +184,95 @@
     var sheetWrap = shell.querySelector('#rite-sheet');
     var mark = document.createElement('div');
     mark.className = 'rite-chest-mark';
-    mark.hidden = true;
     sheetWrap.appendChild(mark);
-    var cv = s.sheets.face.cv;
-    cv.classList.add('rite-sheet');
-    sheetWrap.appendChild(cv);
-    if (doll) {
-      var pvBox = shell.querySelector('#rite-pv');
-      pvBox.appendChild(s.pvCanvas);
-      sizePreview();
+    var pvBox = shell.querySelector('#rite-pv');
+    if (doll && s.pvCanvas) { pvBox.appendChild(s.pvCanvas); sizePreview(); }
+
+    // ── strokes ──
+    var drawing = false, last = null;
+    var bound = new Set();
+    function ws() { return s.sheets[STEPS[s.idx].surf]; }
+    function cv() { return ws().ws.cv; }
+    function bindCanvas(c) {
+      if (bound.has(c)) return;
+      bound.add(c);
+      c.addEventListener('pointerdown', function (e) {
+        if (c !== cv()) return;
+        e.preventDefault();
+        try { c.setPointerCapture(e.pointerId); } catch (err) {}
+        drawing = true; last = null;
+        stroke(e, true);
+      });
+      c.addEventListener('pointermove', function (e) { if (drawing) stroke(e, false); });
+      c.addEventListener('pointerup', endStroke);
+      c.addEventListener('pointercancel', endStroke);
+    }
+    function endStroke() { drawing = false; last = null; }
+    function stroke(e, start) {
+      var w = ws();
+      var p = w.pos(e);
+      if (start) w.pushUndo();
+      if (s.tool === 'bucket') { w.fillAt(p.x, p.y, s.ink, 40); }
+      else {
+        var r = s.size / 2;
+        if (last && !start) w.stampLine(last.x, last.y, p.x, p.y, r, s.ink);
+        else w.stamp(p.x, p.y, r, s.ink);
+        last = { x: p.x, y: p.y };
+      }
+      touch();
+    }
+    function touch() {
+      s.touched[STEPS[s.idx].id]++; s.strokes++;
+      if (STEPS[s.idx].surf === 'clothes' && doll.markHullPainted) {
+        try { doll.markHullPainted(); } catch (e) {}
+      }
+      syncReveal();
     }
 
-    // tabs
-    shell.querySelectorAll('.rite-tab').forEach(function (b) {
-      b.addEventListener('click', function () { setTab(b.dataset.tab); });
+    // ── steps ──
+    var camGoal = { pos: new THREE.Vector3(0, 1.55, 1.9), look: new THREE.Vector3(0, 1.45, 0) };
+    function showStep(i) {
+      s.idx = i;
+      var step = STEPS[i];
+      shell.querySelector('#rite-progress').textContent =
+        'piece ' + (i + 1) + ' of ' + STEPS.length + ' — ' + step.label;
+      shell.querySelector('#rite-hint').textContent = step.hint;
+      shell.querySelectorAll('.rite-tab').forEach(function (x, xi) {
+        x.classList.toggle('is-on', xi === i);
+      });
+      var old = sheetWrap.querySelector('canvas');
+      if (old) sheetWrap.removeChild(old);
+      var c = cv();
+      c.classList.add('rite-sheet');
+      sheetWrap.insertBefore(c, mark);
+      mark.hidden = !step.box;
+      if (step.box) {
+        mark.style.left = step.box[0] + '%'; mark.style.top = step.box[1] + '%';
+        mark.style.width = step.box[2] + '%'; mark.style.height = step.box[3] + '%';
+      }
+      sheetWrap.style.aspectRatio = (step.surf === 'clothes') ? '2 / 1' : '1 / 1';
+      bindCanvas(c);
+      camGoal.pos.set(step.cam[0][0], step.cam[0][1], step.cam[0][2]);
+      camGoal.look.set(step.cam[1][0], step.cam[1][1], step.cam[1][2]);
+      shell.querySelector('#rite-back').disabled = (i === 0);
+      shell.querySelector('#rite-next').disabled = (i === STEPS.length - 1);
+    }
+    shell.querySelectorAll('.rite-tab').forEach(function (x) {
+      x.addEventListener('click', function () { showStep(Number(x.dataset.i)); });
     });
-    // inks
+    shell.querySelector('#rite-back').addEventListener('click', function () {
+      if (s.idx > 0) showStep(s.idx - 1);
+    });
+    shell.querySelector('#rite-next').addEventListener('click', function () {
+      if (s.idx < STEPS.length - 1) showStep(s.idx + 1);
+    });
+
+    // tools
     var inksBox = shell.querySelector('#rite-inks');
     INKS.forEach(function (hex, i) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'rite-ink' + (i === 0 ? ' is-on' : '');
-      b.style.background = hex; b.title = inkName(hex);
+      b.style.background = hex;
       b.setAttribute('aria-label', 'ink ' + inkName(hex));
       b.addEventListener('click', function () {
         s.ink = hex;
@@ -204,7 +281,6 @@
       });
       inksBox.appendChild(b);
     });
-    // sizes
     var sizesBox = shell.querySelector('#rite-sizes');
     SIZES.forEach(function (n, i) {
       var b = document.createElement('button');
@@ -218,91 +294,30 @@
       });
       sizesBox.appendChild(b);
     });
-    // brush / bucket
     shell.querySelectorAll('.rite-tool[data-tool]').forEach(function (b) {
-      if (b.dataset.tool === 'brush') b.classList.add('is-on');
       b.addEventListener('click', function () {
         s.tool = b.dataset.tool;
         shell.querySelectorAll('.rite-tool[data-tool]').forEach(function (x) { x.classList.remove('is-on'); });
         b.classList.add('is-on');
       });
     });
-    shell.querySelector('#rite-undo').addEventListener('click', function () {
-      s.sheets[s.tab].undo();
-    });
+    shell.querySelector('#rite-undo').addEventListener('click', function () { ws().undo(); });
     shell.querySelector('.rite-x').addEventListener('click', function () { dismiss(); });
-    shell.querySelector('#rite-keep').addEventListener('click', function () { keep(); });
 
-    // ── strokes land through the worksurface ──
-    var drawing = false, last = null;
-    var bound = new Set();
-    function bindCanvas(c) {
-      if (bound.has(c)) return;
-      bound.add(c);
-      c.addEventListener('pointerdown', function (e) {
-        if (s.tab !== c.dataset.tab) return;
-        e.preventDefault();
-        try { c.setPointerCapture(e.pointerId); } catch (err) {}
-        drawing = true; last = null;
-        stroke(e, true);
-      });
-      c.addEventListener('pointermove', function (e) { if (drawing) stroke(e, false); });
-      c.addEventListener('pointerup', endStroke);
-      c.addEventListener('pointercancel', endStroke);
+    // ── the reveal: workshop open, keep or keep-editing ──
+    function revealed() {
+      return STEPS.every(function (st) { return s.touched[st.id] > 0; });
     }
-    function endStroke() { drawing = false; last = null; }
-
-    function stroke(e, start) {
-      var ws = s.sheets[s.tab];
-      var p = ws.pos(e);
-      if (start) ws.pushUndo();
-      if (s.tool === 'bucket') {
-        ws.fillAt(p.x, p.y, s.ink, 40);
-        if (start) { touch(); }
-        return;
+    function syncReveal() {
+      var done = revealed();
+      shell.querySelector('#rite-reveal').hidden = !done;
+      if (done) {
+        var h = shell.querySelector('#rite-hint');
+        if (h) h.textContent = 'every piece touched. ready.';
       }
-      var r = s.size / 2;
-      if (last && !start) ws.stampLine(last.x, last.y, p.x, p.y, r, s.ink);
-      else ws.stamp(p.x, p.y, r, s.ink);
-      last = { x: p.x, y: p.y };
-      touch();
     }
-
-    function touch() {
-      s.touched[s.tab]++; s.strokes++;
-      if (s.tab === 'clothes' && doll.markHullPainted) { try { doll.markHullPainted(); } catch (e) {} }
-      syncKeep();
-    }
-
-    function setTab(key) {
-      s.tab = key;
-      mark.hidden = (key !== 'sigil');
-      // canvases keep their native aspect — never stretched (coords map 1:1)
-      sheetWrap.style.aspectRatio = (key === 'clothes') ? '2 / 1' : '1 / 1';
-      shell.querySelectorAll('.rite-tab').forEach(function (x) {
-        x.classList.toggle('is-on', x.dataset.tab === key);
-      });
-      var old = sheetWrap.querySelector('canvas');
-      if (old) sheetWrap.removeChild(old);
-      cv = s.sheets[key].cv;
-      cv.classList.add('rite-sheet');
-      cv.dataset.tab = key;
-      bindCanvas(cv);
-      sheetWrap.insertBefore(cv, mark);
-    }
-    // initial canvas
-    cv.dataset.tab = 'face';
-    bindCanvas(cv);
-
-    function syncKeep() {
-      var done = s.touched.face > 0 && s.touched.hair > 0 && s.touched.clothes > 0 && s.touched.sigil > 0;
-      var btn = shell.querySelector('#rite-keep');
-      var hint = shell.querySelector('#rite-hint');
-      btn.disabled = !done;
-      if (hint) hint.textContent = done ? 'it wears everything. keep it.' : 'touch each of the four — then keep.';
-    }
-
-    function keep() {
+    function keepThen(cb) {
+      if (s.kept) { if (cb) cb(); return; }
       var n;
       try {
         n = MOD.keep.saveKeepsake(atlasCv, null, {
@@ -314,8 +329,6 @@
           coverage: MOD.keep.atlasCoverage(doll.bodyCtx, doll.ATLAS)
         });
       } catch (e) { return; }
-      // buddy mirror through state (fires change events; keepdrop's path is
-      // lab-localStorage-direct and would skip them).
       try {
         var st = window.Liber && window.Liber.state;
         if (st) {
@@ -328,13 +341,20 @@
         }
       } catch (e) {}
       try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
-      var cb = s.onKeep;
+      s.kept = true;
+      var cb2 = s.onKeep;
       teardown();
-      if (cb) cb(n);
+      if (cb) cb();
+      if (cb2) cb2(n);
     }
+    shell.querySelector('#rite-keep').addEventListener('click', function () { keepThen(null); });
+    shell.querySelector('#rite-refine').addEventListener('click', function () {
+      // kept first (nothing travels unkept), then the workshop doors open.
+      keepThen(function () { location.href = 'sigil.html'; });
+    });
 
     function dismiss() {
-      if (s.strokes > 0 && !window.confirm('the first making is unfinished; leave it?')) return;
+      if (s.strokes > 0 && !s.kept && !window.confirm('the first making is unfinished; leave it?')) return;
       var cb = s.onDismiss;
       teardown();
       if (cb) cb();
@@ -342,14 +362,12 @@
 
     function sizePreview() {
       if (!pvRenderer || !pvCamera) return;
-      var box = shell.querySelector('#rite-pv');
-      var w = Math.max(2, box.clientWidth || 220), h = Math.max(2, box.clientHeight || 260);
+      var w = Math.max(2, pvBox.clientWidth || 220), h = Math.max(2, pvBox.clientHeight || 260);
       pvRenderer.setSize(w, h, false);
       pvCamera.aspect = w / Math.max(1, h);
       pvCamera.updateProjectionMatrix();
     }
 
-    // gentle turntable while open — hidden frames cost nothing
     var raf = 0, lastT = 0;
     function loop(t) {
       if (!session) return;
@@ -358,7 +376,11 @@
       var dt = Math.min(0.05, (t - lastT) / 1000 || 0);
       lastT = t;
       try {
-        if (doll && doll.body) doll.body.rotation.y += dt * 0.4;
+        var k = 1 - Math.exp(-dt / 1.1);
+        pvCamera.position.lerp(camGoal.pos, k);
+        // lookAt needs the goal, not a drifted accumulation
+        pvCamera.lookAt(camGoal.look);
+        if (doll && doll.body) doll.body.rotation.y += dt * 0.35;
         if (pvRenderer && pvScene && pvCamera) pvRenderer.render(pvScene, pvCamera);
       } catch (e) {}
     }
@@ -372,17 +394,17 @@
 
     window.addEventListener('resize', sizePreview);
     s.ready = true;
-    syncKeep();
+    showStep(0);
+    syncReveal();
     sizePreview();
     lastT = performance.now();
     raf = requestAnimationFrame(loop);
   }
 
-  function close(silent) {
+  function close() {
     if (!session) return;
     var s = session;
     try {
-      cancelAnimationFrame(0);
       if (s.shell.parentNode) s.shell.parentNode.removeChild(s.shell);
     } catch (e) {}
     session = null;

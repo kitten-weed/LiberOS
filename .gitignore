@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 .audit/
 dist/
+# alt/ — local-only poppet-lab alternative prototype (compare + contrast).
+# Never committed, never staged, never shipped.
+alt/

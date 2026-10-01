@@ -13,7 +13,7 @@
 /* the cutscene mounts on .screen-stage beside #desktop — veil it whole
    while dormant so the tube stays blank (hidden, never removed: the
    cutscene's own timers keep their nodes). */
-.screen-stage.enter-veiled > :not(#desktop) { display: none !important; }
+.screen-stage.enter-veiled > :not(#desktop):not(#poppet-rite) { display: none !important; }
 
 body.enter-dormant-room .crt-bay,
 body.enter-dormant-room .crt-bay-well,
