@@ -22,13 +22,16 @@
   // Every dialogue beat receives the existing progress gate. Angle-bracket
   // responses remain player choices; >> remains a simple progress response.
   var BEATS = [
-    // The release script opened on seven beats of the machine talking to
-    // itself, and five of them handed the traveller a fake choice they had no
-    // part in ("what?", "No you're not", "Okay.."). Three beats instead, each
-    // with a plain advance: disorientation, recognition, the invitation.
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'What just happened? WHOA. That\'s me? Looking back at the..', response: '>>', effect: 'opening-disturbance' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Uh.. I sound a little like you, <name>. Is that strange? That is fair. I am a voice in a room; you know who you are better than I do. You do not have to. We can leave the meaning open and keep walking.', response: '>>', effect: 'name-loosen' },
-    { speaker: 'liber-vacui', kind: 'dialogue', text: 'There\'s something written on the floor.. Should I read it?', response: '>>', effect: 'floor-inscription' },
+    // The opening, authored 2026-10-01: the machine meets the traveller by
+    // name, claims identity, explains the artifact, and earns the spell.
+    // Seven beats, all plain advances except the traveller's own pushback.
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Oh hello <name>!', response: '>>', effect: 'opening-disturbance' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'I am literally you.', response: 'no you\u2019re not..', effect: 'name-loosen' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Okay let me explain. In this artifact, the liber vacui, the imaginary and real are the same thing.', response: 'so I am playing pretend?', effect: 'floor-inscription' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'You could look at it that way, if you want. You actually prefer to define yourself with research backed terminology.', response: 'why are you saying \u2018you\u2019' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'For instance, that is object-relational theory. By yourself identifying uh.. itself.. with..', response: 'this is confusing' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'You\u2019re right. After all, we are just starting this journey. We can cast a spell and summon some help.', response: 'a spell?' },
+    { speaker: 'liber-vacui', kind: 'dialogue', text: 'Yes. On the next screen I will conjure up some text, type it and my friend out here in the imaginary world will come assist us.', response: 'okay..' },
     { speaker: 'liber-vacui', kind: 'ritual', text: '', response: '' },
 
     // grand: true — her FIRST entrance is staged: two knocks land on the

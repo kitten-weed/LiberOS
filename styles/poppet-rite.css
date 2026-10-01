@@ -1,0 +1,100 @@
+/* poppet-rite.css — the tutorial's first making: paint here, not in the lab.
+   A panel over the desktop screen: texture tabs + tools left, live buddy right.
+   House voice: dark red ground, cream type, gold seals, letterspaced caps. */
+.rite {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 4, 3, 0.72);
+}
+.rite-card {
+  width: min(680px, 92%);
+  max-height: 94%;
+  overflow: auto;
+  background: linear-gradient(165deg, #1c0f0a, #0d0705);
+  border: 1px solid rgba(212, 175, 101, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 175, 101, 0.12);
+  padding: 18px 20px;
+  color: #eadfc6;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.rite-head { display: flex; align-items: center; justify-content: space-between; }
+.rite-title { font-size: 0.95rem; letter-spacing: 0.24em; text-transform: uppercase; color: #d4af65; }
+.rite-x {
+  background: transparent; border: 1px solid rgba(212, 175, 101, 0.4);
+  color: #b19a78; border-radius: 4px; width: 32px; height: 32px;
+  font-size: 1rem; cursor: pointer;
+}
+.rite-x:hover { color: #eadfc6; border-color: #d4af65; }
+.rite-line { color: #b19a78; font-size: 0.92rem; line-height: 1.5; margin: 8px 0 14px; }
+.rite-body { display: flex; gap: 16px; }
+.rite-canvas-col { flex: 1 1 auto; min-width: 0; }
+.rite-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.rite-tab {
+  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78; border-radius: 4px; padding: 7px 10px; font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer;
+}
+.rite-tab.is-on { color: #eadfc6; border-color: #d4af65; background: rgba(212, 175, 101, 0.1); }
+.rite-sheet-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 340px;
+  margin: 0 auto;
+  background: #ead9b4;
+  border: 1px solid rgba(212, 175, 101, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  touch-action: none;
+}
+canvas.rite-sheet { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+.rite-chest-mark {
+  position: absolute; pointer-events: none;
+  left: 35%; top: 1.5%; width: 31%; height: 30%;
+  border: 2px dashed rgba(176, 58, 42, 0.85);
+  border-radius: 4px;
+}
+.rite-chest-mark::after {
+  content: 'the mark';
+  position: absolute; top: -1.4em; left: 0;
+  font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: #b03a2a;
+}
+.rite-tools { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.rite-inks, .rite-sizes { display: flex; gap: 6px; }
+.rite-ink {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+}
+.rite-ink.is-on { border-color: #eadfc6; }
+.rite-size {
+  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78; border-radius: 4px; width: 30px; height: 28px; cursor: pointer;
+}
+.rite-size.is-on { color: #eadfc6; border-color: #d4af65; }
+.rite-tool {
+  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78; border-radius: 4px; padding: 6px 10px; font-size: 0.72rem;
+  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+}
+.rite-tool.is-on, #rite-undo { color: #eadfc6; border-color: #d4af65; }
+.rite-pv-col { flex: 0 0 220px; display: flex; flex-direction: column; }
+.rite-pv {
+  width: 220px; height: 260px;
+  border: 1px solid rgba(212, 175, 101, 0.5);
+  border-radius: 6px; overflow: hidden; background: #14100a;
+}
+.rite-pv canvas { width: 100%; height: 100%; display: block; }
+.rite-hint { color: #b19a78; font-size: 0.82rem; line-height: 1.5; margin: 10px 0; min-height: 2.4em; }
+.rite-keep {
+  background: transparent; border: 1px solid #d4af65; color: #d4af65;
+  border-radius: 6px; padding: 12px; font-size: 0.8rem; letter-spacing: 0.2em;
+  text-transform: uppercase; cursor: pointer; font-family: inherit;
+}
+.rite-keep:disabled { opacity: 0.35; cursor: default; }
+.rite-keep:not(:disabled):hover { background: rgba(212, 175, 101, 0.14); color: #eadfc6; }

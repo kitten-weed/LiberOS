@@ -544,6 +544,7 @@
   }
 
   function mountRoot() {
+    liftVeil();
     retireLegacyTutorialLayers();
     clearTransientTutorialNodes();
     clearBox();
@@ -1804,9 +1805,9 @@
         if (beat.speaker === 'riason') revealRiasonParentheticals(lineEl);
         if (beat.speaker === 'riason' && beat.text.indexOf('LEARN') >= 0) markLineWord(lineEl, 'LEARN', 'ctv-learn-door');
         if (beat.text && /imaginary/i.test(beat.text)) fxImaginaryWord(body);
-        // the slip rode on the "leave the meaning open" line; keying it to the
-        // words rather than a beat number survives the retuned opening.
-        if (beat.text && /leave the meaning open/i.test(beat.text)) fxLogicSlip(body);
+        // the OBJECT↔SELF slip rides the object-relations beat; keyed to the
+        // words rather than a beat number so retuned openings keep it.
+        if (beat.text && /by yourself identifying/i.test(beat.text)) fxLogicSlip(body);
         if (beat.effect === 'room-cycle' || beat.effect === 'pixel-smoke' || beat.effect === 'diegetic-cracks') fxWindowBreath();
         if (beat.effect === 'color-cycle') fxColorCycle(body, 2400);
         // The shadow material arrives with Vanir's authored warning; the
@@ -2040,11 +2041,10 @@
 
   // ── the new-opening and desktop-finale beats ───────────────────────────
 
-  /* handoff: the tutorial returns to the desktop with a single glowing
-     "poppet" cartridge waiting on the TraveROM. Seating it opens the lab,
-     where the guided workshop takes over. The beat parks on the desktop and
-     never advances: the finale waits until a poppet is actually kept, and the
-     leave happens through the normal pipeline. */
+  /* handoff: the tutorial opens the paint rite on the desktop — the doll's
+     own texture canvases with a live buddy beside them. Keeping lifts the
+     park; walking away falls back to the tray seat (full lab). The beat
+     parks here either way: the finale waits until a poppet is kept. */
   function keptCount() {
     // The same store poppet-lab's keepsakeCount() reads, plus the state mirror
     // the lab writes when a poppet is seated, so the park lifts whichever way
@@ -2078,27 +2078,39 @@
     var dock = (window.Liber && window.Liber.crtBay) || null;
     if (!dock || !dock.openTray) { setTimeout(function () { location.href = 'sigil.html'; }, 600); next(); return; }
     document.body.classList.add('ctv-poppet-glow');
-    setTimeout(function () {
-      try { dock.openTray(); } catch (e) {}
+    // The first making happens HERE, on the desktop: the paint rite pulls up
+    // the doll's own texture canvases with a live buddy beside them, so the
+    // first passthrough never navigates the lab. Keeping lifts the park
+    // (keptCount sees the keepsake); walking away falls back to the tray,
+    // whose glowing cart still seats the full lab.
+    var seatedLab = function () {
       setTimeout(function () {
-        // One cartridge only: the poppet. Clicking it seats the lab. The
-        // tutorial cursor parks on the handoff until the poppet is kept.
-        try {
-          if (window.LiberTraveROM && window.LiberTraveROM.soloPoppet) window.LiberTraveROM.soloPoppet();
-        } catch (e) {}
-        // No next() here. The cursor parks on the handoff, so the finale
-        // cannot run over the open tray — the old call advanced into it right
-        // here, and a fast clicker watched it play before the workshop.
-        // The response rail is closed too, so a gate left behind by the
-        // previous line cannot be clicked twice into the finale.
+        try { dock.openTray(); } catch (e) {}
+        setTimeout(function () {
+          try {
+            if (window.LiberTraveROM && window.LiberTraveROM.soloPoppet) window.LiberTraveROM.soloPoppet();
+          } catch (e) {}
+          closeGate('action-lock');
+          try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
+        }, 700);
+      }, 500);
+    };
+    if (window.LiberPoppetRite) {
+      try {
+        window.LiberPoppetRite.open({
+          onKeep: function () {
+            document.body.classList.remove('ctv-poppet-glow');
+            try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
+            next();
+          },
+          onDismiss: function () { seatedLab(); }
+        });
         closeGate('action-lock');
-        // Pause the tutorial while the traveller is in the workshop: the
-        // cutscene stays down on the desktop, and when keepdrop pops the
-        // flag and walks them home, the DOMContentLoaded watcher below
-        // resumes straight from the saved cursor — no tray replay.
         try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
-      }, 700);
-    }, 500);
+        return;
+      } catch (e) { /* fall through to the lab seat */ }
+    }
+    seatedLab();
   }
 
   /* summon: Wanderlust's four-line rhyming call, staged like the opening */
@@ -2267,9 +2279,21 @@
   window.Cutscene.reentry = playReentry;
   window.Cutscene.resume = resumeTutorial;
 
+  // ── pre-tutorial veil ─────────────────────────────────────────────
+  // desktop.html paints a VOID cover with first paint so the home screen
+  // (rug poppet included) never flashes before the cutscene exists. Lift it
+  // the moment the cutscene mounts, and on every path where no cutscene
+  // will play (returning users, name gate) so it can never trap.
+  function liftVeil() {
+    try {
+      var v = document.getElementById('ctv-veil');
+      if (v && v.parentNode) v.parentNode.removeChild(v);
+    } catch (e) {}
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
-    if (!document.getElementById('desktop')) return;
-    if (!window.CutsceneV2Data) return;
+    if (!document.getElementById('desktop')) { liftVeil(); return; }
+    if (!window.CutsceneV2Data) { liftVeil(); return; }
     // A completed state can arrive from the dock, a reload handoff, or a
     // harness restoring a saved session while the old scene is still on the
     // screen. Never leave the Poppet worktable/cast mounted in that window.
@@ -2295,12 +2319,14 @@
       transition.setAttribute('aria-hidden', 'true');
       transition.innerHTML = '<i></i><b>THE NAME HAS ARRIVED</b><span>' + fillName(aliasOf()) + '</span>';
       document.body.appendChild(transition);
+      liftVeil(); // the transition owns the screen from this repaint on
       setTimeout(function () { if (transition.parentNode) transition.parentNode.removeChild(transition); }, 1600);
       setTimeout(function () { playFrom(0); }, 650);
       return;
     }
-    if (g.tutorialPaused) return;
+    if (g.tutorialPaused) { liftVeil(); return; }
     if (g.tutorialDone) {
+      liftVeil(); // residue only from here — no cutscene will mount
       renderDesktopResidue();
       if (g.tutorialStage === 'reentry') {
         if (st()) st().set({ tutorialStage: 'done' });
@@ -2309,7 +2335,10 @@
       return;
     }
     // The name gate runs first: enter-rite owns the tube until it hands off.
-    if (!g.enterRiteDone) return;
+    // Veil lifts here — the name modal must be visible, and pre-tutorial the
+    // desktop behind it is the current behavior, not the flash (which is the
+    // post-name reload path, covered by mountRoot).
+    if (!g.enterRiteDone) { liftVeil(); return; }
     var at = typeof g.tutorialBeat === 'number' && g.tutorialBeat >= 0 ? g.tutorialBeat : 0;
     if (at >= beats().length) { endClean(true); return; }
     playFrom(at);

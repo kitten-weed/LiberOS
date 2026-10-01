@@ -24,9 +24,15 @@
   <link rel="stylesheet" href="src/features/sigil/poppet-rework.css?v=forge1"/>
   <link rel="stylesheet" href="styles/poppet-readback.css"/>
   <link rel="stylesheet" href="styles/poppet-loop.css?v=slot2"/>
+  <link rel="stylesheet" href="styles/poppet-rite.css?v=rite1"/>
   <link rel="stylesheet" href="styles/readability.css?v=run12-20260924"/>
 </head>
 <body>
+
+  <!-- pre-tutorial veil: first-paint cover so the home screen never flashes
+       before the cutscene mounts. cutscene.js lifts it; the failsafe below
+       guarantees it can never trap (e.g. cutscene script fails to load). -->
+  <div class="ctv-veil" id="ctv-veil" aria-hidden="true"></div>
 
   <div class="room">
     <div class="machine">
@@ -183,6 +189,7 @@
   <script src="data/prompts.data.js"></script>
   <script src="src/poppet-readback.js"></script>
   <script src="src/poppet-loop.js?v=slot2"></script>
+  <script src="src/poppet-rite.js?v=rite1"></script>
   <script src="data/citations.data.js"></script>
   <script src="src/constellation.js?v=slot2"></script>
   <script>
@@ -239,5 +246,18 @@
        the room's own authored lamp. Take the canvas away and the cast still
        reads; it just stops being alive. -->
   <script src="src/pixi-cast.js?v=cleanup-20260922"></script>
+  <script>
+    // Veil failsafe: cutscene.js lifts #ctv-veil on every path, but if the
+    // cutscene script itself never runs the cover must still come off.
+    // Only fires when no cutscene mounted — never mid-tutorial.
+    setTimeout(function () {
+      try {
+        if (!document.getElementById('cutscene')) {
+          var v = document.getElementById('ctv-veil');
+          if (v && v.parentNode) v.parentNode.removeChild(v);
+        }
+      } catch (e) {}
+    }, 8000);
+  </script>
 </body>
 </html>

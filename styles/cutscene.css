@@ -2251,3 +2251,14 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
   0% { filter: brightness(1.14) saturate(1.1); }
   100% { filter: none; }
 }
+
+/* ── pre-tutorial veil (2026-10-01): covers first paint on desktop so the
+   home screen (rug poppet included) never flashes before the cutscene
+   mounts. Lifted by cutscene.js at mount + on every no-tutorial path;
+   the inline failsafe in desktop.html guarantees it can never trap. */
+.ctv-veil {
+  position: fixed;
+  inset: 0;
+  background: #070403;
+  z-index: 5000;
+}
