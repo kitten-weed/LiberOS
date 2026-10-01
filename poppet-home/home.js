@@ -15,6 +15,10 @@ const tmpWP = new THREE.Vector3();
 const canvas = document.getElementById('view');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio));
+// house grade (2026-10-01): ACES rolloff like the other rooms; exposure a
+// touch hot to keep the hearth-lit coziness after the filmic compression.
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
 if (renderer.shadowMap) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -1400,6 +1404,7 @@ function tick(now) {
   requestAnimationFrame(tick);
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
+  if (document.hidden) return; // dt-clamped: skipping hidden frames can't jump the clock
   tSec += dt;
   moodT += dt;
   if (pokeCool > 0) pokeCool -= dt;

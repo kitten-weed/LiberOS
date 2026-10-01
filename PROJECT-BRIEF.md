@@ -62,6 +62,7 @@ Previous covenant NOT binding. New answer files are canonical going forward.
 - Reduced motion: DO NOT INCLUDE. Remove `prefers-reduced-motion` blocks going forward (owner decision 2026-10-01). Animate by default.
 - Keyboard controls: not required. No full keyboard path, no global shortcuts for v1.
 - Window chrome: immersive, locked, non-resizable + fullscreen toggle (owner 2026-10-01). Must fit 16:9 down to 720p (1280×720 min). At 720p: crop with letterbox bars (owner choice). HiDPI aware, native close/minimize only.
+- Bezel: SLIM profile (owner 2026-10-01) — `styles/machine.css` padding `3cqi` sides (≈30px at ship width, was 5.2cqi), dock bay preserved; carvings 16px at 8px offsets (`styles/bezel.css`); LED/plate/power/screw pulled inward. Machine outer size unchanged; screen gains ~4% per axis.
 
 ## Versioning / history
 - Preserve single-commit style from here. Small patch bumps from `0.1.0` → `0.1.1`, `0.1.2`… (0.0.1 increments).

@@ -260,9 +260,12 @@ function hotFor(sheet, x, y) {
   }
   return hot;
 }
+/* unsaved work on the sheet — sigil.html's leave guard reads this flag */
+function markDirty() { window.__labDirty = true; }
 function paintProxy(sheet, x, y) {
   const sl = getSheet(sheet);
   if (!sl) return;
+  markDirty();
   if (inkMode === 'bucket') {
     undoPush(sheet);
     sl.fillAt(x, y, brushes.body.ink, 40);
@@ -307,6 +310,7 @@ function regionFromUV(mesh, uv) {
 }
 function bucketAt(p) {
   if (!p) return false;
+  markDirty();
   if (p.sheet === 'atlas') {
     const reg = uvToRegion(p.x / atlasCv.width, 1 - p.y / atlasCv.height);   // canvas y → uv v
     if (reg) {
@@ -577,11 +581,13 @@ function layerBrush() {
   return brushes.body;
 }
 function stampFace(zone, x, y) {
+  markDirty();
   const fm = doll.faceMaps[zone];
   daub(fm.ctx, x, y, brushes.body.size / 2, brushes.body.ink);
   fm.tex.needsUpdate = true;
 }
 function stampHull(x, y) {
+  markDirty();
   daub(doll.hullCtx, x, y, brushes.body.size / 2, brushes.body.ink);
   doll.hullTex.needsUpdate = true;
   doll.markHullPainted();
@@ -823,6 +829,7 @@ canvas.addEventListener('pointerdown', function (e) {
     if (ob.visible) {
       const part = ob.userData.hull;
       const pxs = hullUVtoPx(hit.uv, part);
+      markDirty();
       if (inkMode === 'bucket') {
         undoPush('clothes');
         doll.hullCtx.fillStyle = brushes.body.ink;
@@ -1207,6 +1214,7 @@ function tick(now) {
   requestAnimationFrame(tick);
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
+  if (document.hidden) return; // dt-clamped: skipping hidden frames can't jump the clock
   idle += dt;
   popOverlay.tick && popOverlay.tick(dt);
   if (rebuildQueued && (burn.phase === 'idle' || burn.phase === 'settle')) doRebuild();

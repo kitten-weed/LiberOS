@@ -26,7 +26,7 @@
    ============================================================================ */
 
 .bezel {
-  --carving-size: 22px;
+  --carving-size: 16px;
 }
 
 /* A carving is a small inline-SVG container. We use SVG paths for each
@@ -104,19 +104,19 @@
 .machine.patina-3 .carving[data-id="stone"]::after,
 .machine.patina-3 .carving[data-id="grate"]::after { opacity: 0.78; }
 
-/* Position the 12 carvings clockwise from top-center. */
-.carving[data-id="stone"]      { top: 14px; left: 50%; transform: translateX(-50%); }
-.carving[data-id="thread"]     { top: 14px; left: calc(50% + 60px); }
-.carving[data-id="candle"]     { top: 14px; right: calc(50% + 60px); }
-.carving[data-id="bell"]       { top: 32%; left: 14px; }
-.carving[data-id="glyph"]      { top: 18%; left: 14px; }
-.carving[data-id="bulb"]       { top: 50%; left: 14px; transform: translateY(-50%); }
-.carving[data-id="tower-rev"]  { top: 50%; right: 14px; transform: translateY(-50%); }
-.carving[data-id="hole-punch"] { top: 18%; right: 14px; }
-.carving[data-id="nib"]        { top: 32%; right: 14px; }
-.carving[data-id="compass"]    { bottom: 44px; left: 50%; transform: translateX(-50%); }
-.carving[data-id="grate"]      { bottom: 44px; left: calc(50% + 50px); }
-.carving[data-id="hook"]       { bottom: 44px; right: calc(50% + 50px); }
+/* Position the 12 carvings clockwise from top-center (slim bezel 2026-10-01). */
+.carving[data-id="stone"]      { top: 8px; left: 50%; transform: translateX(-50%); }
+.carving[data-id="thread"]     { top: 8px; left: calc(50% + 44px); }
+.carving[data-id="candle"]     { top: 8px; right: calc(50% + 44px); }
+.carving[data-id="bell"]       { top: 32%; left: 8px; }
+.carving[data-id="glyph"]      { top: 18%; left: 8px; }
+.carving[data-id="bulb"]       { top: 50%; left: 8px; transform: translateY(-50%); }
+.carving[data-id="tower-rev"]  { top: 50%; right: 8px; transform: translateY(-50%); }
+.carving[data-id="hole-punch"] { top: 18%; right: 8px; }
+.carving[data-id="nib"]        { top: 32%; right: 8px; }
+.carving[data-id="compass"]    { bottom: 30px; left: 50%; transform: translateX(-50%); }
+.carving[data-id="grate"]      { bottom: 30px; left: calc(50% + 38px); }
+.carving[data-id="hook"]       { bottom: 30px; right: calc(50% + 38px); }
 
 /* Override the transform on active state to keep them centered. */
 .carving.active[data-id="stone"]   { transform: translateX(-50%) scale(1.1); }

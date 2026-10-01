@@ -6,10 +6,13 @@ export function V(x, y, z) { return new THREE.Vector3(x, y, z); }
 export function buildScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio));
+  // house grade (2026-10-01): ACES rolloff + warm VOID, matching the other rooms.
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b0a0d);
-  scene.fog = new THREE.Fog(0x0b0a0d, 8.5, 17);
+  scene.background = new THREE.Color(0x0d0a08);
+  scene.fog = new THREE.Fog(0x0d0a08, 8.5, 17);
 
   const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 60);
 
