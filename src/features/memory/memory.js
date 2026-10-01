@@ -1332,15 +1332,33 @@ import {
     photoImg.hidden = true;
     photoActions.style.display = 'none';
     photoLabelRow.hidden = true;
-    const frames = S.photos.map((p, i) =>
-      '<span class="frame"><b>' + ['first', 'second', 'third'][i] + ' · ' + (p.label || 'untitled') + '</b>'
-      + '<img src="' + p.dataUrl + '" alt=""/></span>'
-    ).join('');
-    photoStory.innerHTML = frames
-      + '<button type="button" class="mem-btn" id="mem-story-keep">keep it in the journal</button>';
+    // Hardened: build nodes via DOM (textContent + validated data-URL src).
+    // Previously interpolated p.label / p.dataUrl into innerHTML (stored XSS).
+    photoStory.textContent = '';
+    const order = ['first', 'second', 'third'];
+    S.photos.forEach((p, i) => {
+      const span = document.createElement('span');
+      span.className = 'frame';
+      const b = document.createElement('b');
+      b.textContent = (order[i] || ('frame ' + (i + 1))) + ' · ' + (p.label || 'untitled');
+      span.appendChild(b);
+      const img = document.createElement('img');
+      img.alt = '';
+      if (typeof p.dataUrl === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(p.dataUrl)) {
+        img.src = p.dataUrl;
+      }
+      span.appendChild(img);
+      photoStory.appendChild(span);
+    });
+    const keep = document.createElement('button');
+    keep.type = 'button';
+    keep.className = 'mem-btn';
+    keep.id = 'mem-story-keep';
+    keep.textContent = 'keep it in the journal';
+    photoStory.appendChild(keep);
+    keep.addEventListener('click', saveStory);
     photoWrap.hidden = false;
     photoWrap.removeAttribute('inert');
-    document.getElementById('mem-story-keep').addEventListener('click', saveStory);
   }
 
   function saveStory() {

@@ -97,9 +97,7 @@
   transition: opacity 0.6s ease;
 }
 .divination-rim-sideways.shown { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .divination-rim-sideways { transition: none; }
-}
+
 .divination-slate {
   width: min(430px, 62%);
   background:
@@ -584,21 +582,6 @@
 }
 
 /* ── stillness for reduced-motion visitors: the function survives ── */
-@media (prefers-reduced-motion: reduce) {
-  .divination-lamp { display: none; }
-  .divination-card { animation: none; transform: rotate(-1.8deg); }
-  .divination-hexagram-row { animation: none; }
-  .divination-iching-result { animation: none; }
-  .divination-input, .deck-card, .coin,
-  .divination-mode, .divination-mode::after,
-  .divination-save-prompt, .divination-raison,
-  .divination-save-prompt-keep, .divination-save-prompt-discard {
-    transition: none !important;
-  }
-  .divination-coin-dish.tossing .c1, .divination-coin-dish.tossing .c2, .divination-coin-dish.tossing .c3 {
-    transform: none; transition: none;
-  }
-}
 
 /* ── the tent at 439px: the table narrows, the deck and the reading stack ── */
 @media (max-width: 700px), (max-height: 560px) {
@@ -751,9 +734,6 @@
   from { opacity: 1; transform: translate(0, 0) scale(1); }
   to { opacity: 0; transform: translate(calc(var(--dx, 0) * 135px), calc(var(--dy, 0) * 135px)) scale(0.4); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .div-demo-bit { animation: none; opacity: 0; }
-}
 
 /* the tutorial's curtain (2.13.0): the tent opens from black on the side
    the stone's curtain closed, and closes the same way for the desktop */
@@ -767,6 +747,4 @@
   transition: opacity 0.6s ease;
 }
 .div-curtain.go { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .div-curtain { transition: none; }
-}
+

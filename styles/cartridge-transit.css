@@ -179,12 +179,6 @@
 /* reduced motion: instant readable portrait + complete faux bar.
    The global room.css wildcard already collapses the CSS journey to
    0.01ms; the JS path below renders the arrival state with no waits. */
-@media (prefers-reduced-motion: reduce) {
-  .cartridge-transit.go .ct-portrait { animation: none; opacity: 1; transform: none; }
-  .cartridge-transit.go .ct-bar i { transition: none; width: 100%; }
-  .cartridge-transit.wipe { transition: none; transform: none; }
-  .ct-skip:hover { background: transparent; }
-}
 
 /* 439px: the portrait stays small, the bar fits the glass. */
 @media (max-width: 439px) {

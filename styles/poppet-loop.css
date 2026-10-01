@@ -232,7 +232,3 @@
    in a caption. */
 .poppet-readback[data-poppet="read"] { cursor: pointer; }
 
-@media (prefers-reduced-motion: reduce) {
-  .poppet-orbit-row { transition: none !important; }
-  .poppet-orbit-row[data-consumed="yes"] { transform: none; }
-}

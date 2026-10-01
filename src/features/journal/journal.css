@@ -1069,12 +1069,6 @@
 }
 
 /* ── reduced motion: the room holds still ─────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .journal-stamp, .journal-pen, .journal-cap, .journal-slip,
-  .journal-list-item[data-marginal]::after, .journal-raison,
-  .journal-exit-ribbon::before,
-  .journal-summon-bell svg, .journal-chat-gate { transition: none; animation: none; }
-}
 
 /* Rainy Day (s.shadowOn) — rain on the desk: the oaked boards go to a
    cold blue-black and the lamp pool dims. A real palette shift, not an

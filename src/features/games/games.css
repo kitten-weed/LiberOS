@@ -9,7 +9,8 @@
      (outlines, glows, backdrops) — never reflowed. Outlines, not borders.
    - Exactly two keyframe motions (bulb chase + curtain settle), GPU props only.
      The marquee is display type only — no roll. Hover/active states are instant
-     except the one prize-ticket revelation. prefers-reduced-motion kills all.
+     except the one prize-ticket revelation. Motion always (reduced-motion
+     handling removed per owner 2026-10-01).
    - NO sans-serif in this room. Everything is Georgia/Times serif, except
      .storm-buffer which is Entity404's phosphor terminal (monospace, deliberate).
    - Touch targets are never shrunk: all controls are >= 44px. */
@@ -1438,12 +1439,6 @@
 .shield-booth .games-result,
 .circles-booth .games-result { flex: 0 0 auto; margin-top: 2px; text-align: left; }
 
-@media (prefers-reduced-motion: reduce) {
-  .shield-lever.settling,
-  .circles-tag.dropped { animation: none; }
-  .shield-wall { transition: none; }
-}
-
 /* ── powder tent. Sand canvas keeps its pixel geometry; gilt outline frames it. ── */
 
 .sand-wrap {
@@ -1563,7 +1558,6 @@
   min-width: 120px;
 }
 .storm-hint { color: #f4e8d2; font-style: normal; font-size: 1rem; line-height: 1.5; margin-top: 6px; }
-
 
 /* ── keep prompt: the barker's velvet plaque with a gilt double frame ── */
 
@@ -1830,16 +1824,6 @@
   border-top: 1px dashed rgba(212, 175, 55, 0.4);
   font-size: 0.95rem;
   letter-spacing: 0.05em;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .games-app,
-  .games-app *,
-  .games-app *::before,
-  .games-app *::after {
-    animation: none !important;
-    transition: none !important;
-  }
 }
 
 /* locked stage + invite lines (affinity unlocks, futures §17) */
@@ -2709,7 +2693,6 @@
     linear-gradient(180deg, #252157, #120f25);
 }
 
-
 .games-app[data-view="facade"] .games-booth-poster {
   position: absolute;
   z-index: 2;
@@ -3085,8 +3068,6 @@
   content: 'TYPE THE WORD';
   color: #bce98e;
 }
-
-
 
 .games-app[data-view="facade"] .games-booth[data-game="tipp"] .games-booth-poster {
   color: #123a44;
@@ -3488,16 +3469,6 @@
 /* The camera facade is the last cascade layer, so its motion gate must also
    live after the camera rules. A reduced-motion visitor gets the same scene,
    just without the poster glide or hardware drift between stops. */
-@media (prefers-reduced-motion: reduce) {
-  .games-app[data-view="facade"] .games-booth,
-  .games-app[data-view="facade"] .games-booth-scene,
-  .games-app[data-view="facade"] .games-booth-poster {
-    transition: none !important;
-  }
-  .games-app[data-view="facade"] .games-side::before {
-    animation: none !important;
-  }
-}
 
 /* ── the full promenade (pitch: The Full Promenade) ──────────────────────
    The camera already walks; the walk now has a world: three parallax
@@ -3621,14 +3592,6 @@
 }
 
 /* reduced motion: the bark is a state change, the parallax holds still */
-@media (prefers-reduced-motion: reduce) {
-  .games-app[data-view="facade"] .games-grid::before,
-  .games-app[data-view="facade"] .games-grid::after,
-  .games-app[data-view="facade"] .games-shell::after {
-    transform: none;
-  }
-  .games-bark { transition: none; }
-}
 
 /* Rainy Day (s.shadowOn) - the promenade's own weather.
    A midway with the power cut: gold goes to wet pewter, the velvet turns

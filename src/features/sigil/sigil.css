@@ -543,7 +543,6 @@
     0 0 0 rgba(0, 0, 0, 0.5);
 }
 
-
 .sigil-help:hover {
   background: rgba(120, 60, 30, 0.2);
   color: #c89060;
@@ -919,14 +918,6 @@
   outline: 2px solid #c89060;
   outline-offset: 2px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sigil-save:active { animation: none; }
-  .sigil-app.saved .sigil-frame,
-  .sigil-app.saved .sigil-input,
-  .sigil-app.saved .sigil-canvas-wrap,
-  .sigil-app.saved .sigil-save,
-  .sigil-app.saved .sigil-discard { transition: none; }
-}
 
 /* ─── WS4: hover-revelation — stone dust gathers in the cracks
    when the tablet is attended to. ─── */
@@ -1068,9 +1059,7 @@
 .sigil-rail .sigil-actions {
   margin-top: auto;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sigil-dust { transition: none; }
-}
+
 .sigil-veil {
   position: fixed;
   inset: 0;
@@ -1165,11 +1154,11 @@ body[data-crt="sigil"] .crt-weave::after {
     radial-gradient(1px 1px at 72% 52%, rgba(255, 240, 200, 0.5), transparent 62%),
     radial-gradient(1.4px 1.4px at 48% 82%, rgba(255, 240, 200, 0.45), transparent 62%);
 }
-@media (prefers-reduced-motion: no-preference) {
-  body[data-crt="sigil"]:not(.crt-off) .crt-weave::after {
+
+body[data-crt="sigil"]:not(.crt-off) .crt-weave::after {
     animation: sigil-dust-drift 17s ease-in-out infinite alternate;
   }
-}
+
 @keyframes sigil-dust-drift {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(5px, -9px, 0); }
@@ -1210,10 +1199,6 @@ body[data-crt="sigil"] .crt-weave::after {
 /* the tray's density gauge — the scatter thickens as the sitting goes on */
 .sigil-dust { opacity: calc(var(--grit, 0) * 0.34); }
 
-@media (prefers-reduced-motion: reduce) {
-  .sigil-dust-grain { animation: none; }
-}
-
 /* ─── Rainy Day (s.shadowOn) — the stone room's own weather.
    The workbench light goes cold and the grey takes a blue cast, so the
    stone is harder to read by — which is the point of the room. A real
@@ -1241,6 +1226,4 @@ body[data-crt="sigil"] .crt-weave::after {
   transition: opacity 0.6s ease;
 }
 .sigil-curtain.go { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .sigil-curtain { transition: none; }
-}
+

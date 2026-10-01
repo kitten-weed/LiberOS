@@ -142,7 +142,6 @@
 .screw,
 .power-button { z-index: 22; }
 
-
 /* Side ventilation slits — vertical lines on the right side of the
    bezel. Subtle, decorative. */
 .vent-slits {
@@ -248,8 +247,7 @@
   transform: translateY(-33.333%);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .crt-tube-glass::after {
+.crt-tube-glass::after {
     opacity: calc(0.26 * var(--crt, 0));
     animation: crt-glass-refresh 28s linear infinite;
   }
@@ -258,7 +256,6 @@
     from { transform: translateY(-33.333%); }
     to { transform: translateY(33.333%); }
   }
-}
 
 body.crt-off .crt-tube-glass {
   display: none;
@@ -505,15 +502,13 @@ body.crt-off .crt-tube-glass::after {
   z-index: 2;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .base-heart { animation: base-heart 5.5s ease-in-out infinite; }
+.base-heart { animation: base-heart 5.5s ease-in-out infinite; }
   @keyframes base-heart {
     0%, 100% { box-shadow: 0 0 2px 0 rgba(255, 170, 80, 0.1);   filter: brightness(0.85); }
     12%      { box-shadow: 0 0 14px 3px rgba(255, 170, 80, 0.55); filter: brightness(1.15); }
     26%      { box-shadow: 0 0 4px 0 rgba(255, 170, 80, 0.2);   filter: brightness(0.9); }
     34%      { box-shadow: 0 0 10px 2px rgba(255, 170, 80, 0.4); filter: brightness(1); }
   }
-}
 
 /* ii. vent breath — a cold spill under the right bezel edge, the slits
    exhaling. One blurred pseudo-element; the exhale is one slow swell every
@@ -538,23 +533,14 @@ body.crt-off .crt-tube-glass::after {
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .vent-slits::after { animation: vent-breath 19s ease-in-out infinite; }
+.vent-slits::after { animation: vent-breath 19s ease-in-out infinite; }
   @keyframes vent-breath {
     0%, 100% { opacity: 0.05; transform: translateY(0); }
     42%      { opacity: 0.34; transform: translateY(4px); }
     58%      { opacity: 0.16; transform: translateY(7px); }
   }
-}
 
 /* WS4 motion pass: the LED's pulse is ambient — still under reduced motion. */
-@media (prefers-reduced-motion: reduce) {
-  .led { animation: none; opacity: 0.8; }
-  .screen::after { animation: none; opacity: 0; }
-  .crt-tube-glass::after { animation: none; opacity: 0; }
-  .base-heart { animation: none; }
-  .vent-slits::after { animation: none; opacity: 0.08; }
-}
 
 /* lane C: on the small screens the machine fills more of the room. The
    default 72vw hands rooms ~286×208 of glass at 439px — less than a

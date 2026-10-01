@@ -416,15 +416,7 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@media (prefers-reduced-motion:reduce) {
-  .constellation-empty[data-empty-state="pre"],
-  .constellation-empty[data-empty-state="cast"],
-  .constellation-empty[data-empty-state="buddy"],
-  .constellation-empty[data-empty-state="bind"],
-  .astral-barycenter:not(.is-bound) .barycenter-core {
-    animation: none;
-  }
-}
+
 .constellation-poppet.is-recent .poppet-composite { animation:poppet-arrival-uncanny 2.8s cubic-bezier(.18,.8,.25,1) 1; }
 .constellation-poppet.is-bound .poppet-composite { animation:poppet-bound-pull 5.2s ease-in-out infinite; }
 .constellation-poppet.is-bound .poppet-layer-others { filter:drop-shadow(0 0 5px rgba(169,155,255,.55)); }

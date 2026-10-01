@@ -151,9 +151,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-@media (prefers-reduced-motion: reduce) {
-  .mem-polaroid { animation: none; }
-}
+
 .mem-polaroid.empty { visibility: hidden; }
 .mem-polaroid:not(.empty) {
   pointer-events: auto;
@@ -386,7 +384,3 @@
   .mem-shutter i, .mem-btn, .mem-tool { transition: none; }
 }
 
-
-@media (prefers-reduced-motion: reduce) {
-  .mem-shutter i, .mem-btn, .mem-tool { transition: none; }
-}

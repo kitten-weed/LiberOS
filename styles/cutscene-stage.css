@@ -418,9 +418,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ctv-world-glow,
-  .ctv-world-glow::after {
-    animation: none;
-  }
-}

@@ -18,6 +18,15 @@ function el(tag, cls, html) {
   return e;
 }
 
+// Hardened: escape user-controlled text before interpolating into artifact HTML.
+// st.thought / st.answers come from free-text inputs (stored XSS); findings names
+// come from the static detect.js table but are escaped anyway for defense in depth.
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
 export function createHud({ onThought, onFinished, onDispose }) {
   const app = $('#app');
   const stage = $('#stage');
@@ -244,12 +253,12 @@ export function createHud({ onThought, onFinished, onDispose }) {
   // ── artifact ───────────────────────────────────────────────────────────────
   function artifactHTML(st) {
     const f = st.findings.length
-      ? `<ul>${st.findings.map((x) => `<li><em>${x.name}</em> — ${x.whisper}<br><span style="color:var(--bone-dim);font-size:0.85em">${x.balm}</span></li>`).join('')}</ul>`
+      ? `<ul>${st.findings.map((x) => `<li><em>${esc(x.name)}</em> — ${esc(x.whisper)}<br><span style="color:var(--bone-dim);font-size:0.85em">${esc(x.balm)}</span></li>`).join('')}</ul>`
       : '<p>No distortion found in the dark.</p>';
-    const answers = st.answers.map((a, i) => a ? `<p><span style="color:var(--bone-dim);font-size:0.8em">${QUESTIONS[i]}</span><br>${a}</p>` : '').join('');
+    const answers = st.answers.map((a, i) => a ? `<p><span style="color:var(--bone-dim);font-size:0.8em">${QUESTIONS[i]}</span><br>${esc(a)}</p>` : '').join('');
     return `
       <h2>Artifact of the Crossing</h2>
-      <div class="artifact-section"><h3>The Thought</h3><p><em>“${st.thought}”</em></p></div>
+      <div class="artifact-section"><h3>The Thought</h3><p><em>“${esc(st.thought)}”</em></p></div>
       <div class="artifact-section"><h3>Suspected Distortions</h3>${f}</div>
       <div class="artifact-section"><h3>The Answers</h3>${answers}</div>`;
   }
@@ -287,8 +296,8 @@ export function createHud({ onThought, onFinished, onDispose }) {
     s.innerHTML = `<h2>Artifacts (${items.length})</h2>` + (items.length
       ? items.slice().reverse().map((it, idx) =>
         `<div class="shelf-item" data-i="${items.length - 1 - idx}">
-           <div class="t">“${it.thought}”</div>
-           <div class="d">${it.label} · ${new Date(it.date).toLocaleDateString()}</div>
+           <div class="t">“${esc(it.thought)}”</div>
+           <div class="d">${esc(it.label)} · ${esc(new Date(it.date).toLocaleDateString())}</div>
          </div>`).join('')
       : '<div class="shelf-empty">The shelf is empty. Save a jar and it will rest here.</div>');
     s.querySelectorAll('.shelf-item').forEach((n) => {

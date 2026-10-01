@@ -14,8 +14,9 @@
      · silhouette first. At thumbnail size the material and the mark still
        say whose tube it is. `.wp-thumb` folds the real thing down rather
        than inventing a second, simpler swatch.
-     · motion with consent. The few drifting pictures (corrupted, vanir,
-       ravaging) still hold perfectly still under prefers-reduced-motion.
+     · motion always. The few drifting pictures (corrupted, vanir,
+       ravaging) animate by default; no reduced-motion stilling (removed
+       per owner 2026-10-01).
      · residue, not caption. The marks are the maker's own — an accession
        number, a stall number, a tide height. Nothing here explains itself.
 
@@ -359,8 +360,8 @@
    Three travellers left their picture moving: the born-in tube breathes,
    the deep swells, the turned earth settles. Motion is a gift — under
    reduced motion these stand perfectly still. */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes wp-breathe {
+
+@keyframes wp-breathe {
     from { opacity: 0.86; transform: scale(1); }
     to   { opacity: 1;    transform: scale(1.02); }
   }
@@ -375,4 +376,4 @@
   .wallpaper[data-wt="corrupted"]::before { animation: wp-breathe 14s ease-in-out infinite alternate; }
   .wallpaper[data-wt="vanir"]::before { animation: wp-swell 22s ease-in-out infinite alternate; }
   .wallpaper[data-wt="ravaging"]::before { animation: wp-settle 26s ease-in-out infinite alternate; }
-}
+

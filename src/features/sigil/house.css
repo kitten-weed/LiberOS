@@ -125,6 +125,3 @@
   transform: rotate(4deg);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .house-scene[data-house="sigil"] [data-prop] { transition: none !important; }
-}

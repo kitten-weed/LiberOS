@@ -333,9 +333,7 @@ body {
 /* keep prompt buttons inherit .arc-btn */
 
 /* ── reduced motion / flat mode ────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .arc-field { animation: none; }
-}
+
 .arc-flatnote {
   position: absolute;
   right: 14px; bottom: 10px;
@@ -607,6 +605,3 @@ body {
 .arc-win { transition: box-shadow 1s ease; }
 .arc-win.rd-glow { box-shadow: 0 0 34px rgba(227,199,138,0.4), 0 0 24px rgba(0,0,0,0.55); }
 
-@media (prefers-reduced-motion: reduce) {
-  .arc-doc { display: none; }
-}

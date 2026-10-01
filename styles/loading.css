@@ -91,15 +91,6 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .letterpress-glyph,
-  .state-loading .loading-now.letterpress-arrives {
-    animation: none;
-    opacity: inherit;
-    transform: none;
-  }
-}
-
 .state-loading .loading-patrons {
   font-family: 'VT323', 'Courier New', Courier, monospace;
   font-size: clamp(1rem, 1.4vw, 1.2rem);
@@ -114,10 +105,6 @@
 @keyframes loading-blink {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.78; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .state-loading .loading-patrons { animation: none; }
 }
 
 /* ── Phosphor title (ported from the retired pixi-boot canvas) ───────── */

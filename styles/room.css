@@ -186,13 +186,11 @@ html.pixel-register .pixi-runtime-canvas { image-rendering: pixelated; }
   display: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .room::before { animation: cold-spot 47s ease-in-out infinite; }
+.room::before { animation: cold-spot 47s ease-in-out infinite; }
   @keyframes cold-spot {
     0%, 100% { opacity: 0.45; }
     46%      { opacity: 0.85; }
   }
-}
 
 /* The passing whisper — once in a long while a half-line of italic text
    crosses the deep red of the tube. Drawn from the same pool the status
@@ -224,8 +222,6 @@ html.pixel-register .pixi-runtime-canvas { image-rendering: pixelated; }
   55%  { opacity: 0.34; }
   100% { opacity: 0;    transform: translateX(-3%); }
 }
-
-
 
 /* CRT scanlines removed (plan 2026-09-04 D0002) — the old body::after
    repeating-linear-gradient overlay is gone. The vignette below and the
@@ -282,21 +278,6 @@ html.pixel-register .pixi-runtime-canvas { image-rendering: pixelated; }
 
    Rooms that need a different resolution keep their own blocks: they load
    after this file, and a later !important at equal specificity wins. */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
-    scroll-behavior: auto !important;
-  }
-}
 
 /* Respect reduced motion — kill dust animation, keep state still. */
-@media (prefers-reduced-motion: reduce) {
-  .whispers { display: none; }
-  .room-whisper { display: none; }
-}
+

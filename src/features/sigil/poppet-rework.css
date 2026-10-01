@@ -637,9 +637,6 @@
 @keyframes forge-drift0 { from { translate: 0 0; } to { translate: 3px -2px; } }
 @keyframes forge-drift1 { from { translate: 0 0; } to { translate: -3px 2px; } }
 @keyframes forge-drift2 { from { translate: 0 0; } to { translate: 2px 3px; } }
-@media (prefers-reduced-motion: reduce) {
-  .forge-ink { animation: none !important; }
-}
 
 /* the tool well: two columns — instruments left, inks filling right */
 .forge-well {
@@ -1082,9 +1079,7 @@
   92% { opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .fso-iris, .fso-seal { animation-duration: 0.2s !important; }
-}
+
 .poppet-discard { border-color: rgba(122, 134, 150, 0.5); }
 .poppet-drawer-toggle {
   width: 58px;
@@ -1312,8 +1307,4 @@
 .journal-recall .journal-chat-skip { margin-top: 10px; }
 
 /* ── motion law ──────────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .poppet-plate, .poppet-clamp, .journal-chat-gate,
-  .poppet-rail .poppet-minimenu, .forge-exit::after { transition: none; animation: none; }
-  .forge-transfer { display: none; }
-}
+

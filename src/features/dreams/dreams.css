@@ -1176,19 +1176,6 @@
 }
 
 /* ── reduced motion: the room stills ──────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .dreams-door,
-  .dreams-record-btn,
-  .dreams-assoc-btn,
-  .dreams-fitting,
-  .dreams-raison,
-  .dreams-cite,
-  .dreams-entry,
-  .dreams-entry::after,
-  .dreams-drawer {
-    transition: none;
-  }
-}
 
 /* keeping to the book — the non-fitting variants: inside the keep-row and
    on the ledger rows. The spine carries the fittings themselves. */
@@ -1476,9 +1463,4 @@
 .dreams-marginalia[data-band="planted"] { color: rgba(84, 96, 60, 0.82); }
 
 /* reduced motion: fog holds still, the develop beat is an instant state */
-@media (prefers-reduced-motion: reduce) {
-  .dreams-app::before,
-  .dreams-app::after { animation: none; }
-  .dreams-plate.develop .dreams-read-text,
-  .dreams-paper.develop .dreams-read-body { animation: none; }
-}
+

@@ -393,14 +393,4 @@ body.rainy-on .rainy-ticker {
 .shadow-prompt.show { opacity: 0.85; }
 
 /* ─── motion with consent ─────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  /* the weather still happens; it just holds still */
-  .shadow-on { animation: none; filter: brightness(0.94) saturate(0.83) hue-rotate(7deg); }
-  .shadow-on .led { animation: none; opacity: 0.85; }
-  .shadow-on .bezel::after { animation: none; opacity: 0.55; }
-  /* the rain still falls; it just holds still in the panes */
-  .shadow-on .screen-stage::after { animation: none; }
-  .rainy-toggle,
-  .rainy-ticker,
-  .rainy-ask { transition: none; }
-}
+

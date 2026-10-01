@@ -402,14 +402,6 @@ select:focus-visible,
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .state-desktop .notes,
-  .state-desktop .influence-core,
-  .astral-orbit {
-    animation: none !important;
-  }
-}
-
 /* Run 12 clarity lock: a strong line is part of LiberOS's voice. Keep the
    same geometry and interactions, but replace hairlines with authored marks
    and make the desktop's empty state a single, unmistakable instruction. */
