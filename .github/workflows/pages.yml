@@ -24,7 +24,7 @@ jobs:
           SHORT="${GITHUB_SHA:0:7}"
           node -e "const fs=require('fs');const p='api/health.json';const d=JSON.parse(fs.readFileSync(p,'utf8'));d.sha='$SHORT';fs.writeFileSync(p,JSON.stringify(d,null,2)+'\n')"
           cat api/health.json
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - id: deployment
