@@ -4,7 +4,7 @@
    clothes hull). Used by the tutorial rite and the alt workshop so a stroke
    means the same thing in both. The lab keeps its own literals: its P is
    re-randomized per specimen (freshP), which a shared-live import would corrupt. */
-import { makeWorksurface } from './surface.js?v=lab51';
+import { makeWorksurface } from './surface.js?v=lab53';
 
 export const INKS = ['#2b2016', '#b03a2a', '#c9962e', '#7fb069'];
 export const SIZES = [6, 10, 18];

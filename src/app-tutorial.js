@@ -55,6 +55,9 @@
     if (existing) existing.remove();
     var root = document.createElement('div');
     root.className = 'apptut-root';
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', cfg.title || 'how this room works');
     root.style.setProperty('--apptut-accent', cfg.accent || '#c9962e');
     root.innerHTML = '<div class="apptut-card">'
       + '<b class="who">' + (cfg.traveller || 'the room') + '</b>'
@@ -62,7 +65,12 @@
       + cfg.lines.map(function (l) { return '<p>' + l + '</p>'; }).join('')
       + '<div class="apptut-btns"><button type="button">GOT IT</button></div>'
       + '</div>';
-    var close = function () { root.remove(); };
+    var close = function () {
+      root.remove();
+      document.removeEventListener('keydown', onKey);
+    };
+    var onKey = function (e) { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
     root.querySelector('button').addEventListener('click', close);
     root.addEventListener('click', function (e) { if (e.target === root) close(); });
     document.body.appendChild(root);

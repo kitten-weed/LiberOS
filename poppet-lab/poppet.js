@@ -8,7 +8,7 @@
 
    The same sheet it paints is the sheet DOLL DRAW paints through (surface.js),
    so a stroke lands in the same pixels whether you work here or on the doll. */
-import { makeWorksurface as buildWorksurface } from './surface.js?v=lab51';
+import { makeWorksurface as buildWorksurface } from './surface.js?v=lab53';
 
 const BODY_PARTS = ['head', 'chest', 'pelvis', 'waistBall', 'armLU', 'armLL', 'armRU', 'armRL', 'legLU', 'legLL', 'legRU', 'legRL', 'haL', 'haR', 'ftL', 'ftR'];
 const HULL_PARTS = ['armLU', 'armRU', 'armLL', 'armRL', 'legLU', 'legRU', 'legLL', 'legRL'];

@@ -43,9 +43,9 @@
     // static imports). Keeps file://-safe relative addressing throughout.
     return Promise.all([
       import('../vendor/three.module.js'),
-      import('../poppet-lab/doll.js?v=lab51'),
-      import('../poppet-lab/surface.js?v=lab51'),
-      import('../poppet-lab/keepsake.js?v=lab51'),
+      import('../poppet-lab/doll.js?v=lab53'),
+      import('../poppet-lab/surface.js?v=lab53'),
+      import('../poppet-lab/keepsake.js?v=lab53'),
       import('../poppet-lab/paint-kit.js?v=kit1')
     ]).then(function (m) {
       MOD = { THREE: m[0], doll: m[1], surface: m[2], keep: m[3], kit: m[4] };

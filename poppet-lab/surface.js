@@ -7,7 +7,7 @@
      thoughts  → one sheet per thought kind (fears · wishes · likes · dislikes · thoughts)
    Key format: 'body' | 'face:eyes' | 'face:face' | 'face:hair' |
                'clothes' | 'thoughts:fears' | … | 'cloth' | 'aura3' | 'aura4' */
-import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab51';
+import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab53';
 
 export function makeWorksurface(opts) {
   const o = opts || {};

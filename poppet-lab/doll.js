@@ -2,8 +2,8 @@
    Limb tubes SPAN +Y from their root joint — shoulders read on the torso, forearms
    and shins bridge elbow→wrist and knee→foot. Doll starts bare. */
 import * as THREE from '../vendor/three.module.js';
-import { V } from './lab.js?v=lab51';
-import { IDX, N, TOTAL, POSES, dims, fkPose, fkConfig, buildSticks } from './rig.js?v=lab51';
+import { V } from './lab.js?v=lab53';
+import { IDX, N, TOTAL, POSES, dims, fkPose, fkConfig, buildSticks } from './rig.js?v=lab53';
 
 export function weaveFill(ctx, w, h, base) {
   ctx.fillStyle = base;

@@ -5,7 +5,7 @@
    - real neck length: chest top 1.0 → neck → head sphere above it
    - spike pins: pelvis+waist kinematic on the needle, braced by ankle/shoulder chains */
 import * as THREE from '../vendor/three.module.js';
-import { V } from './lab.js?v=lab51';
+import { V } from './lab.js?v=lab53';
 
 export const IDX = { head: 0, neck: 1, chest: 2, waist: 3, pelvis: 4,
   shL: 5, shR: 6, elL: 7, elR: 8, haL: 9, haR: 10,

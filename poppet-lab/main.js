@@ -2,15 +2,15 @@
    columns (ACTIONS beside LAYERS), the settings gear, the burn plate, the view
    locks and the plaque — all objects on the table, hit through one raycaster. */
 import * as THREE from '../vendor/three.module.js';
-import { V, buildScene } from './lab.js?v=lab51';
-import { IDX, TOTAL, dims, makeRng } from './rig.js?v=lab51';
-import { createDoll, weaveFill } from './doll.js?v=lab51';
-import { buildDesk } from './desk.js?v=lab51';
-import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab51';
-import { saveKeepsake, keepsakeCount, atlasCoverage, snapshotDollSheets, KEYP_KEY } from './keepsake.js?v=lab51';
+import { V, buildScene } from './lab.js?v=lab53';
+import { IDX, TOTAL, dims, makeRng } from './rig.js?v=lab53';
+import { createDoll, weaveFill } from './doll.js?v=lab53';
+import { buildDesk } from './desk.js?v=lab53';
+import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab53';
+import { saveKeepsake, keepsakeCount, atlasCoverage, snapshotDollSheets, KEYP_KEY } from './keepsake.js?v=lab53';
 import { buildPoppetOverlay } from './poppet.js?v=lab53';
-import { makeWorksurface } from './surface.js?v=lab51';
-import { beginKeeping } from './keepdrop.js?v=lab51';
+import { makeWorksurface } from './surface.js?v=lab53';
+import { beginKeeping } from './keepdrop.js?v=lab53';
 
 const canvas = document.getElementById('view');
 const L = buildScene(canvas);

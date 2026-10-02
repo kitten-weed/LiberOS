@@ -7,8 +7,8 @@
    Artifacts kept from the ship's rooms appear as per-traveller 3D tokens:
    unbound ones orbit the poppet, related ones perch on the furniture. */
 import * as THREE from '../vendor/three.module.js';
-import { V } from '../poppet-lab/lab.js?v=lab51';
-import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab51';
+import { V } from '../poppet-lab/lab.js?v=lab53';
+import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab53';
 
 const tmpWP = new THREE.Vector3();
 
@@ -574,7 +574,7 @@ const HP = {
 };
 const atlasCv = document.createElement('canvas');
 atlasCv.width = atlasCv.height = 1024;
-const { createDoll } = await import('../poppet-lab/doll.js?v=lab51');
+const { createDoll } = await import('../poppet-lab/doll.js?v=lab53');
 const doll = createDoll(scene, atlasCv, null, { rng: null, brush: function () { return { ink: '#2b2016', size: 10 }; } });
 doll.state.groundOn = false;      // the lab's floor ring does not belong in the living room
 doll.setParams(HP);
@@ -655,7 +655,7 @@ hideRings();
    opens its card — with the fields its own game kept — and unbound
    tokens offer "relate this", which opens the desktop's orbit rail.
    ══════════════════════════════════════════════════════════════════ */
-const keepsakeMod = await import('../poppet-lab/keepsake.js?v=lab51');
+const keepsakeMod = await import('../poppet-lab/keepsake.js?v=lab53');
 adoptKept();   // now that the keepsake store is loaded: become the poppet that was kept
 doll.body.scale.setScalar(0.55);   // room scale: head against the bed and hearth, not the walls
 const keepGroup = new THREE.Group();      // orbit group, rides the poppet

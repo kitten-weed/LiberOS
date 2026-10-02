@@ -4,7 +4,7 @@
    keepsake data is already in localStorage; then the page walks to home.
    HOME SIDE: home reads poppet.keepdrop.v1 and drops the poppet onto the rug. */
 
-import { mirrorKeepsakeToBuddy } from './keepsake.js?v=lab51';
+import { mirrorKeepsakeToBuddy } from './keepsake.js?v=lab53';
 
 const DROP_KEY = 'poppet.keepdrop.v1';
 
