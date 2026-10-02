@@ -487,11 +487,14 @@
         if (seating) return;
         var runtime = window.LiberTraveROM;
         if (runtime && typeof runtime.launch === 'function') {
-          if (!runtime.launch(c.id)) return;
-          selectedIdx = i;
-          lightLamps();
-          b.setAttribute('aria-selected', 'true');
-          return;
+          if (runtime.launch(c.id)) {
+            selectedIdx = i;
+            lightLamps();
+            b.setAttribute('aria-selected', 'true');
+            return;
+          }
+          // console refused (closed/idle): fall through to the direct
+          // travel ritual below instead of dying on a dead click.
         }
         selectedIdx = i;
         lightLamps();

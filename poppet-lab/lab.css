@@ -9,6 +9,11 @@
   src: url('../fonts/Deutsch.ttf') format('truetype');
   font-display: swap;
 }
+@font-face {
+  font-family: 'House Font';
+  src: url('../assets/fonts/House%20Font.ttf') format('truetype');
+  font-display: swap;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {
@@ -123,20 +128,19 @@ body {
 
 .lesson-card {
   position: absolute;
-  left: 50%;
-  bottom: 42px;
-  transform: translateX(-50%);
+  left: 12px;
+  bottom: 12px;
+  transform: none;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
+  max-width: 300px;
   background: linear-gradient(180deg, #efe6cd 0%, #e2d5b4 100%);
   border: 2px solid #6a5218;
   border-radius: 5px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(212, 175, 55, 0.35);
-  padding: 9px 16px;
-  color: #241708;
-  min-width: 380px;
-  max-width: 640px;
+  padding: 7px 10px;
+  font-size: 0.85em;
 }
 .lesson-card .lc-nav {
   font-family: inherit;
@@ -299,6 +303,28 @@ body {
   margin: 9px 0 4px;
 }
 .poppet-inks { display: flex; gap: 7px; flex-wrap: wrap; min-height: 24px; }
+/* ink dots read as ink: round wells, no native button chrome */
+.poppet-inks .ink-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.poppet-inks .ink-dot.on { border-color: #f4ecd8; }
+/* while the texture sheet is open, Physius docks top-left so her box
+   never covers the canvas she narrates */
+body.sheet-open .ctv-body.pv-box {
+  left: 12px !important;
+  right: auto !important;
+  top: 12px !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  width: min(360px, 44%) !important;
+}
 .poppet-tools { display: flex; gap: 5px; }
 .poppet-tools button {
   flex: 1;

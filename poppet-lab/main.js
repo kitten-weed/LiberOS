@@ -434,7 +434,9 @@ function pressKeepsake(force) {
   }
   const D = dims(P);
   const paintSheets = snapshotDollSheets(doll);
-  const n = saveKeepsake(atlasCv, doll.clothCtx.canvas, {
+  var n;
+  try {
+    n = saveKeepsake(atlasCv, doll.clothCtx.canvas, {
     P: P,
     pose: P.pose,
     worn: P.worn,
@@ -454,6 +456,13 @@ function pressKeepsake(force) {
       return out;
     })(),
   });
+  } catch (e) {
+    // storage (usually quota) refused the keep: say so on the plaque instead
+    // of stranding the traveller on a done step with no way home.
+    updatePlaque('THE KEEP FAILED — STORAGE FULL?');
+    hint();
+    return;
+  }
   updatePlaque('SAVED ' + n);
   hint();
   syncLedger();

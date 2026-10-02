@@ -362,9 +362,15 @@ export function buildPoppetOverlay(mount, cfg) {
   const api = {
     open(layer, idx) {
       root.classList.add('open');
+      // the sheet owns the middle of the room: dock Physius aside so her
+      // box never covers the canvas it narrates.
+      try { document.body.classList.add('sheet-open'); } catch (e) {}
       setWalk(layer || 'body', idx || 0);
     },
-    close() { root.classList.remove('open'); },
+    close() {
+      root.classList.remove('open');
+      try { document.body.classList.remove('sheet-open'); } catch (e) {}
+    },
     isOpen() { return root.classList.contains('open'); },
     setSub(text) { el.sub.textContent = text || ''; },
     /* DOLL DRAW hands its brush here so both share one ink + size */

@@ -183,12 +183,18 @@
   bottom: 0;
   transform: translateX(-50%);
   width: min(880px, 92cqi);
-  z-index: 6;
+  z-index: 7;
   pointer-events: auto;
   background: linear-gradient(to top, rgba(5, 8, 14, 0.88), rgba(5, 8, 14, 0));
-  padding: 4.5rem 1rem 2.2rem;
+  /* the dock band owns the bottom ~104px: reserve it so continue never
+     slides under the tray; cinema bars add their own margin while out */
+  padding: 4.5rem 1rem calc(2.2rem + 104px);
   transition: opacity 0.9s ease;
 }
+/* cinema letterbox bars (7cqi) would swallow the console: ride above them */
+body.cinema #console { margin-bottom: 7cqi; }
+body.cinema #summon-toggle,
+body.cinema #exit-toggle { margin-bottom: 7cqi; }
 #console.veiled { opacity: 0; pointer-events: none; }
 
 #q-count {
@@ -425,7 +431,7 @@
 
 #summon-toggle {
   right: 6.2rem;
-  bottom: 1.3rem;
+  bottom: calc(1.3rem + 104px);
   z-index: 11;
   width: 58px;
   height: 58px;
@@ -456,7 +462,7 @@
 
 #exit-toggle {
   right: 1.3rem;
-  bottom: 1.3rem;
+  bottom: calc(1.3rem + 104px);
   z-index: 11;
   width: 58px;
   height: 58px;

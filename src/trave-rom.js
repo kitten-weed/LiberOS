@@ -811,6 +811,16 @@
   }
 
   function launch(index) {
+    // crt-bay passes cartridge ids ('vanir'); the console's own callers pass
+    // numeric indices. Resolve ids here so a string never silently misses.
+    if (typeof index === 'string') {
+      var found = -1;
+      for (var k = 0; k < cards.length; k++) {
+        if (cards[k].cart && cards[k].cart.id === index) { found = k; break; }
+      }
+      if (found < 0) return false;
+      index = found;
+    }
     if (!externalActive || !open || possessing || !cards[index]) return false;
     var item = cards[index];
     possessing = true;

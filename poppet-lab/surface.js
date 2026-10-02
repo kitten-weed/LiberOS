@@ -183,7 +183,7 @@ export function makeWorksurface(opts) {
       if (ws.panels) {
         g.strokeStyle = 'rgba(90, 66, 34, 0.5)';
         g.lineWidth = 2;
-        g.font = '600 ' + Math.max(13, Math.min(26, 1024 / 46)) + 'px Germania, Georgia, serif';
+        g.font = '600 ' + Math.max(13, Math.min(26, 1024 / 46)) + 'px "House Font", Germania, Georgia, serif';
         g.fillStyle = 'rgba(90, 66, 34, 0.62)';
         const keys = Object.keys(ws.panels);
         const labelAll = keys.length <= 24;
