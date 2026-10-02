@@ -834,35 +834,6 @@ function buildBookToken(d) {
   }
   return g;
 }
-function buildLabToken(k) {
-  // the framed portrait from before — a saved poppet, painted by hand.
-  // Without portrait pixels (legacy/bare keeps) the frame carries the
-  // poppet glyph instead of hanging a blank tan square.
-  const cv = document.createElement('canvas');
-  cv.width = cv.height = 128;
-  const g2 = cv.getContext('2d');
-  g2.fillStyle = '#efe6cd';
-  g2.fillRect(0, 0, 128, 128);
-  g2.strokeStyle = '#c9962e';
-  g2.lineWidth = 7;
-  g2.strokeRect(4, 4, 120, 120);
-  g2.fillStyle = '#6a4a1a';
-  g2.font = '64px Georgia, serif';
-  g2.textAlign = 'center';
-  g2.textBaseline = 'middle';
-  g2.fillText('▤', 64, 68);
-  const tex = new THREE.CanvasTexture(cv);
-  if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
-  if (k && k.atlas) {
-    const im = new Image();
-    im.onload = function () {
-      g2.drawImage(im, 12, 12, 104, 104);
-      tex.needsUpdate = true;
-    };
-    im.src = k.atlas;
-  }
-  return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-}
 function buildStoneToken(d) {
   const g = new THREE.Group();
   const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(0.08, 0), mat(0x5a5a62, { roughness: 0.55, flatShading: true }));
@@ -1022,30 +993,28 @@ function buildTokens() {
       arr.forEach(function (e) {
         if (!e || !e.id) return;
         if (store === 'journal' && e.kind === 'dream' && e.ref) return;   // dream mirror, not a second thing
+        // the poppet itself is the artifact: buddy-kind poppet entries get
+        // no stone proxy — the rug doll already embodies the keep.
+        if (e.kind === 'poppet') return;
         addToken(store, e, !!boundOf[e.id]);
       });
     });
   }
-  // 2. lab keepsakes, always (standalone and seated)
-  keepsakeMod.loadKeepsakes().forEach(function (k) {
-    addToken('poppet', k, false);
-  });
+  // 2. lab keepsakes: embodied by the rug doll, not tokened. The framed
+  // portrait canvases used to orbit here; the doll itself is the artifact
+  // now, so keeps live on the shelf (journal) instead of the orbit.
   document.getElementById('keep-count').textContent = tokens.length ?
     tokens.length + ' KEEP' + (tokens.length > 1 ? 'S' : '') : 'NO KEEPS YET';
 }
 function addToken(store, entry, bound) {
-  const isLab = store === 'poppet';
-  const d = isLab ? entry : entry;
-  const obj = isLab ? buildLabToken(d) : tokenBuilderFor(store, d)(d);
-  const scale = isLab ? (0.3 + (d.heightHeads ? Math.min(0.16, d.heightHeads * 0.05) : 0.08)) : 1;
-  if (obj.isSprite) obj.scale.setScalar(scale);
-  else obj.scale.setScalar(1.15);
+  const obj = tokenBuilderFor(store, entry)(entry);
+  obj.scale.setScalar(1.15);
   const tok = {
-    id: isLab ? 'poppet-' + (d.n || d.when) : entry.id,
+    id: entry.id,
     store: store,
-    data: d,
-    traveller: isLab ? 'the lab' : (TRAVELLERS[store] || 'wanderlust'),
-    name: isLab ? d.name : (entry.name || entry.title || entry.label || 'a kept thing'),
+    data: entry,
+    traveller: TRAVELLERS[store] || 'wanderlust',
+    name: entry.name || entry.title || entry.label || 'a kept thing',
     obj: obj,
     bound: bound,
     perch: null,
@@ -1055,7 +1024,7 @@ function addToken(store, entry, bound) {
     radius: 0.62 + (tokens.length % 3) * 0.2,
     speed: 0.2 + (tokens.length % 4) * 0.045,
     summon: null,
-    __scale: scale
+    __scale: 1.15
   };
   if (bound) {
     // a keep already related to the poppet settles onto the furniture
