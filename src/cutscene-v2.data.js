@@ -44,8 +44,10 @@
     { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends. I do love these guys.', response: '>>', effect: 'room-cycle', tone: 'suspicious' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'WHOA.', response: '>>', tone: 'still' },
 
-    /* ── the new opening, per the release script: only one traveller comes ── */
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Well we better make a poppet first and see what happens', response: '>>', tone: 'suspicious' },
+    /* ── the new opening, per the release script: only one traveller comes.
+       auto: after this line Wanderlust opens the poppet app herself — the
+       traveller seats nothing and clicks nothing to get there. ── */
+    { speaker: 'wanderlust', kind: 'dialogue', text: 'Well we better make a poppet first and see what happens', response: '>>', tone: 'suspicious', auto: true },
     { kind: 'handoff', text: '', response: '' },
 
     /* ── the finale, played on the desktop after the poppet is kept ──
@@ -54,10 +56,10 @@
     { speaker: 'wanderlust', kind: 'arrival', text: 'OH! Aren’t you just precious!', tone: 'jovial', effect: 'finale-envelope', wait: 1400 },
      { speaker: 'liber-vacui', kind: 'dialogue', text: 'Yay!', response: '>>', tone: 'jovial' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'Oh and monosyllabic too. Little <name> why don’t you ask for some more travellers?', response: '>>', tone: 'jovial' },
-    { kind: 'summon', text: 'I summon you across all times|With magic words enriched by rhymes|To help me find the parts of me|Provide your light and make me see!', response: '' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'Listen.. you\'ll hear them before you see them. The crossing arrives first, then the ones who keep and name. Let them come one at a time, <name>. First meetings deserve room.', response: 'okay..', tone: 'still' },
-    { kind: 'carts', text: '', response: '' },
-    { speaker: 'wanderlust', kind: 'dialogue', text: 'There. Every one of them answered. Go say hello — they\'ll wait for you.', response: '>>', tone: 'jovial' },
+    // No summoning ceremony: the travellers arrive with the finale itself
+    // (revealAll fires on the finale envelope). The spell, the crossing
+    // lines, the carts procession and its herald were cut 2026-10-01 —
+    // the finale opens on joy, not logistics.
     { speaker: 'wanderlust', kind: 'dialogue', text: 'WOW! That was amazing!', response: '>>', tone: 'jovial' },
      { speaker: 'liber-vacui', kind: 'dialogue', text: 'THANKS!', response: '>>', tone: 'jovial' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'No worries, buddy.', response: '>>', tone: 'jovial' },

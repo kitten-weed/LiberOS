@@ -59,6 +59,24 @@ export function atlasCoverage(ctx, ATLAS, creamHex) {
   return out;
 }
 
+/* Snapshot a doll's paint-only sheets (face trio + hull) for the keepsake.
+   Takes the doll object (faceMaps/hullCanvas); returns dataURLs or nulls.
+   Keeps the rug's doll wearing the same paint the maker laid down. */
+export function snapshotDollSheets(doll) {
+  const out = { face: null, hull: null };
+  try {
+    if (doll && doll.faceMaps) {
+      out.face = {};
+      for (const z of ['eyes', 'face', 'hair']) {
+        const m = doll.faceMaps[z];
+        out.face[z] = m ? cvToData(m.cv, 256) : null;
+      }
+    }
+    if (doll && doll.hullCanvas) out.hull = cvToData(doll.hullCanvas, 512);
+  } catch (err) { /* sheets stay null; atlas still carries the keep */ }
+  return out;
+}
+
 /* save the current specimen — returns the keepsake count afterwards.
    Everything useful about the moment travels with it. */
 export function saveKeepsake(atlasCv, clothCv, spec) {
@@ -78,6 +96,8 @@ export function saveKeepsake(atlasCv, clothCv, spec) {
     coverage: spec.coverage || null,      // per-part painted coverage (0..1)
     aura3: spec.aura3 || null,            // close-aura sheet snapshot (dataURL)
     aura4: spec.aura4 || null,            // far-aura sheet snapshot
+    face: spec.face || null,              // face trio snapshots {eyes,face,hair}
+    hull: spec.hull || null,              // clothes hull snapshot
     thoughts: spec.thoughts || null,      // the five thought sheets, one dataURL each
     atlas: cvToData(atlasCv, 512),
     cloth: clothCv ? cvToData(clothCv, 512) : null

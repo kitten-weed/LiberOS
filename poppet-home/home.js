@@ -603,6 +603,37 @@ function adoptKept() {
       };
       im.src = k.atlas;
     }
+    // face + hulls travel with the keep too — without them the rug doll
+    // loses its painted face, hair and tubes. Shells stay on in the room.
+    try {
+      if (k.face) {
+        for (const z of ['eyes', 'face', 'hair']) {
+          if (!k.face[z] || !doll.faceMaps[z]) continue;
+          const im = new Image();
+          im.onload = (function (zz) {
+            return function () {
+              const fm = doll.faceMaps[zz];
+              fm.ctx.clearRect(0, 0, fm.cv.width, fm.cv.height);
+              fm.ctx.drawImage(im, 0, 0, fm.cv.width, fm.cv.height);
+              fm.tex.needsUpdate = true;
+            };
+          })(z);
+          im.src = k.face[z];
+        }
+      }
+      if (k.hull) {
+        const him = new Image();
+        him.onload = function () {
+          doll.hullCtx.clearRect(0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
+          doll.hullCtx.drawImage(him, 0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
+          doll.hullTex.needsUpdate = true;
+          try { doll.markHullPainted(); } catch (e) {}
+        };
+        him.src = k.hull;
+      }
+      doll.setFaceShell(true);
+      doll.setHulls(true);
+    } catch (err) { /* paint layers stay as they were */ }
     doll.rebuild(k.pose || 'stand');
     doll.setKinematic(true);   // rebuild() drops back to pose targets; re-arm
     hideRings();               // rebuild() also rebuilds the lab rings — hide again
@@ -804,7 +835,9 @@ function buildBookToken(d) {
   return g;
 }
 function buildLabToken(k) {
-  // the framed portrait from before — a saved poppet, painted by hand
+  // the framed portrait from before — a saved poppet, painted by hand.
+  // Without portrait pixels (legacy/bare keeps) the frame carries the
+  // poppet glyph instead of hanging a blank tan square.
   const cv = document.createElement('canvas');
   cv.width = cv.height = 128;
   const g2 = cv.getContext('2d');
@@ -813,14 +846,21 @@ function buildLabToken(k) {
   g2.strokeStyle = '#c9962e';
   g2.lineWidth = 7;
   g2.strokeRect(4, 4, 120, 120);
-  const im = new Image();
-  im.onload = function () {
-    g2.drawImage(im, 12, 12, 104, 104);
-    tex.needsUpdate = true;
-  };
-  im.src = k.atlas;
+  g2.fillStyle = '#6a4a1a';
+  g2.font = '64px Georgia, serif';
+  g2.textAlign = 'center';
+  g2.textBaseline = 'middle';
+  g2.fillText('▤', 64, 68);
   const tex = new THREE.CanvasTexture(cv);
   if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  if (k && k.atlas) {
+    const im = new Image();
+    im.onload = function () {
+      g2.drawImage(im, 12, 12, 104, 104);
+      tex.needsUpdate = true;
+    };
+    im.src = k.atlas;
+  }
   return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
 }
 function buildStoneToken(d) {

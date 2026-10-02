@@ -7,7 +7,7 @@ import { IDX, TOTAL, dims, makeRng } from './rig.js?v=lab51';
 import { createDoll, weaveFill } from './doll.js?v=lab51';
 import { buildDesk } from './desk.js?v=lab51';
 import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab51';
-import { saveKeepsake, keepsakeCount, atlasCoverage, KEYP_KEY } from './keepsake.js?v=lab51';
+import { saveKeepsake, keepsakeCount, atlasCoverage, snapshotDollSheets, KEYP_KEY } from './keepsake.js?v=lab51';
 import { buildPoppetOverlay } from './poppet.js?v=lab53';
 import { makeWorksurface } from './surface.js?v=lab51';
 import { beginKeeping } from './keepdrop.js?v=lab51';
@@ -433,6 +433,7 @@ function pressKeepsake(force) {
     return;
   }
   const D = dims(P);
+  const paintSheets = snapshotDollSheets(doll);
   const n = saveKeepsake(atlasCv, doll.clothCtx.canvas, {
     P: P,
     pose: P.pose,
@@ -443,6 +444,8 @@ function pressKeepsake(force) {
     name: 'Poppet Nº ' + (gen + 1),
     lesson: { layer: lesson.layer, step: lesson.idx + 1, of: MAPPING[lesson.layer].length, part: lessonKey() },
     coverage: atlasCoverage(doll.bodyCtx, doll.ATLAS),
+    face: paintSheets.face,
+    hull: paintSheets.hull,
     aura3: thoughtCvs.fears.toDataURL('image/png'),
     aura4: thoughtCvs.thoughts.toDataURL('image/png'),
     thoughts: (function () {

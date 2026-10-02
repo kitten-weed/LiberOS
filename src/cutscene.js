@@ -276,12 +276,21 @@
   // arms itself and waits for a click (or Enter/Space on focus) before the
   // beat advances. Only the text is automated; the cutscene is not.
   var HIJACK_CPS = 26;
-  function autoAdvance(label, onAdvance) {
+  // auto: when true, the armed response fires itself after a breath instead
+  // of waiting for the player's click — Wanderlust acting on her own words
+  // (the poppet handoff). Guarded against double-fire either way.
+  function autoAdvance(label, onAdvance, auto) {
     var root = el('cutscene');
     if (!root) { onAdvance(); return; }
     // gateRow keeps the original geometry — including the poppet-worktable
     // placement — and owns the consumed/disabled click contract.
-    var btn = gateRow(label || '>>', onAdvance);
+    var fired = false;
+    var fire = function () {
+      if (fired) return;
+      fired = true;
+      onAdvance();
+    };
+    var btn = gateRow(label || '>>', fire);
     if (!btn) { onAdvance(); return; }
     if (root.classList.contains('has-poppet')) btn.classList.add('ctv-act');
     btn.classList.add('ctv-response-auto');
@@ -297,8 +306,10 @@
         btn.classList.remove('ctv-response-auto');
         btn.classList.add('is-armed');
         btn.disabled = false;
-        btn.hidden = false;           // armed: the player's click advances
+        btn.hidden = false;           // armed: the player's click advances —
+                                      // unless this beat fires itself (auto)
         try { btn.focus(); } catch (e) {}
+        if (auto) setTimeout(fire, 1100);
       }
     }, per);
   }
@@ -977,6 +988,11 @@
       // warm the cast so the room reads as changed before she speaks.
       root.classList.add('ctv-finale-warm');
       setTimeout(function () { root.classList.remove('ctv-finale-warm'); }, 3200);
+      // The travellers arrive WITH the finale now (no separate summoning
+      // ceremony): lift the handoff's solo mask the moment the finale opens.
+      try {
+        if (window.LiberTraveROM && window.LiberTraveROM.revealAll) window.LiberTraveROM.revealAll();
+      } catch (e) {}
     }
     if (name === 'vanir-ritual') {
       root.classList.add('ctv-vanir-threshold');
@@ -1828,6 +1844,7 @@
         }
         // Wanderlust hijacks the keyboard: the authored response types
         // itself in the rail and the scene advances. No gate, no button.
+        // beat.auto: she fires it herself (the poppet handoff opens the app).
         autoAdvance(beat.response, function () {
         var c2 = cast();
         if (c2) c2.classList.remove('is-overlap');
@@ -1898,7 +1915,7 @@
         }
         if (beat.effect !== 'noble-shadow' && beat.effect !== 'rainy-day' && beat.effect !== 'as-above') fxV3Effect(beat.effect);
         advanceFrom(idx, next);
-        });
+        }, beat.auto);
       };
       if (beat.identities) revealIdentities(lineEl, beat.identities, afterVoice);
       else afterVoice();

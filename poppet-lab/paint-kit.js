@@ -29,9 +29,9 @@ export function inkName(hex) {
 export function buildSheetSet(doll, atlasCv) {
   function one(surf) {
     let made;
-    if (surf === 'face') {
-      const fm = doll.faceMaps.face;
-      made = makeWorksurface({ cv: fm.cv, tex: fm.tex, key: 'face' });
+    if (surf === 'face' || surf === 'eyes') {
+      const fm = surf === 'eyes' ? doll.faceMaps.eyes : doll.faceMaps.face;
+      made = makeWorksurface({ cv: fm.cv, tex: fm.tex, key: surf });
     } else if (surf === 'hair') {
       const hm = doll.faceMaps.hair;
       made = makeWorksurface({ cv: hm.cv, tex: hm.tex, key: 'hair' });
@@ -43,5 +43,5 @@ export function buildSheetSet(doll, atlasCv) {
     made.ws.el = made.ws.cv;
     return made;
   }
-  return { face: one('face'), hair: one('hair'), body: one('body'), clothes: one('clothes') };
+  return { eyes: one('eyes'), face: one('face'), hair: one('hair'), body: one('body'), clothes: one('clothes') };
 }

@@ -19,14 +19,18 @@
   // cannot drift apart. The lab keeps its own literals (freshP randomizes).
   var INKS = null, SIZES = null;
 
-  // Step → surface + camera push (pos/look) + guide box (% of shown canvas).
+  // Step → surface + camera push (pos/look) + guide box (% of shown canvas,
+  // canvas-y top-down: converted from the atlas uv fractions, bottom-up).
   // Boxes are suggestions ("a mark here") — paint anywhere counts.
   var STEPS = [
     { id: 'face', label: 'face', surf: 'face', hint: 'eyes, mouth — whatever it should be', cam: [[0, 1.55, 1.9], [0, 1.45, 0]], box: null },
+    { id: 'eyes', label: 'eyes', surf: 'eyes', hint: 'the look in them', cam: [[0, 1.58, 1.6], [0, 1.48, 0]], box: null },
     { id: 'hair', label: 'hair', surf: 'hair', hint: 'crown it — wild, sleek, or gone', cam: [[0, 1.6, 2.0], [0, 1.5, 0]], box: null },
-    { id: 'chest', label: 'the chest mark', surf: 'body', hint: 'a sigil over the heart', cam: [[0, 1.15, 2.6], [0, 1.05, 0]], box: [35, 1.5, 31, 30] },
-    { id: 'arm', label: 'an arm', surf: 'body', hint: 'sleeves of scars or stars', cam: [[1.0, 1.0, 2.6], [0.5, 0.95, 0]], box: [1.5, 61, 11.5, 37] },
-    { id: 'leg', label: 'a leg', surf: 'body', hint: 'stockings, wounds, maps', cam: [[0.6, 0.45, 2.8], [0.25, 0.4, 0]], box: [49, 61, 11.5, 37] },
+    { id: 'chest', label: 'the chest mark', surf: 'body', hint: 'a sigil over the heart', cam: [[0, 1.15, 2.6], [0, 1.05, 0]], box: [35, 68.5, 31, 30] },
+    { id: 'arm', label: 'an arm', surf: 'body', hint: 'sleeves of scars or stars', cam: [[1.0, 1.0, 2.6], [0.5, 0.95, 0]], box: [1.5, 2, 11.5, 37] },
+    { id: 'hand', label: 'a hand', surf: 'body', hint: 'what it holds, what it lets go', cam: [[0.9, 0.8, 2.2], [0.4, 0.75, 0]], box: [1.5, 41, 9, 9] },
+    { id: 'leg', label: 'a leg', surf: 'body', hint: 'stockings, wounds, maps', cam: [[0.6, 0.45, 2.8], [0.25, 0.4, 0]], box: [49, 2, 11.5, 37] },
+    { id: 'foot', label: 'a foot', surf: 'body', hint: 'where it has walked', cam: [[0.5, 0.3, 2.4], [0.2, 0.3, 0]], box: [21.5, 41, 11, 9] },
     { id: 'clothes', label: 'clothes', surf: 'clothes', hint: 'the hulls appear where you paint them', cam: [[0, 1.0, 4.6], [0, 0.95, 0]], box: null }
   ];
 
@@ -295,13 +299,16 @@
       if (s.kept) { if (cb) cb(); return; }
       var n;
       try {
+        var sheets = MOD.keep.snapshotDollSheets(doll);
         n = MOD.keep.saveKeepsake(atlasCv, null, {
           P: MOD.kit.defaultProportions(),
           pose: 'stand', worn: {},
           ink: s.ink, brush: s.size,
           name: 'Poppet Nº 1',
           lesson: { tutorial: true, rite: 'first-making' },
-          coverage: MOD.keep.atlasCoverage(doll.bodyCtx, doll.ATLAS)
+          coverage: MOD.keep.atlasCoverage(doll.bodyCtx, doll.ATLAS),
+          face: sheets.face,
+          hull: sheets.hull
         });
       } catch (e) { return; }
       MOD.keep.mirrorKeepsakeToBuddy(n, 'Poppet Nº ' + n, 'poppet-rite');
