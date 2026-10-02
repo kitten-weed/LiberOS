@@ -1002,9 +1002,12 @@ function buildTokens() {
   }
   // 2. lab keepsakes: embodied by the rug doll, not tokened. The framed
   // portrait canvases used to orbit here; the doll itself is the artifact
-  // now, so keeps live on the shelf (journal) instead of the orbit.
-  document.getElementById('keep-count').textContent = tokens.length ?
-    tokens.length + ' KEEP' + (tokens.length > 1 ? 'S' : '') : 'NO KEEPS YET';
+  // now, so keeps live on the shelf (journal) instead of the orbit. The
+  // count still names them: tokens plus lab-kept poppets.
+  const kept = keepsakeMod.loadKeepsakes().length;
+  const total = tokens.length + kept;
+  document.getElementById('keep-count').textContent = total ?
+    total + ' KEEP' + (total > 1 ? 'S' : '') : 'NO KEEPS YET';
 }
 function addToken(store, entry, bound) {
   const obj = tokenBuilderFor(store, entry)(entry);

@@ -1196,7 +1196,13 @@ if (window.PoppetGuide) {
       } catch (err) { /* standalone */ }
       return (window.Liber && window.Liber.state && window.Liber.state.get().travellerAlias) || 'traveller';
     },
-    shouldRun: function () { return !keepsakeCount(); },
+    shouldRun: function () {
+      // guidedness, not keeps: a rite-kept poppet must not skip guidance.
+      try {
+        if (localStorage.getItem('poppet.guided.v1')) return false;
+      } catch (e) {}
+      return !keepsakeCount();
+    },
     setDollPaint: function (on) { setDollPaint(!!on); },
     // the guide opens the desk's own texture subsections: layer + index
     // into the real lesson plan, as the flat sheet (same direct-texture

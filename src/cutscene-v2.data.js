@@ -37,7 +37,7 @@
     // grand: true — her FIRST entrance is staged: two knocks land on the
     // seated boxes, a bloom gathers, then the chatbox arrives too large for
     // the room and compresses into its seat. Later arrivals stay ordinary.
-    { speaker: 'wanderlust', kind: 'arrival', text: 'Oh, a new traveller! How exciting! Hello <you> how are you?', tone: 'jovial', effect: 'infection', grand: true },
+    { speaker: 'wanderlust', kind: 'arrival', text: 'Oh, a new traveller! How exciting! Hello <you>, how are you?', tone: 'jovial', effect: 'infection', grand: true },
     { speaker: 'liber-vacui', kind: 'dialogue', text: 'Scared, it\'s dark and cold.', response: '>>', tone: 'still' },
     { speaker: 'wanderlust', kind: 'dialogue', text: 'OH! You\'re so right, let me fix that.', response: '>>', effect: 'infection', tone: 'jovial' },
     { speaker: 'liber-vacui', kind: 'dialogue', text: 'Nothing happened', response: '>>', tone: 'still' },

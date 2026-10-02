@@ -112,6 +112,7 @@
      that says the part is finished; pressing it re-emerges the box. */
   var plate = null;
   function clearPlate() {
+    clearTimeout(state.stallTimer);
     if (plate && plate.parentNode) plate.parentNode.removeChild(plate);
     plate = null;
   }
@@ -227,6 +228,8 @@
   }
 
   function makeBox(side) {
+    // never stack boxes: a second start removes the first node's corpse.
+    if (state.box && state.box.parentNode) state.box.parentNode.removeChild(state.box);
     state.box = document.createElement('div');
     state.box.className = 'ctv-body ctv-physius pv-box pv-arrive' + (side ? ' pv-side' : '');
     state.box.innerHTML = '<div class="ctv-aura" aria-hidden="true"><i></i><i></i><i></i></div>'
@@ -310,6 +313,9 @@
     clearTimeout(state.stallTimer);
     clearInterval(state.poll);
     bell(false, false);
+    // guided once: the gate checks this flag, not the keepsake count, so a
+    // poppet kept elsewhere (tutorial rite) never silently skips guidance.
+    try { localStorage.setItem('poppet.guided.v1', '1'); } catch (e) {}
     say('Then let’s send it home.');
     if (state.hooks.keep) setTimeout(function () { state.hooks.keep(); }, 1400);
     state.active = false;

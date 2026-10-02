@@ -46,7 +46,7 @@
       import('../poppet-lab/doll.js?v=lab53'),
       import('../poppet-lab/surface.js?v=lab53'),
       import('../poppet-lab/keepsake.js?v=lab53'),
-      import('../poppet-lab/paint-kit.js?v=kit1')
+      import('../poppet-lab/paint-kit.js?v=kit2')
     ]).then(function (m) {
       MOD = { THREE: m[0], doll: m[1], surface: m[2], keep: m[3], kit: m[4] };
       INKS = m[4].INKS; SIZES = m[4].SIZES;
@@ -73,6 +73,31 @@
       if (opts.onDismiss) opts.onDismiss();
     });
     return session;
+  }
+
+  // One teardown for every exit path: the module-failure close() used to
+  // skip GPU disposal and leak the resize listener + rAF against a dead shell.
+  function teardownSession(s) {
+    try {
+      if (s.raf) cancelAnimationFrame(s.raf);
+    } catch (e) {}
+    try {
+      if (s.onResize) window.removeEventListener('resize', s.onResize);
+    } catch (e) {}
+    try {
+      if (s.pvScene) {
+        s.pvScene.traverse(function (o) {
+          if (o.geometry) { try { o.geometry.dispose(); } catch (e) {} }
+          var mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+          mats.forEach(function (mt) { try { mt.dispose(); } catch (e) {} });
+        });
+      }
+      if (s.pvRenderer) { try { s.pvRenderer.dispose(); } catch (e) {} }
+    } catch (e) {}
+    try {
+      if (s.shell && s.shell.parentNode) s.shell.parentNode.removeChild(s.shell);
+    } catch (e) {}
+    if (session === s) session = null;
   }
 
   function build(s) {
@@ -114,6 +139,15 @@
       pvCamera.lookAt(0, 1.45, 0);
       s.pvCanvas = pvCanvas;
     } catch (e) { doll = null; }
+    // WebGL (or the doll build) can fail after the shell is already up.
+    // Fail closed through the caller's dismiss path — never strand the
+    // "waking the pigments…" shell on a dead dialog.
+    if (!doll) {
+      var cb0 = s.onDismiss;
+      teardownSession(s);
+      if (cb0) cb0();
+      return;
+    }
 
     // ── worksurfaces on the doll's own canvases, via the shared kit ──
     s.sheets = MOD.kit.buildSheetSet(doll, atlasCv);
@@ -295,8 +329,26 @@
         if (h) h.textContent = 'every piece touched. ready.';
       }
     }
+    function keepFail(msg) {
+      var h = shell.querySelector('#rite-hint');
+      if (h) h.textContent = msg || 'the keeping failed — nothing was lost. try again.';
+      s.saving = false;
+      var keep = shell.querySelector('#rite-keep');
+      var refine = shell.querySelector('#rite-refine');
+      if (keep) keep.disabled = false;
+      if (refine) refine.disabled = false;
+    }
     function keepThen(cb) {
       if (s.kept) { if (cb) cb(); return; }
+      // re-entrancy latch: the PNG encode takes hundreds of ms, and a second
+      // click inside that window would mint a second poppet. Buttons lock
+      // until the save settles either way.
+      if (s.saving) return;
+      s.saving = true;
+      var keep = shell.querySelector('#rite-keep');
+      var refine = shell.querySelector('#rite-refine');
+      if (keep) keep.disabled = true;
+      if (refine) refine.disabled = true;
       var n;
       try {
         var sheets = MOD.keep.snapshotDollSheets(doll);
@@ -310,9 +362,12 @@
           face: sheets.face,
           hull: sheets.hull
         });
-      } catch (e) { return; }
-      MOD.keep.mirrorKeepsakeToBuddy(n, 'Poppet Nº ' + n, 'poppet-rite');
-      try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
+      } catch (e) { keepFail(); return; }
+      try {
+        MOD.keep.mirrorKeepsakeToBuddy(n, 'Poppet Nº ' + n, 'poppet-rite');
+        try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
+      } catch (e) { keepFail(); return; }
+      s.kept = true;
       s.kept = true;
       var cb2 = s.onKeep;
       teardown();
@@ -343,7 +398,8 @@
     var raf = 0, lastT = 0;
     function loop(t) {
       if (!session) return;
-      raf = requestAnimationFrame(loop);
+      s.raf = requestAnimationFrame(loop);
+      raf = s.raf;
       if (document.hidden) return;
       var dt = Math.min(0.05, (t - lastT) / 1000 || 0);
       lastT = t;
@@ -357,41 +413,24 @@
       } catch (e) {}
     }
 
-    function teardown() {
-      try { cancelAnimationFrame(raf); } catch (e) {}
-      // release GPU: geometries, materials and the renderer context would
-      // otherwise leak one WebGL context per open (browsers cap ~16).
-      try {
-        if (pvScene) {
-          pvScene.traverse(function (o) {
-            if (o.geometry) { try { o.geometry.dispose(); } catch (e) {} }
-            var mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
-            mats.forEach(function (mt) { try { mt.dispose(); } catch (e) {} });
-          });
-        }
-        if (pvRenderer) { try { pvRenderer.dispose(); } catch (e) {} }
-      } catch (e) {}
-      if (shell.parentNode) shell.parentNode.removeChild(shell);
-      if (session === s) session = null;
-    }
+    function teardown() { teardownSession(s); }
     s.teardown = teardown;
 
-    window.addEventListener('resize', sizePreview);
+    s.onResize = sizePreview;
+    s.pvScene = pvScene;
+    s.pvRenderer = pvRenderer;
+    window.addEventListener('resize', s.onResize);
     s.ready = true;
     showStep(0);
     syncReveal();
     sizePreview();
     lastT = performance.now();
-    raf = requestAnimationFrame(loop);
+    s.raf = requestAnimationFrame(loop);
   }
 
   function close() {
     if (!session) return;
-    var s = session;
-    try {
-      if (s.shell.parentNode) s.shell.parentNode.removeChild(s.shell);
-    } catch (e) {}
-    session = null;
+    teardownSession(session);
   }
 
   window.LiberPoppetRite = { open: open, close: close };

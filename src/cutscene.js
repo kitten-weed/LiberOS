@@ -2035,10 +2035,6 @@
           playPoppetStage(b, function () { advanceFrom(at, go); });
         } else if (b.kind === 'handoff') {
           playHandoff(function () { advanceFrom(at, go); });
-        } else if (b.kind === 'summon') {
-          playSummon(b, function () { advanceFrom(at, go); });
-        } else if (b.kind === 'carts') {
-          playCartsReveal(function () { advanceFrom(at, go); });
         } else if (b.kind === 'rat') {
           playRat(function () { advanceFrom(at, go); });
         } else if (b.kind === 'rat-explode') {
@@ -2141,54 +2137,6 @@
   }
 
   /* summon: Wanderlust's four-line rhyming call, staged like the opening */
-  function playSummon(beat, next) {
-    var root = el('cutscene');
-    if (!root) { next(); return; }
-    var lines = String(beat.text || '').split('|');
-    var wrap = document.createElement('div');
-    wrap.className = 'ctv-ritual ctv-summon';
-    wrap.innerHTML = lines.map(function (l, i) {
-      return '<div class="ctv-ritual-line" data-ritual-line="' + i + '"><span class="ctv-ritual-text">' + fillName(l) + '</span></div>';
-    }).join('');
-    root.appendChild(wrap);
-    var i = 0;
-    (function line() {
-      if (i >= lines.length) {
-        setTimeout(function () {
-          if (wrap.parentNode) wrap.remove();
-          next();
-        }, 1400);
-        return;
-      }
-      var row = wrap.querySelector('[data-ritual-line="' + i + '"]');
-      if (row) row.classList.add('is-lit');
-      if (i === 0) weather('stars', 1);
-      i++;
-      setTimeout(line, 1250);
-    })();
-  }
-
-  /* carts: the traveller cartridges arrive one at a time — a procession,
-     not a deck flipped face-up. Each name takes the stage alone long
-     enough to be read before the next cart lights (the stagger itself
-     lives in TraveROM.revealAll; this beat simply holds the curtain while
-     the procession walks). */
-  function playCartsReveal(next) {
-    var dock = (window.Liber && window.Liber.crtBay) || null;
-    flash('rgba(255,236,248,0.5)', 500);
-    if (dock && dock.closeTray) { try { dock.closeTray(); } catch (e) {} }
-    var CART_COUNT = (window.LiberTravellers && window.LiberTravellers.all && Object.keys(window.LiberTravellers.all).length) || 8;
-    var STAGGER_MS = 640;      // one cart lights every beat
-    var HOLD_PER_NAME = 900;   // reading time after the last name lands
-    var total = 600 + CART_COUNT * STAGGER_MS + HOLD_PER_NAME;
-    setTimeout(function () {
-      try {
-        if (window.LiberTraveROM && window.LiberTraveROM.revealAll) window.LiberTraveROM.revealAll();
-      } catch (e) {}
-      setTimeout(next, Math.max(1600, total - 600));
-    }, 600);
-  }
-
   /* rat: the creator's fourth-wall note, glitching into existence */
   function playRat(next) {
     var root = el('cutscene');
