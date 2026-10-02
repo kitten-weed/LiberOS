@@ -8,7 +8,7 @@ import { createDoll, weaveFill } from './doll.js?v=lab51';
 import { buildDesk } from './desk.js?v=lab51';
 import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab51';
 import { saveKeepsake, keepsakeCount, atlasCoverage, KEYP_KEY } from './keepsake.js?v=lab51';
-import { buildPoppetOverlay } from './poppet.js?v=lab51';
+import { buildPoppetOverlay } from './poppet.js?v=lab53';
 import { makeWorksurface } from './surface.js?v=lab51';
 import { beginKeeping } from './keepdrop.js?v=lab51';
 
@@ -648,6 +648,15 @@ function canvasLaunch() {
   popOverlay.open(lesson.layer, lesson.idx);   // the walkthrough IS the overlay's stage
 }
 
+// Guide paint steps open the same texture sheet the tutorial rite paints:
+// the traveller should never have to discover the desk buttons mid-lesson.
+function openSheetPart(layer, idx) {
+  if (dollPaint) setDollPaint(false);
+  setLesson(layer, idx);
+  popOverlay.syncBrush();
+  popOverlay.open(layer, idx);
+}
+
 /* ── the EXPAND overlay: the walkthrough of the whole mapping lives here ── */
 const popOverlay = buildPoppetOverlay(document.body, {
   doll: doll,
@@ -1187,11 +1196,11 @@ if (window.PoppetGuide) {
     shouldRun: function () { return !keepsakeCount(); },
     setDollPaint: function (on) { setDollPaint(!!on); },
     // the guide opens the desk's own texture subsections: layer + index
-    // into the real lesson plan (the threejs desk IS the tutorial).
-    // activeLayer must move too: deferred rebuilds re-impose setLesson
-    // from the band, so the band IS the authority.
-    setLessonPart: function (layer, idx) { activeLayer = layer; setDollPaint(true); setLesson(layer, idx); },
-    setLessonFree: function () { setLesson('clothes', 0); },
+    // into the real lesson plan, as the flat sheet (same direct-texture
+    // painting as the tutorial rite) — not bare DOLL DRAW. The overlay's
+    // own DOLL → button still offers the 3D doll whenever wanted.
+    setLessonPart: function (layer, idx) { activeLayer = layer; openSheetPart(layer, idx); },
+    setLessonFree: function () { setLesson('clothes', 0); openSheetPart('clothes', 0); },
     keep: function () {
       try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
       pressKeepsake(true);   // the guided workshop keeps whatever stage it reached

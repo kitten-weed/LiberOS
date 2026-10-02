@@ -2097,14 +2097,24 @@
     };
     if (window.LiberPoppetRite) {
       try {
-        window.LiberPoppetRite.open({
-          onKeep: function () {
-            document.body.classList.remove('ctv-poppet-glow');
-            try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
-            next();
-          },
-          onDismiss: function () { seatedLab(); }
-        });
+        // Wanderlust does it herself: the machine shakes, the TraveROM
+        // rattles, and the first making opens on its own — the traveller
+        // seats nothing and clicks nothing to get there.
+        try {
+          var dock2 = (window.Liber && window.Liber.crtBay) || null;
+          if (dock2 && dock2.shudder) dock2.shudder(1200);
+        } catch (e) {}
+        shakeMachine(1200);
+        setTimeout(function () {
+          window.LiberPoppetRite.open({
+            onKeep: function () {
+              document.body.classList.remove('ctv-poppet-glow');
+              try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
+              next();
+            },
+            onDismiss: function () { seatedLab(); }
+          });
+        }, 900);
         closeGate('action-lock');
         try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
         return;

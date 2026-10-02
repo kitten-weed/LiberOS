@@ -288,9 +288,12 @@
     if (step.part) {
       // the desk takes over: open the texture subsection, let the line be
       // read, THEN the box leaves and the part plate appears — order
-      // matters, say() clears any plate and hiding early swallows the text
+      // matters, say() clears any plate and hiding early swallows the text.
+      // NOTE: no setDollPaint(true) here — that call closes the sheet
+      // overlay (setDollPaint shuts popOverlay), and the sheet IS the
+      // painting surface now. The overlay's own DOLL → button still offers
+      // the 3D doll whenever wanted.
       if (state.hooks.setLessonPart) state.hooks.setLessonPart(step.part[0], step.part[1]);
-      if (state.hooks.setDollPaint) state.hooks.setDollPaint(true);
       say(step.say, { done: function () { setTimeout(function () { enterPaintMode(step); }, 2400); } });
       return;
     }

@@ -167,6 +167,7 @@ export function buildPoppetOverlay(mount, cfg) {
     '</div>' +
     '</div>' +
     '<div class="poppet-stage">' +
+    '<div class="poppet-phase" id="poppet-phase" aria-live="polite"></div>' +
     '<canvas class="poppet-cv" width="1024" height="1024"></canvas>' +
     '<div class="poppet-doll-btn" title="paint this on the doll itself">DOLL →</div>' +
     '</div>' +
@@ -190,6 +191,7 @@ export function buildPoppetOverlay(mount, cfg) {
     dollBtn: root.querySelector('.poppet-doll-btn'),
     x: root.querySelector('.poppet-x'),
     prog: root.querySelector('.poppet-prog'), prompt: root.querySelector('.poppet-prompt'),
+    phase: root.querySelector('#poppet-phase'),
     prev: root.querySelector('#poppet-prev'), next: root.querySelector('#poppet-next')
   };
   el.ctx = el.cv.getContext('2d', { willReadFrequently: true });
@@ -225,7 +227,7 @@ export function buildPoppetOverlay(mount, cfg) {
   el.cv.addEventListener('pointerdown', function (e) {
     e.preventDefault();
     try { el.cv.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointers */ }
-    const p = s().pos(e);
+    const p = vpos(e);
     undoStack.push({ key: activeKey, data: s().ctx.getImageData(0, 0, s().cv.width, s().cv.height) });
     if (undoStack.length > 6) undoStack.shift();
     st.painting = true;
@@ -243,7 +245,7 @@ export function buildPoppetOverlay(mount, cfg) {
   });
   el.cv.addEventListener('pointermove', function (e) {
     if (!st.painting || st.tool === 'bucket') return;
-    const p = s().pos(e);
+    const p = vpos(e);
     s().stampLine(st.last.x, st.last.y, p.x, p.y, st.size / 2, st.ink, st.tool === 'erase');
     st.last = p;
     draw();
@@ -285,15 +287,66 @@ export function buildPoppetOverlay(mount, cfg) {
   el.x.addEventListener('click', function () { api.close(); });
   el.dollBtn.addEventListener('click', function () { if (cfg.onDoll) cfg.onDoll(); });
 
-  /* ── draw + show ── */
+  /* ── draw + show ──
+     The sheet moves WITH the walkthrough: instead of the whole atlas every
+     time, the display zooms to the current panel (with a margin of
+     surrounding skin for context). Pointer mapping follows the same view,
+     so strokes land where the eye sees them. Face zones are already
+     single-panel canvases and show whole. */
+  var view = null;   // {sx,sy,sw,sh} canvas px currently framed, or null
+  function hotPanel() {
+    var api = s();
+    var inner = (api && api.ws) || {};
+    var panels = inner.panels;
+    if (!panels) return null;
+    var key = inner.outline || activeKey;
+    var r = panels[key] || panels[part()];
+    if (!r) return null;
+    return r;
+  }
   function draw() {
-    s().redraw(el.ctx, el.cv.width, el.cv.height);
+    var ws = s();
+    var W = el.cv.width, H = el.cv.height;
+    var cv = ws.cv;
+    var r = hotPanel();
+    if (!r) {
+      view = null;
+      ws.redraw(el.ctx, W, H);
+    } else {
+      var mx = 0.35, my = 0.45;   // margin of surrounding skin
+      var sx = Math.max(0, (r[0] - r[2] * mx) * cv.width);
+      var sy = Math.max(0, (r[1] - r[3] * my) * cv.height);
+      var sw = Math.min(cv.width - sx, r[2] * (1 + mx * 2) * cv.width);
+      var sh = Math.min(cv.height - sy, r[3] * (1 + my * 2) * cv.height);
+      view = { sx: sx, sy: sy, sw: sw, sh: sh, W: W, H: H };
+      var g = el.ctx;
+      g.clearRect(0, 0, W, H);
+      g.fillStyle = '#efe6cd';
+      g.fillRect(0, 0, W, H);
+      g.drawImage(cv, sx, sy, sw, sh, 0, 0, W, H);
+      g.strokeStyle = '#a8862e';
+      g.lineWidth = 6;
+      g.strokeRect(4, 4, W - 8, H - 8);
+    }
     updateLessonRow();
+  }
+  // pointer → texture coords through the CURRENT view (zoomed or whole)
+  function vpos(e) {
+    var ws = s();
+    var rect = el.cv.getBoundingClientRect();
+    if (!view) return ws.pos(e);
+    return {
+      x: view.sx + ((e.clientX - rect.left) / rect.width) * view.sw,
+      y: view.sy + ((e.clientY - rect.top) / rect.height) * view.sh
+    };
   }
   function updateLessonRow() {
     const total = LAYER_SHEETS[walk.layer].length;
     const layerNames = { body: 'BODY — THE SKIN', face: 'FACE & HAIR — THE SHELL', clothes: 'CLOTHES — THE HULLS', thoughts: 'THOUGHTS — THE GLYPHS' };
+    // the phase banner: nobody wonders what they are drawing on.
+    const phase = { body: 'DRAW THE SKIN', face: 'DRAW THE FACE & HAIR', clothes: 'DRAW THE CLOTHES', thoughts: 'DRAW THE THOUGHTS' };
     el.prog.textContent = layerNames[walk.layer] + ' · PIECE ' + (walk.idx + 1) + ' OF ' + total + ' — ' + sheetName();
+    if (el.phase) el.phase.textContent = phase[walk.layer] || '';
     el.prompt.textContent = walkPrompt();
     el.prev.disabled = walk.layer === 'body' && walk.idx === 0;
     const lastLayer = walk.layer === 'thoughts' && walk.idx === total - 1;

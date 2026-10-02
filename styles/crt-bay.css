@@ -977,6 +977,18 @@
   80% { transform: translate(2px, 0); }
 }
 .machine.crt-shake { animation: crt-seat-shake 0.5s linear; }
+/* Wanderlust's rattle: the dock shudders in place while she opens the
+   first making herself — longer and looser than a seat shake. */
+.crt-bay.crt-shudder { animation: crt-shudder 1.2s linear; }
+@keyframes crt-shudder {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-3px, 1px) rotate(-0.4deg); }
+  25% { transform: translate(3px, -1px) rotate(0.4deg); }
+  40% { transform: translate(-2px, 0) rotate(-0.3deg); }
+  55% { transform: translate(2px, 1px) rotate(0.3deg); }
+  70% { transform: translate(-1px, 0); }
+  85% { transform: translate(1px, 0); }
+}
 @keyframes crt-seat-flash {
   0%, 100% { filter: brightness(1); }
   30% { filter: brightness(1.22); }

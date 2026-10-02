@@ -81,6 +81,14 @@
     m.classList.add('crt-flash');
     setTimeout(function () { m.classList.remove('crt-flash'); }, 500);
   }
+  // Wanderlust rattles the dock herself: the whole bay shudders in place —
+  // no tray opens, nothing seats, the traveller does nothing. The cutscene
+  // handoff calls this right before the first making opens itself.
+  function shudder(ms) {
+    if (!bay || bay.classList.contains('crt-shudder')) return;
+    bay.classList.add('crt-shudder');
+    setTimeout(function () { if (bay) bay.classList.remove('crt-shudder'); }, ms || 1200);
+  }
 
   // the cutscene's Riason-cursor beat drives the REAL dock: open the tray,
   // then press the real cartridge button so the whole slot-click → tray →
@@ -647,6 +655,7 @@
   window.Liber.crtBay = {
     openTray: out,
     closeTray: seat,
+    shudder: shudder,
     // Legacy callers may still ask the console to show its tray, but this
     // shim intentionally cannot navigate. Destination commits belong to Pixi.
     seatCart: function () { out(); return false; },
