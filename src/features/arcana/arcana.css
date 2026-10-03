@@ -87,12 +87,12 @@ body {
 
 .arc-btn {
   font-family: var(--mono-pix);
-  font-size: 1.3rem;
+  font-size: 16px;
   color: var(--fg);
   background: transparent;
   border: 1px solid rgba(189,189,189,0.35);
   padding: 2px 10px;
-  min-height: 34px;
+  min-height: 44px;
   cursor: pointer;
 }
 .arc-btn:hover { color: var(--bg); background: var(--yellow); border-color: var(--yellow); }
@@ -152,16 +152,17 @@ body {
 .arc-win-head .win-x:hover { color: var(--red); }
 .arc-win-head .win-x:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 .arc-win-body {
-  padding: 10px 14px;
+  padding: 10px 12px;
   overflow: auto;
   flex: 1;
   min-height: 0;
-  font-size: 1.45rem;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.45;
+  background: #080a08;
 }
 
 /* window placement per screen */
-.win-menu    { left: 50%; top: 50%; transform: translate(-50%, -54%); width: min(720px, 92%); }
+.win-menu    { left: 50%; top: 50%; transform: translate(-50%, -54%); width: min(720px, 92%); max-height: calc(100% - 32px); }
 .win-studies { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, 92%); max-height: 84%; }
 .win-read    { right: 3%;  bottom: 6%; width: min(560px, 46%); max-height: 78%; }
 /* the work table lives at the TOP so the stage's keep/discard rows at the
@@ -179,15 +180,15 @@ body {
   color: var(--green);
   text-shadow: 0 0 12px rgba(140,200,95,0.4);
   white-space: pre;
-  font-size: 1.6rem;
-  line-height: 1.25;
-  margin: 2px 0 10px;
+  font-size: 16px;
+  line-height: 1.1;
+  margin: 0 0 10px;
   text-align: center;
 }
 .menu-opts { display: flex; flex-direction: column; gap: 6px; }
 .menu-opt {
   font-family: inherit;
-  font-size: 1.55rem;
+  font-size: 16px;
   text-align: left;
   color: var(--fg);
   background: transparent;
@@ -203,8 +204,8 @@ body {
 .menu-opt .opt-glyph { color: var(--violet); }
 .menu-opt:hover { border-color: var(--green); border-style: solid; color: var(--green); background: rgba(140,200,95,0.07); }
 .menu-opt:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-.menu-opt .opt-hint { margin-left: auto; color: var(--dim); font-size: 1.15rem; }
-.menu-foot { margin-top: 10px; color: var(--dim); font-size: 1.15rem; }
+.menu-opt .opt-hint { margin-left: auto; color: var(--dim); font-size: 14px; line-height: 1.35; }
+.menu-foot { margin-top: 10px; color: var(--dim); font-size: 14px; line-height: 1.35; }
 
 /* ── boot log ──────────────────────────────────────────────────────── */
 .arc-bootlog {
@@ -258,9 +259,10 @@ body {
 /* ── the question input ────────────────────────────────────────────── */
 .arc-q {
   font-family: inherit;
-  font-size: 1.45rem;
+  font-size: 16px;
+  line-height: 1.45;
   color: var(--cyan);
-  background: rgba(8,10,8,0.85);
+  background: #080a08;
   border: none;
   border-bottom: 1px dashed rgba(121,218,200,0.5);
   width: 100%;
@@ -271,10 +273,10 @@ body {
 .arc-q:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 /* ── reading pane text ─────────────────────────────────────────────── */
-.rd-name { color: var(--green); font-size: 1.7rem; letter-spacing: 0.05em; }
-.rd-meta { color: var(--dim); font-size: 1.1rem; margin: 2px 0 8px; }
-.rd-line { margin: 6px 0; }
-.rd-label { color: var(--blue); font-size: 1.1rem; letter-spacing: 0.08em; }
+.rd-name { color: var(--green); font-size: 16px; letter-spacing: 0.05em; }
+.rd-meta { color: var(--dim); font-size: 14px; line-height: 1.35; margin: 2px 0 8px; }
+.rd-line { margin: 6px 0; font-size: 16px; line-height: 1.45; }
+.rd-label { color: var(--blue); font-size: 14px; letter-spacing: 0.08em; }
 .rd-rev { color: var(--red); }
 .rd-cite { color: var(--dim); font-size: 1.05rem; margin-top: 10px; border-top: 1px dashed rgba(189,189,189,0.2); padding-top: 6px; }
 
@@ -304,6 +306,7 @@ body {
   padding: 8px 10px;
 }
 .wg-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 12px rgba(140,200,95,0.25); }
+.wg-input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .wg-cue {
   color: var(--yellow);
   font-size: 2rem;
@@ -313,7 +316,8 @@ body {
 }
 .wg-score { color: var(--dim); font-size: 1.2rem; }
 .wg-score b { color: var(--green); font-weight: normal; }
-.wg-hint { color: var(--dimmer); font-size: 1.1rem; }
+.wg-hint { color: var(--dim); font-size: 16px; line-height: 1.45; }
+#arc-deck-left { font-size: 16px; line-height: 1.45; }
 .wg-hint .no-norm { color: var(--blue); }
 
 /* junction probes */
@@ -325,6 +329,7 @@ body {
   width: 100%; padding: 6px 8px; margin-top: 4px;
 }
 .jq-input:focus { outline: none; border-color: var(--cyan); }
+.jq-input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 /* analysis summary */
 .an-line { margin: 5px 0; }
@@ -602,6 +607,6 @@ body {
 .arc-doc.end .glow, .arc-doc.end .veil { opacity: 0; transition: opacity 0.9s ease; }
 
 /* the reading pane breathes with the scene */
-.arc-win { transition: box-shadow 1s ease; }
+.arc-win { transition: opacity 0.7s ease, box-shadow 1s ease; }
+.arc-win.scene-suspended { opacity: 0.14; pointer-events: none; }
 .arc-win.rd-glow { box-shadow: 0 0 34px rgba(227,199,138,0.4), 0 0 24px rgba(0,0,0,0.55); }
-

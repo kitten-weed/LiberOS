@@ -4,8 +4,6 @@
    keepsake data is already in localStorage; then the page walks to home.
    HOME SIDE: home reads poppet.keepdrop.v1 and drops the poppet onto the rug. */
 
-import { mirrorKeepsakeToBuddy } from './keepsake.js?v=lab53';
-
 const DROP_KEY = 'poppet.keepdrop.v1';
 
 /* ── lab side: the transition ─────────────────────────────────────────────── */
@@ -50,16 +48,6 @@ export function beginKeeping(durationMs) {
   setTimeout(function () {
     stopped = true;
     try { localStorage.setItem(DROP_KEY, String(Date.now())); } catch (err) { /* non-fatal */ }
-    /* Mirror the kept poppet into the ship's state, so every surface that
-       reads the buddy (journal, constellation, home room's parent state)
-       sees the same poppet the lab just kept. Single source of truth: the
-       lab keepsake store holds the atlas/params; the buddy entry points
-       at it. Goes through the mirror helper (correct slot via Liber.state). */
-    try {
-      const keeps = JSON.parse(localStorage.getItem('poppet.keepsakes.v1') || '[]');
-      const k = keeps[keeps.length - 1];
-      if (k) mirrorKeepsakeToBuddy(k.n, k.name || ('Poppet Nº ' + k.n), 'poppet-lab');
-    } catch (err) { /* state stays as it was; the keepsake store is intact */ }
     /* standalone: the home room page. Seated in the ship's bezel (sigil.html
        frames the lab): hand the poppet to the parent desktop instead — it
        embeds the home room and will land the drop on its own rug. */

@@ -31,7 +31,7 @@
     sea: 'vanir',
     garden: 'ruby',
     dreams: 'insightful inquiry',
-    journal: 'the mad scribe',
+    journal: 'riason',
     abstract: 'physius',
     methodology: 'riason',
     graveyard: 'pete',
@@ -40,6 +40,29 @@
   };
 
   var STORES = Object.keys(OWNER);
+  var actionSerial = 0;
+  var consumeTimer = 0;
+  var consuming = false;
+  var speaking = false;
+
+  function updateActionState() {
+    var desktop = document.getElementById('desktop');
+    if (!desktop) return;
+    if (consuming || speaking) {
+      desktop.setAttribute('data-poppet-action', 'yes');
+      var generic = desktop.querySelector('.prompt-line');
+      if (generic) generic.classList.remove('show');
+    } else {
+      desktop.removeAttribute('data-poppet-action');
+    }
+  }
+
+  function isRelated(id) {
+    var rels = snap().relations || [];
+    return rels.some(function (relation) {
+      return relation && relation.from === id && (relation.to || 'buddy') === 'buddy';
+    });
+  }
 
   // AWAITING THE AUTHOR'S APPROVAL, like the prompt banks. A relation needs a
   // verb and the store had no vocabulary for one; 'relates to' is the neutral
@@ -84,9 +107,10 @@
     return out;
   }
 
-  function promptFor(traveller) {
+  function promptFor(traveller, store) {
     var banks = global.LiberPrompts || {};
-    var bank = banks[traveller] || banks.wanderlust;
+    var bank = store === 'journal' && traveller === 'riason'
+      ? banks.riasonJournal : banks[traveller] || banks.wanderlust;
     if (!bank || !bank.length) return null;
     // Weighted by how much has been related: the further in, the further down
     // the bank, so the questions deepen as the work does rather than at random.
@@ -102,7 +126,7 @@
 
     // The bind itself. Returns what was recorded and who answers, so a caller
     // (or a gate) can assert the whole loop ran rather than just the write.
-    relate: function (artifactId, verb) {
+    relate: function (artifactId, verb, options) {
       var s = st();
       if (!s || !s.bindRelation) return null;
       var all = inOrbit(), item = null;
@@ -110,9 +134,9 @@
       if (!item) return null;
       var rel = s.bindRelation(item.id, verb || 'relates to', 'buddy');
       if (!rel) return null;                      // already related; dedupe held
-      var line = promptFor(item.traveller);
+      var line = promptFor(item.traveller, item.store);
       api.last = { relation: rel, artifact: item, traveller: item.traveller, prompt: line };
-      api.render(api.last);
+      if (!(options && options.deferRender)) api.render(api.last);
       return api.last;
     },
 
@@ -122,24 +146,34 @@
       var s = st();
       spoken = spoken || api.last;
       if (!s || !spoken || !spoken.prompt) return null;
-      var cur = snap(), arr = (cur.journal || []).slice();
-      var entry = {
-        id: 'spoken-' + Date.now(),
-        kind: 'spoken',
-        name: spoken.traveller + ' asked',
-        traveller: spoken.traveller,
-        body: spoken.prompt,
-        from: spoken.artifact && spoken.artifact.id,
-        verb: spoken.relation && spoken.relation.verb,
-        ts: Date.now()
-      };
-      arr.push(entry);
-      s.set({ journal: arr });
+      if (!spoken.pendingEntry) {
+        spoken.pendingEntry = {
+          id: 'spoken-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+          kind: 'spoken',
+          name: spoken.traveller + ' asked',
+          traveller: spoken.traveller,
+          body: spoken.prompt,
+          from: spoken.artifact && spoken.artifact.id,
+          verb: spoken.relation && spoken.relation.verb,
+          ts: Date.now()
+        };
+      }
+      var entry = s.tryAddArtifact('journal', spoken.pendingEntry);
+      if (!entry) return null;
+      api.dismiss();
       return entry;
     },
 
     dismiss: function () {
+      actionSerial++;
+      if (consumeTimer) global.clearTimeout(consumeTimer);
+      consumeTimer = 0;
+      consuming = false;
+      speaking = false;
+      updateActionState();
+      api.close();
       var host = document.getElementById('poppet-spoken');
+      api.last = undefined;
       if (!host) return;
       host.removeAttribute('data-spoken');
       host.textContent = '';
@@ -150,6 +184,9 @@
     render: function (spoken) {
       var host = document.getElementById('poppet-spoken');
       if (!host || !spoken) return;
+      consuming = false;
+      speaking = true;
+      updateActionState();
       host.setAttribute('data-spoken', 'yes');
       host.setAttribute('data-traveller', spoken.traveller || '');
       host.setAttribute('role', 'region');
@@ -169,15 +206,20 @@
       var line = document.createElement('span');
       line.className = 'poppet-spoken-line';
       line.textContent = spoken.prompt || '';
+      var status = document.createElement('span');
+      status.className = 'poppet-spoken-status';
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
       var keep = document.createElement('button');
       keep.type = 'button';
       keep.className = 'poppet-spoken-keep';
       keep.textContent = 'keep prompt';
       keep.setAttribute('aria-label', 'keep this optional reflection in the Journal');
       keep.addEventListener('click', function () {
-        if (api.keepToJournal(spoken)) {
-          keep.disabled = true;
-          keep.textContent = 'kept';
+        keep.disabled = true;
+        if (!api.keepToJournal(spoken)) {
+          status.textContent = 'the prompt could not be kept. it is still here. try again.';
+          keep.disabled = false;
         }
       });
       var skip = document.createElement('button');
@@ -190,6 +232,7 @@
       host.appendChild(who);
       host.appendChild(label);
       host.appendChild(line);
+      host.appendChild(status);
       host.appendChild(keep);
       host.appendChild(skip);
     },
@@ -197,6 +240,7 @@
     // The orbit list. Not a modal: a rail of what is already circling, opened
     // by touching the thing it circles.
     open: function () {
+      if (consuming || speaking) return;
       var rail = document.getElementById('poppet-orbit');
       if (!rail) return;
       var items = inOrbit();
@@ -251,20 +295,32 @@
           bind.disabled = true;
           verb.addEventListener('change', function () { bind.disabled = !verb.value; });
           bind.addEventListener('click', function () {
-            if (!verb.value) return;
+            if (!verb.value || consuming || speaking) return;
             var chosenVerb = verb.value;
+            consuming = true;
+            updateActionState();
+            bind.disabled = true;
+            var linked = api.relate(item.id, chosenVerb, {deferRender: true});
+            if (!linked) {
+              consuming = false;
+              updateActionState();
+              bind.disabled = !verb.value;
+              heading.textContent = !inOrbit().some(function (current) {
+                return current.id === item.id;
+              }) || isRelated(item.id)
+                ? 'that keep is no longer available here. close and reopen the orbit to refresh it.'
+                : 'the relation could not be kept. try again.';
+              return;
+            }
+            var serial = ++actionSerial;
             row.setAttribute('data-consumed', 'yes');
             bind.disabled = true;
-            // The fall: it drops to the centre and the poppet takes it
-            setTimeout(function () {
-              var linked = api.relate(item.id, chosenVerb);
-              if (linked) {
-                api.open();
-              } else {
-                row.removeAttribute('data-consumed');
-                bind.disabled = !verb.value;
-                if (heading) heading.textContent = 'that keep is no longer available here. close and reopen the orbit to refresh it.';
-              }
+            consumeTimer = global.setTimeout(function () {
+              if (serial !== actionSerial) return;
+              consumeTimer = 0;
+              consuming = false;
+              api.close();
+              api.render(linked);
             }, prefersReduced() ? 0 : 420);
           });
           row.appendChild(name);

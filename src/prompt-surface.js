@@ -26,6 +26,11 @@
 
   function show(prompt) {
     if (!prompt || !prompt.text) return;
+    var desktop = document.getElementById('desktop');
+    if (desktop && desktop.getAttribute('data-poppet-action') === 'yes') {
+      if (el) el.classList.remove('show');
+      return;
+    }
     var node = ensureEl();
     node.textContent = prompt.text;
     node.classList.add('show');

@@ -7,7 +7,7 @@
 //
 // The register, held to deliberately:
 //   · Each traveller speaks in their own room's material. Vanir talks about
-//     water and level; Physius about stone and cutting; the mad scribe about
+//     water and level; Physius about stone and cutting; Riason about
 //     what was filed and what was not.
 //   · A prompt asks, it does not instruct, and it never diagnoses. Nothing
 //     here scolds, threatens, or implies the reader is behind — per the
@@ -52,9 +52,9 @@ window.LiberPrompts = {
     'something in you was shaped by a hand that is no longer here. what shape did it leave?'
   ],
 
-  // THE MAD SCRIBE — the study. He asks about the record: what got written
+  // RIASON — the study. He asks about the record: what got written
   // down, what got left out, and who has been keeping the account.
-  'the mad scribe': [
+  riasonJournal: [
     'what version of this do you tell people, and what do you leave out?',
     'if you read your own account back as a stranger, what would you not believe?',
     'what would you like this record to hold, if anything?',

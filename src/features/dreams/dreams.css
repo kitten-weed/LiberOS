@@ -159,15 +159,16 @@
 /* the blotter: a dark desk pad under the entry paper; the form sits on it,
    slightly askew, the way the sheet was set down */
 .dreams-record {
-  background: linear-gradient(180deg, var(--dreams-paper) 0%, var(--dreams-paper-dim) 100%);
-  border: 1px solid var(--dreams-purple-deep);
+  background: linear-gradient(180deg, var(--dreams-paper), var(--dreams-paper-dim));
+  color: var(--dreams-ink);
+  border: 1px solid var(--dreams-brass);
   border-radius: 2px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55);
-  padding: 12px 16px 10px;
+  padding: 16px 20px;
   margin: 10px 0 18px;
   position: relative;
   overflow: hidden;
-  transform: rotate(-0.4deg);
+  transform: none;
 }
 .dreams-desk::before {          /* the blotter itself, corner showing under the paper */
   content: '';
@@ -201,8 +202,9 @@
   font-variant: small-caps;
   font-style: normal;
   letter-spacing: 0.14em;
-  font-size: 1rem;
-  color: #5c4688;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--dreams-ink);
   margin-bottom: 3px;
 }
 
@@ -212,14 +214,23 @@
   width: 100%;
   box-sizing: border-box;
   font-family: var(--dreams-serif);
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.45;
   color: var(--dreams-ink);
+  padding: 6px 9px;
+  resize: vertical;
+}
+.dreams-field input,
+.dreams-field textarea {
+  background: rgba(46, 42, 56, 0.035);
+  border: 0;
+  border-bottom: 1px solid var(--dreams-ink-soft);
+  border-radius: 0;
+}
+.dreams-assoc-form textarea {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(111, 90, 160, 0.45);
   border-radius: 2px;
-  padding: 6px 9px;
-  resize: vertical;
 }
 .dreams-field input::placeholder,
 .dreams-field textarea::placeholder,
@@ -227,9 +238,12 @@
   color: rgba(107, 100, 120, 0.55);
   font-style: italic;
 }
-.dreams-field input:focus,
-.dreams-field textarea:focus,
-.dreams-assoc-form textarea:focus {
+.dreams-field input:focus-visible,
+.dreams-field textarea:focus-visible {
+  outline: 2px solid var(--dreams-purple-deep);
+  outline-offset: 3px;
+}
+.dreams-assoc-form textarea:focus-visible {
   outline: 2px solid var(--dreams-cyan);
   outline-offset: 1px;
 }
@@ -247,12 +261,13 @@
   font-variant: small-caps;
   font-style: normal;
   letter-spacing: 0.12em;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
+  min-height: 44px;
   color: var(--dreams-paper);
-  background: linear-gradient(180deg, var(--dreams-purple) 0%, var(--dreams-purple-deep) 100%);
-  border: 1px solid var(--dreams-purple-deep);
+  background: var(--dreams-ink);
+  border: 1px solid var(--dreams-ink);
   border-radius: 2px;
   padding: 6px 18px;
   min-height: 44px;
@@ -267,7 +282,8 @@
 
 .dreams-record-note {
   font-style: normal;
-  font-size: 1rem;
+  font-size: 16px;
+  line-height: 1.45;
   color: var(--dreams-ink);
 }
 
@@ -282,6 +298,8 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 2px;
+  max-height: min(32vh, 320px);
+  overflow-y: auto;
 }
 
 .dreams-ledger-empty,
@@ -1463,4 +1481,3 @@
 .dreams-marginalia[data-band="planted"] { color: rgba(84, 96, 60, 0.82); }
 
 /* reduced motion: fog holds still, the develop beat is an instant state */
-

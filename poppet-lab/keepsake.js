@@ -12,8 +12,57 @@ export function loadKeepsakes() {
     return Array.isArray(arr) ? arr : [];
   } catch (err) { return []; }
 }
-function store(list) {
-  try { localStorage.setItem(KEYP, JSON.stringify(list)); } catch (err) { /* full or blocked */ }
+
+function validateKeepsake(record) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const image = value => typeof value === 'string' && /^data:image\//.test(value);
+  if (!object(record) || !Number.isInteger(record.n) || record.n < 1 ||
+      !image(record.atlas)) throw new Error('keepsake record is malformed');
+  for (const key of ['P', 'worn', 'face', 'thoughts'])
+    if (record[key] != null && !object(record[key]))
+      throw new Error('keepsake ' + key + ' is malformed');
+  for (const key of ['name', 'pose', 'ink'])
+    if (record[key] != null && typeof record[key] !== 'string')
+      throw new Error('keepsake ' + key + ' is malformed');
+  if (record.brush != null && (!Number.isInteger(record.brush) || record.brush < 2 || record.brush > 48))
+    throw new Error('keepsake brush is malformed');
+  for (const key of ['cloth', 'hull', 'aura3', 'aura4'])
+    if (record[key] != null && !image(record[key]))
+      throw new Error('keepsake ' + key + ' is malformed');
+  for (const [field, keys] of [
+    ['face', ['eyes', 'face', 'hair']],
+    ['thoughts', ['fears', 'wishes', 'likes', 'dislikes', 'thoughts']]
+  ]) {
+    for (const key of keys) {
+      if (record[field]?.[key] != null && !image(record[field][key]))
+        throw new Error('keepsake ' + field + ' sheet is malformed');
+    }
+  }
+}
+
+export function readKeepsakes() {
+  let raw;
+  try {
+    raw = localStorage.getItem(KEYP);
+  } catch (cause) {
+    throw new Error('keepsake shelf is unreadable', {cause});
+  }
+  if (raw === null) return [];
+
+  let list;
+  try {
+    list = JSON.parse(raw);
+  } catch (cause) {
+    throw new Error('keepsake shelf is unreadable', {cause});
+  }
+  if (!Array.isArray(list)) throw new Error('keepsake shelf is malformed');
+  const numbers = new Set();
+  for (const record of list) {
+    validateKeepsake(record);
+    if (numbers.has(record.n)) throw new Error('keepsake identity is duplicated');
+    numbers.add(record.n);
+  }
+  return list;
 }
 
 function cvToData(cv, max) {
@@ -25,13 +74,16 @@ function cvToData(cv, max) {
   return c2.toDataURL('image/png');
 }
 function imgToCanvas(dataUrl) {
+  if (typeof dataUrl !== 'string' || !/^data:image\//.test(dataUrl)) {
+    return Promise.reject(new Error('saved paint is not an image'));
+  }
   const cv = document.createElement('canvas');
   cv.width = cv.height = 1024;
   const g = cv.getContext('2d');
-  return new Promise(function (res) {
+  return new Promise(function (res, rej) {
     const im = new Image();
     im.onload = function () { g.drawImage(im, 0, 0, cv.width, cv.height); res(cv); };
-    im.onerror = function () { res(cv); };
+    im.onerror = function () { rej(new Error('saved paint could not be decoded')); };
     im.src = dataUrl;
   });
 }
@@ -64,26 +116,22 @@ export function atlasCoverage(ctx, ATLAS, creamHex) {
    Keeps the rug's doll wearing the same paint the maker laid down. */
 export function snapshotDollSheets(doll) {
   const out = { face: null, hull: null };
-  try {
-    if (doll && doll.faceMaps) {
-      out.face = {};
-      for (const z of ['eyes', 'face', 'hair']) {
-        const m = doll.faceMaps[z];
-        out.face[z] = m ? cvToData(m.cv, 256) : null;
-      }
+  if (doll && doll.faceMaps) {
+    out.face = {};
+    for (const z of ['eyes', 'face', 'hair']) {
+      const m = doll.faceMaps[z];
+      out.face[z] = m ? cvToData(m.cv, 256) : null;
     }
-    if (doll && doll.hullCanvas) out.hull = cvToData(doll.hullCanvas, 512);
-  } catch (err) { /* sheets stay null; atlas still carries the keep */ }
+  }
+  if (doll && doll.hullCanvas) out.hull = cvToData(doll.hullCanvas, 512);
   return out;
 }
 
-/* save the current specimen — returns the keepsake count afterwards.
-   Everything useful about the moment travels with it. */
+/* Save one specimen snapshot; the caller coordinates its durable mirror. */
 export function saveKeepsake(atlasCv, clothCv, spec) {
-  try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (err) { /* non-fatal */ }
-  const list = loadKeepsakes();
-  list.push({
-    n: list.reduce(function (m, k) { return Math.max(m, k.n || 0); }, 0) + 1,   // stays unique past the 8-cap
+  const list = readKeepsakes();
+  const record = {
+    n: list.reduce(function (m, k) { return Math.max(m, k.n); }, 0) + 1,
     when: Date.now(),
     name: spec.name || ('Poppet Nº ' + (list.length + 1)),
     P: JSON.parse(JSON.stringify(spec.P)),
@@ -101,43 +149,66 @@ export function saveKeepsake(atlasCv, clothCv, spec) {
     thoughts: spec.thoughts || null,      // the five thought sheets, one dataURL each
     atlas: cvToData(atlasCv, 512),
     cloth: clothCv ? cvToData(clothCv, 512) : null
-  });
-  if (list.length > 8) list.shift();   // the shelf holds eight
-  store(list);
-  return list.length;
+  };
+  validateKeepsake(record);
+  const next = list.concat(record);
+  if (next.length > 8) next.shift();
+  localStorage.setItem(KEYP, JSON.stringify(next));
+  return {record, count: next.length};
 }
 
-/* Mirror a keepsake into the ship's buddy array, so every surface that
-   reads the buddy (journal, constellation, home rug) sees the same poppet.
-   Goes through window.Liber.state when available (correct slot); falls back
-   to the legacy direct write. Single source of truth for both the lab
-   (keepdrop) and the tutorial rite. */
-export function mirrorKeepsakeToBuddy(n, name, idPrefix) {
-  if (!n) return false;
+function reportMirrorFailure(state, error) {
+  const detail = {
+    op: 'mirrorKeepsakeToBuddy',
+    err: String(error).slice(0, 120)
+  };
   try {
-    const w = (typeof window !== 'undefined') ? window : {};
-    const st = w.Liber && w.Liber.state;
-    if (st && typeof st.get === 'function' && typeof st.set === 'function') {
-      const g = st.get() || {};
-      const arr = Array.isArray(g.buddy) ? g.buddy.slice() : [];
-      if (!arr.some(function (e) { return e && e.kind === 'poppet' && e.keepsakeN === n; })) {
-        arr.push({ id: (idPrefix || 'poppet-keep') + '-' + n, kind: 'poppet', name: name || ('Poppet Nº ' + n), keepsakeN: n, ts: Date.now() });
-        st.set({ buddy: arr });
-      }
+    const target = state || (typeof window !== 'undefined' && window.Liber && window.Liber.state);
+    if (target && typeof target.diagnose === 'function') {
+      target.diagnose('keep-mirror-fail', detail);
+      return;
+    }
+  } catch (diagnosticError) {
+    console.error('keepsake mirror diagnostic failed', String(diagnosticError).slice(0, 120));
+  }
+  console.error('keepsake mirror failed', detail.err);
+}
+
+export function mirrorKeepsakeToBuddy(n, name, idPrefix, mirrorPatch = {}) {
+  let canonicalState = null;
+  try {
+    const w = typeof window !== 'undefined' ? window : null;
+    if (!w || !Number.isInteger(n) || n < 1) throw new Error('keepsake identity is invalid');
+    const canonicalWindow = w.parent !== w ? w.parent : w;
+    canonicalState = canonicalWindow.Liber && canonicalWindow.Liber.state;
+    if (!canonicalState || typeof canonicalState.get !== 'function' ||
+        typeof canonicalState.trySet !== 'function') {
+      throw new Error('canonical state is unavailable');
+    }
+    if (!mirrorPatch || typeof mirrorPatch !== 'object' || Array.isArray(mirrorPatch)) {
+      throw new Error('mirror patch is invalid');
+    }
+    const current = canonicalState.get() || {};
+    if (!Array.isArray(current.buddy)) throw new Error('canonical buddy shelf is malformed');
+    const nextBuddy = current.buddy.slice();
+    if (!nextBuddy.some(entry => entry && entry.kind === 'poppet' && entry.keepsakeN === n)) {
+      nextBuddy.push({
+        id: (idPrefix || 'poppet-keep') + '-' + n,
+        kind: 'poppet',
+        name: name || ('Poppet Nº ' + n),
+        keepsakeN: n,
+        ts: Date.now()
+      });
+    } else if (Object.keys(mirrorPatch).length === 0) {
       return true;
     }
-  } catch (err) { /* fall through to legacy */ }
-  try {
-    const raw = localStorage.getItem('liber_vacui_v1__keep');
-    const st = raw ? JSON.parse(raw) : {};
-    const arr = Array.isArray(st.buddy) ? st.buddy : [];
-    if (!arr.some(function (e) { return e && e.kind === 'poppet' && e.keepsakeN === n; })) {
-      arr.push({ id: (idPrefix || 'poppet-keep') + '-' + n, kind: 'poppet', name: name || ('Poppet Nº ' + n), keepsakeN: n, ts: Date.now() });
-      st.buddy = arr;
-      localStorage.setItem('liber_vacui_v1__keep', JSON.stringify(st));
-    }
+    const patch = Object.assign({}, mirrorPatch, {buddy: nextBuddy});
+    if (!canonicalState.trySet(patch)) throw new Error('canonical state rejected the mirror');
     return true;
-  } catch (err) { return false; }
+  } catch (error) {
+    reportMirrorFailure(canonicalState, error);
+    return false;
+  }
 }
 
 export const KEYP_KEY = KEYP;
@@ -146,10 +217,11 @@ export const KEYP_KEY = KEYP;
    race: lab just wrote, home reads before the tab's storage flushed its events. */
 export function keepsakeCount() { return loadKeepsakes().length; }
 export function materializeKeepsake(k) {
-  return imgToCanvas(k.atlas).then(function (atlasCv) {
-    const clothCvP = k.cloth ? imgToCanvas(k.cloth) : Promise.resolve(null);
-    return clothCvP.then(function (clothCv) {
-      return { atlasCv: atlasCv, clothCv: clothCv };
-    });
+  if (!k || typeof k !== 'object') return Promise.reject(new TypeError('keepsake record is required'));
+  return Promise.all([
+    imgToCanvas(k.atlas),
+    k.cloth ? imgToCanvas(k.cloth) : Promise.resolve(null)
+  ]).then(function (canvases) {
+    return {atlasCv: canvases[0], clothCv: canvases[1]};
   });
 }

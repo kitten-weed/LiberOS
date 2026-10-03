@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="styles/crt-bay.css?v=pass12"/>
   <link rel="stylesheet" href="styles/cartridge-transit.css?v=off2"/>
   <link rel="stylesheet" href="styles/house.css?v=lamp1"/>
-  <link rel="stylesheet" href="src/features/memory/memory.css?v=bench61"/>
+  <link rel="stylesheet" href="src/features/memory/memory.css?v=bench62"/>
   <link rel="stylesheet" href="src/features/memory/house.css"/>
   <link rel="stylesheet" href="styles/shadow.css"/>
   <link rel="stylesheet" href="styles/trave-rom.css?v=run13" />
@@ -79,7 +79,10 @@
               <!-- the photo preview + story + save prompt -->
               <div class="mem-photo" id="mem-photo" role="dialog" aria-modal="true" aria-labelledby="mem-photo-title" hidden inert>
                 <div class="mem-photo-card">
-                  <div class="mem-photo-head" id="mem-photo-title">— the developing tray —</div>
+                  <div class="mem-photo-head">
+                    <span id="mem-photo-title">— the developing tray —</span>
+                    <button type="button" class="mem-btn mem-x" id="mem-photo-close" aria-label="cancel">×</button>
+                  </div>
                   <img class="mem-photo-img" id="mem-photo-img" alt="photograph of the sand tray" hidden/>
                   <div class="mem-photo-label-row" id="mem-photo-label-row" hidden>
                     <label class="mem-photo-label-text" for="mem-photo-label">write it on the back</label>
@@ -90,7 +93,6 @@
                   <div class="mem-photo-actions" id="mem-photo-actions">
                     <button type="button" class="mem-btn" id="mem-photo-retake">take another</button>
                     <button type="button" class="mem-btn" id="mem-photo-save">hang it</button>
-                    <button type="button" class="mem-btn mem-x" id="mem-photo-close" aria-label="cancel">×</button>
                   </div>
                   <div class="mem-photo-story" id="mem-photo-story"></div>
                 </div>
@@ -132,9 +134,9 @@
   <script src="src/shadow.js"></script>
   <script src="src/apply-theme.js"></script>
   <script src="src/carvings.js"></script>
-  <script type="module" src="src/features/memory/memory.js?v=bench67"></script>
+  <script type="module" src="src/features/memory/memory.js?v=bench69"></script>
   <script src="src/cartridge-transit.js?v=off2"></script>
-  <script src="src/crt-bay.js?v=mem8"></script>
+  <script src="src/crt-bay.js?v=mem9"></script>
   <script src="vendor/pixi.min.js"></script>
   <script src="src/pixi-runtime.js"></script>
   <script src="src/pixi-palette.js?v=cleanup-20260922"></script>

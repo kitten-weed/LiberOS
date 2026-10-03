@@ -60,12 +60,17 @@ export function createHud({ onThought, onFinished, onDispose }) {
   function thoughtRite() {
     hideStage(); // the intro letter must not linger behind the form
     const form = el('div', 'thought-form');
+    const label = el('label', 'thought-label', 'enter the thought you carry');
     const input = el('input', 'thought-input');
     input.type = 'text';
+    input.id = 'vanir-thought';
+    label.htmlFor = input.id;
+    label.id = 'thought-label';
+    input.setAttribute('aria-labelledby', label.id);
     input.placeholder = 'enter the thought you carry';
     input.maxLength = 140;
     const btn = el('button', 'thought-seal', 'seal it in the jar');
-    form.append(input, btn);
+    form.append(label, input, btn);
     hudRoot().appendChild(form);
     setTimeout(() => input.focus(), 400);
 
@@ -153,6 +158,7 @@ export function createHud({ onThought, onFinished, onDispose }) {
     hudRoot().appendChild(con);
     let i = 0;
     const input = con.querySelector('#q-input');
+    input.setAttribute('aria-labelledby', 'q-text');
     const render = () => {
       con.querySelector('#q-count').textContent = `question ${i + 1} of ${QUESTIONS.length}`;
       con.querySelector('#q-text').textContent = QUESTIONS[i];
@@ -413,11 +419,21 @@ export function createHud({ onThought, onFinished, onDispose }) {
   initExit();
 
   // ── summon: brief instructions, on demand ───────────────────────────────
+  function showSummon(card, open) {
+    card.hidden = !open;
+    card.inert = !open;
+    card.classList.toggle('show', open);
+    if (open) card.querySelector('.summon-close').focus();
+    else document.getElementById('summon-toggle').focus();
+  }
+
   $('#summon-toggle')?.addEventListener('click', () => {
     let c = $('#summon-card');
     if (!c) {
       c = el('div', null);
       c.id = 'summon-card';
+      c.hidden = true;
+      c.inert = true;
       c.innerHTML = `
         <h3>The Crossing, Briefly</h3>
         <ol>
@@ -428,9 +444,9 @@ export function createHud({ onThought, onFinished, onDispose }) {
         </ol>
         <button class="summon-close">return to the water</button>`;
       hudRoot().appendChild(c);
-      c.querySelector('.summon-close').addEventListener('click', () => c.classList.remove('show'));
+      c.querySelector('.summon-close').addEventListener('click', () => showSummon(c, false));
     }
-    c.classList.toggle('show');
+    showSummon(c, c.hidden);
   });
 
   // ── boot sequence ──────────────────────────────────────────────────────────

@@ -107,8 +107,13 @@
   left: 50%;
   top: 38%;
   transform: translate(-50%, -50%);
+  width: min(560px, 78%);
   z-index: 8;   /* above the stage text's z:5 — the form never loses to a line */
   pointer-events: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #080e18;
+  border: 1px solid rgba(109, 185, 255, 0.5);
   animation: vanir-drift 7s ease-in-out infinite;
 }
 @keyframes vanir-drift {
@@ -117,16 +122,17 @@
 }
 
 .thought-input {
-  background: rgba(5, 8, 14, 0.55);
+  width: 100%;
+  box-sizing: border-box;
+  background: #080e18;
   border: none;
   border-bottom: 1px solid rgba(109, 185, 255, 0.35);
   color: var(--bone);
   font-family: inherit;
-  font-size: clamp(1.1rem, 2.4cqi, 1.7rem);
+  font-size: 16px;
   font-style: italic;
   text-align: center;
   padding: 0.5em 1em;
-  width: min(60ch, 78cqi);
   outline: none;
   backdrop-filter: blur(2px);
   text-shadow: 0 0 12px rgba(109, 185, 255, 0.3);
@@ -137,6 +143,13 @@
   border-color: rgba(109, 185, 255, 0.7);
   box-shadow: 0 12px 40px -18px rgba(109, 185, 255, 0.4);
 }
+.thought-label {
+  display: block;
+  color: var(--bone);
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
 
 .thought-seal {
   display: block;
@@ -145,12 +158,13 @@
   border: 1px solid rgba(109, 185, 255, 0.35);
   color: var(--torch);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 16px;
+  min-height: 44px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   padding: 0.7em 2.2em;
   cursor: pointer;
-  opacity: 0.85;
+  opacity: 1;
   transition: opacity 0.5s, border-color 0.5s, box-shadow 0.5s;
 }
 .thought-seal:hover {
@@ -182,13 +196,13 @@
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: min(880px, 92cqi);
+  width: min(680px, 88%);
   z-index: 7;
   pointer-events: auto;
-  background: linear-gradient(to top, rgba(5, 8, 14, 0.88), rgba(5, 8, 14, 0));
+  background: #080e18;
   /* the dock band owns the bottom ~104px: reserve it so continue never
      slides under the tray; cinema bars add their own margin while out */
-  padding: 4.5rem 1rem calc(2.2rem + 104px);
+  padding: 16px 1rem calc(2.2rem + 104px);
   transition: opacity 0.9s ease;
 }
 /* cinema letterbox bars (7cqi) would swallow the console: ride above them */
@@ -199,25 +213,26 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
 
 #q-count {
   color: var(--bone-dim);
-  font-size: 0.72rem;
+  font-size: 14px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   margin-bottom: 0.7em;
 }
 #q-text {
   color: var(--bone);
-  font-size: clamp(1.15rem, 2.6cqi, 1.8rem);
+  font-size: 16px;
+  line-height: 1.45;
   margin: 0 0 1em;
   text-shadow: 0 0 16px rgba(109, 185, 255, 0.2);
 }
 #q-input {
   width: 100%;
-  background: rgba(8, 12, 20, 0.6);
+  background: #080e18;
   border: 1px solid rgba(109, 185, 255, 0.22);
   color: var(--bone);
   font-family: inherit;
-  font-size: 1.02rem;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.45;
   padding: 0.8em 1em;
   resize: none;
   outline: none;
@@ -232,11 +247,12 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
   font-family: inherit;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  font-size: 0.82rem;
+  font-size: 16px;
+  min-height: 44px;
   padding: 0.65em 1.8em;
   cursor: pointer;
   transition: border-color 0.4s, box-shadow 0.4s, opacity 0.4s;
-  opacity: 0.8;
+  opacity: 1;
 }
 #q-next:hover { opacity: 1; border-color: rgba(109, 185, 255, 0.7); box-shadow: 0 0 24px -8px rgba(109, 185, 255, 0.5); }
 
@@ -380,11 +396,12 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
   border: none;
   color: var(--bone-dim);
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 16px;
+  min-height: 44px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   cursor: pointer;
-  opacity: 0.65;
+  opacity: 1;
   transition: opacity 0.4s;
 }
 #shelf-toggle:hover { opacity: 1; }
@@ -427,6 +444,10 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
 #summon-toggle,
 #exit-toggle {
   position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 16px;
+  opacity: 1;
 }
 
 #summon-toggle {
@@ -508,11 +529,12 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
   transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.3, 0.8, 0.3, 1);
 }
 #summon-card.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+#summon-card[hidden] { display: none; }
 #summon-card h3 {
   margin: 0 0 0.9em;
   color: var(--torch);
   font-weight: normal;
-  font-size: 0.78rem;
+  font-size: 16px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   text-align: center;
@@ -521,8 +543,8 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
   margin: 0;
   padding-left: 1.3em;
   color: var(--bone);
-  font-size: 0.88rem;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.45;
 }
 #summon-card ol em { color: var(--torch); font-style: italic; }
 #summon-card ol span.dim { color: var(--bone-dim); }
@@ -533,7 +555,8 @@ body.cinema #exit-toggle { margin-bottom: 7cqi; }
   border: 1px solid rgba(109, 185, 255, 0.2);
   color: var(--bone-dim);
   font-family: inherit;
-  font-size: 0.68rem;
+  font-size: 16px;
+  min-height: 44px;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   padding: 0.6em 0;

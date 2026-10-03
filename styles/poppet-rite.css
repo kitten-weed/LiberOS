@@ -1,6 +1,10 @@
-/* poppet-rite.css — the tutorial's first making: paint here, not in the lab.
-   A panel over the desktop screen: texture tabs + tools left, live buddy right.
-   House voice: dark red ground, cream type, gold seals, letterspaced caps. */
+/* poppet-rite.css — the tutorial's first making: paint here, not in the lab. */
+@font-face {
+  font-family: 'House Font';
+  src: url('../assets/fonts/House%20Font.ttf') format('truetype');
+  font-display: swap;
+}
+
 .rite {
   position: absolute;
   inset: 0;
@@ -11,48 +15,125 @@
   background: rgba(7, 4, 3, 0.72);
 }
 .rite-card {
-  width: min(620px, 93%);
-  max-height: 96%;
-  overflow: auto;
-  background: linear-gradient(165deg, #1c0f0a, #0d0705);
-  border: 1px solid rgba(212, 175, 101, 0.5);
+  box-sizing: border-box;
+  width: min(960px, 93%);
+  height: 539px;
+  max-height: 100%;
+  padding: 12px;
+  display: grid;
+  grid-template-rows: minmax(44px, auto) 44px minmax(356px, auto) 44px;
+  gap: 8px;
+  overflow: visible;
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(212, 175, 101, 0.08), transparent 58%),
+    linear-gradient(165deg, #1c0f0a, #0d0705);
+  border: 1px solid rgba(212, 175, 101, 0.62);
   border-radius: 10px;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 175, 101, 0.12);
-  padding: 18px 20px;
+  box-shadow: 0 0 0 3px rgba(7, 4, 3, 0.88), 0 0 60px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(212, 175, 101, 0.12), inset 0 0 0 1px rgba(212, 175, 101, 0.12);
   color: #eadfc6;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'House Font', Georgia, 'Times New Roman', serif;
 }
-.rite-head { display: flex; align-items: center; justify-content: space-between; }
+.rite-head {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-rows: minmax(22px, auto) auto;
+  align-items: center;
+  column-gap: 8px;
+}
+.rite-head-main { min-width: 0; display: flex; align-items: center; gap: 12px; }
 .rite-title { font-size: 0.95rem; letter-spacing: 0.24em; text-transform: uppercase; color: #d4af65; }
+.rite-progress {
+  min-width: 0;
+  color: #d4af65;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  white-space: normal;
+}
 .rite-x {
-  background: transparent; border: 1px solid rgba(212, 175, 101, 0.4);
-  color: #b19a78; border-radius: 4px; width: 32px; height: 32px;
-  font-size: 1rem; cursor: pointer;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid rgba(212, 175, 101, 0.4);
+  color: #b19a78;
+  border-radius: 4px;
+  font-size: 1.15rem;
+  font-family: inherit;
+  cursor: pointer;
 }
 .rite-x:hover { color: #eadfc6; border-color: #d4af65; }
-.rite-line { color: #b19a78; font-size: 0.92rem; line-height: 1.5; margin: 8px 0 14px; }
-.rite-body { display: flex; gap: 16px; }
-.rite-canvas-col { flex: 1 1 auto; min-width: 0; }
-.rite-tabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-.rite-tab {
-  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
-  color: #b19a78; border-radius: 4px; padding: 7px 8px; font-size: 0.68rem;
-  letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+.rite-line {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  color: #b19a78;
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0;
+  white-space: normal;
 }
-.rite-tab.is-on { color: #eadfc6; border-color: #d4af65; background: rgba(212, 175, 101, 0.1); }
+.rite-retry {
+  background: transparent; border: 1px solid rgba(212, 175, 101, 0.55);
+  color: #d4af65; border-radius: 4px; padding: 8px 14px;
+  font-family: inherit; font-size: 16px; letter-spacing: 0.16em;
+  text-transform: uppercase; cursor: pointer;
+}
+.rite-retry:hover { color: #eadfc6; border-color: #d4af65; }
+.rite-retry:focus-visible { outline: 2px solid #eadfc6; outline-offset: 3px; }
+.rite-tabs { display: flex; flex-wrap: nowrap; gap: 4px; margin: 0; min-width: 0; }
+.rite-tab {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px;
+  background: linear-gradient(180deg, rgba(255, 238, 199, 0.035), rgba(0, 0, 0, 0.16));
+  border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.rite-tab.is-on {
+  color: #eadfc6; border-color: #d4af65;
+  background: linear-gradient(180deg, rgba(212, 175, 101, 0.18), rgba(80, 44, 18, 0.16));
+  box-shadow: inset 0 1px rgba(255, 238, 199, 0.12), 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.rite-body {
+  display: grid;
+  grid-template-columns: minmax(258px, 1fr) minmax(242px, 0.9fr);
+  gap: 12px;
+  min-height: 0;
+}
+.rite-canvas-col {
+  display: grid;
+  grid-template-rows: 258px 44px 44px;
+  gap: 5px;
+  min-width: 0;
+}
 .rite-sheet-wrap {
   position: relative;
-  width: 100%;
+  box-sizing: border-box;
+  width: 258px;
+  height: 258px;
   aspect-ratio: 1;
-  max-height: 260px;
-  margin: 0 auto;
+  max-height: none;
+  margin: 0;
   background: #ead9b4;
   border: 1px solid rgba(212, 175, 101, 0.5);
   border-radius: 6px;
   overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(106, 82, 24, 0.12), 0 2px 8px rgba(0, 0, 0, 0.42);
   touch-action: none;
 }
-canvas.rite-sheet { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+.rite-sheet-wrap > canvas { display: block; width: 100%; height: 100%; }
+canvas.rite-sheet { cursor: crosshair; touch-action: none; }
 .rite-chest-mark {
   position: absolute; pointer-events: none;
   left: 35%; top: 1.5%; width: 31%; height: 30%;
@@ -65,57 +146,112 @@ canvas.rite-sheet { width: 100%; height: 100%; display: block; cursor: crosshair
   font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: #b03a2a;
 }
-.rite-tools { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-.rite-inks, .rite-sizes { display: flex; gap: 6px; }
+.rite-chest-mark.rite-hull-guide {
+  border: 0;
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(212, 175, 101, 0.2) 0 3.125%,
+    transparent 3.125% 9.375%,
+    rgba(212, 175, 101, 0.2) 9.375% 12.5%
+  );
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 101, 0.28);
+}
+.rite-chest-mark.rite-hull-guide::after { content: none; }
+.rite-palette-row, .rite-tool-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+}
+.rite-inks, .rite-sizes { display: flex; align-items: center; gap: 4px; }
 .rite-ink {
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 2px solid transparent; cursor: pointer;
+  box-sizing: border-box;
+  flex: 0 0 44px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 101, 0.24);
+  box-shadow: inset 0 2px 3px rgba(255, 238, 199, 0.14), 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
 }
 .rite-ink.is-on { border-color: #eadfc6; }
 .rite-size {
-  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
-  color: #b19a78; border-radius: 4px; width: 30px; height: 28px; cursor: pointer;
+  box-sizing: border-box;
+  flex: 0 0 44px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(180deg, rgba(255, 238, 199, 0.04), rgba(0, 0, 0, 0.18));
+  border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78;
+  border-radius: 4px;
+  font-family: inherit;
+  cursor: pointer;
 }
 .rite-size.is-on { color: #eadfc6; border-color: #d4af65; }
 .rite-tool {
-  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
-  color: #b19a78; border-radius: 4px; padding: 6px 10px; font-size: 0.72rem;
-  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+  box-sizing: border-box;
+  flex: 0 0 44px;
+  min-width: 44px;
+  min-height: 44px;
+  height: 44px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid rgba(212, 175, 101, 0.35);
+  color: #b19a78;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 .rite-tool.is-on, #rite-undo { color: #eadfc6; border-color: #d4af65; }
-.rite-pv-col { flex: 0 0 220px; display: flex; flex-direction: column; }
+.rite-pv-col { min-width: 242px; display: grid; grid-template-rows: 282px 1fr; gap: 8px; }
 .rite-pv {
-  width: 200px; height: 200px;
-  border: 1px solid rgba(212, 175, 101, 0.5);
-  border-radius: 6px; overflow: hidden; background: #14100a;
+  box-sizing: border-box;
+  width: 100%;
+  height: 282px;
+  padding: 0;
+  border: 1px solid rgba(212, 175, 101, 0.62);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #14100a;
+  box-shadow: inset 0 0 0 2px rgba(212, 175, 101, 0.09), 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 .rite-pv canvas { width: 100%; height: 100%; display: block; }
-.rite-hint { color: #b19a78; font-size: 0.82rem; line-height: 1.5; margin: 10px 0 4px; min-height: 1.2em; }
-.rite-progress {
-  color: #d4af65; font-size: 0.72rem; letter-spacing: 0.22em;
-  text-transform: uppercase; margin: 0 0 8px;
+.rite-hint { color: #b19a78; font-size: 16px; line-height: 1.35; margin: 0; min-width: 0; }
+.rite-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-width: 0; }
+.rite-footer .rite-nav, .rite-footer .rite-reveal { display: flex; gap: 8px; margin: 0; }
+.rite-footer button {
+  box-sizing: border-box;
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
-.rite-nav { display: flex; gap: 8px; margin-top: 8px; }
-.rite-nav button {
-  background: transparent; border: 1px solid rgba(212, 175, 101, 0.35);
-  color: #b19a78; border-radius: 4px; padding: 8px 14px; font-size: 0.72rem;
-  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+.rite-footer button:disabled { opacity: 0.3; cursor: default; }
+.rite-nav button, .rite-keep, .rite-refine {
+  background: transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
 }
-.rite-nav button:disabled { opacity: 0.3; cursor: default; }
+.rite-nav button { border: 1px solid rgba(212, 175, 101, 0.35); color: #b19a78; }
 .rite-nav button:not(:disabled):hover { color: #eadfc6; border-color: #d4af65; }
-.rite-keep {
-  background: transparent; border: 1px solid #d4af65; color: #d4af65;
-  border-radius: 6px; padding: 12px; font-size: 0.8rem; letter-spacing: 0.2em;
-  text-transform: uppercase; cursor: pointer; font-family: inherit;
-  width: 100%; margin-top: 8px;
-}
+.rite-keep { border: 1px solid #d4af65; color: #d4af65; }
 .rite-keep:hover { background: rgba(212, 175, 101, 0.14); color: #eadfc6; }
-.rite-reveal { margin-top: 10px; }
-.rite-workshop-line { color: #b19a78; font-size: 0.84rem; line-height: 1.55; margin: 0 0 10px; }
-.rite-refine {
-  background: transparent; border: 1px solid rgba(127, 176, 105, 0.7); color: #7fb069;
-  border-radius: 6px; padding: 12px; font-size: 0.8rem; letter-spacing: 0.2em;
-  text-transform: uppercase; cursor: pointer; font-family: inherit;
-  width: 100%; margin-top: 8px;
-}
+.rite-refine { border: 1px solid rgba(127, 176, 105, 0.7); color: #7fb069; }
 .rite-refine:hover { background: rgba(127, 176, 105, 0.14); color: #eadfc6; }
+.rite-reveal[hidden] { display: none; }

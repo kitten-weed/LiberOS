@@ -330,6 +330,55 @@
   --ctv-rail: 96px;
 }
 
+.cutscene.ctv .ctv-response-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  box-sizing: border-box;
+  min-height: var(--ctv-rail);
+  padding: 12px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cutscene.ctv .ctv-response-rail > .ctv-response {
+  width: auto;
+}
+
+.cutscene.ctv .ctv-response {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.cutscene.ctv[data-response-mode='advance'] .ctv-response {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.cutscene.ctv .ctv-line {
+  font-size: max(16px, 1rem);
+  line-height: 1.45;
+}
+
+.cutscene.ctv.is-spell .ctv-body {
+  display: none;
+  pointer-events: none;
+}
+
+.cutscene.ctv .ctv-ritual-input {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.cutscene.ctv .ctv-ritual-status {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
 /* The traveller is the plate the player reads, and it lives low and left.
    Anchor it by its bottom edge, one rail plus a shove's worth of clearance
    above the gate, so the physics leash cannot push its line under the
@@ -417,4 +466,3 @@
     width: min(300px, calc(100% - 32px));
   }
 }
-

@@ -1,0 +1,1054 @@
+{
+  "revision": "b8ec280",
+  "CutsceneV2Data": {
+    "RITUAL": [
+      {
+        "text": "I summon you from somewhere else…",
+        "effect": "pink-cracks"
+      },
+      {
+        "text": "To find the pieces of ourselves",
+        "effect": "starfield"
+      },
+      {
+        "text": "With violet eyes and sun like skin…",
+        "effect": "warm-weather"
+      },
+      {
+        "text": "Come to the void and sing again…",
+        "effect": "chatbox-construct"
+      }
+    ],
+    "BEATS": [
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Oh hello <name>!",
+        "response": ">>",
+        "effect": "opening-disturbance"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "I am literally you.",
+        "response": "no you’re not..",
+        "effect": "name-loosen"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Okay let me explain. In this artifact, the liber vacui, the imaginary and real are the same thing.",
+        "response": "so I am playing pretend?",
+        "effect": "floor-inscription"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "You could look at it that way, if you want. You actually prefer to define yourself with research backed terminology.",
+        "response": "why are you saying ‘you’"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "For instance, that is object-relational theory. By yourself identifying uh.. itself.. with..",
+        "response": "this is confusing"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "You’re right. After all, we are just starting this journey. We can cast a spell and summon some help.",
+        "response": "a spell?"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Yes. On the next screen I will conjure up some text, type it and my friend out here in the imaginary world will come assist us.",
+        "response": "okay.."
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "ritual",
+        "text": "",
+        "response": ""
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "arrival",
+        "text": "Oh, a new traveller! How exciting! Hello <you>, how are you?",
+        "tone": "jovial",
+        "effect": "infection",
+        "grand": true
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Scared, it's dark and cold.",
+        "response": ">>",
+        "tone": "still"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "OH! You're so right, let me fix that.",
+        "response": ">>",
+        "effect": "infection",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Nothing happened",
+        "response": ">>",
+        "tone": "still"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends. I do love these guys.",
+        "response": ">>",
+        "effect": "room-cycle",
+        "tone": "suspicious"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "WHOA.",
+        "response": ">>",
+        "tone": "still"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "Well we better make a poppet first and see what happens",
+        "response": ">>",
+        "tone": "suspicious",
+        "auto": true
+      },
+      {
+        "kind": "handoff",
+        "text": "",
+        "response": ""
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "arrival",
+        "text": "OH! Aren’t you just precious!",
+        "tone": "jovial",
+        "effect": "finale-envelope",
+        "wait": 1400
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "Yay!",
+        "response": ">>",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "Oh and monosyllabic too. Little <name> why don’t you ask for some more travellers?",
+        "response": ">>",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "WOW! That was amazing!",
+        "response": ">>",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "dialogue",
+        "text": "THANKS!",
+        "response": ">>",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "No worries, buddy.",
+        "response": ">>",
+        "tone": "jovial"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "I think it’s time I let you explore. More changes are to come",
+        "response": ">>",
+        "tone": "suspicious"
+      },
+      {
+        "kind": "rat",
+        "text": "",
+        "response": ""
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "The fourth wall breaks. RAT — thank you for the watch. Go carefully.",
+        "response": ">>",
+        "tone": "still"
+      },
+      {
+        "speaker": "rat",
+        "kind": "dialogue",
+        "text": "Understood. I built this; I can let it go. Good luck in there.",
+        "response": ">>",
+        "tone": "still",
+        "effect": "skulks-away"
+      },
+      {
+        "speaker": "wanderlust",
+        "kind": "dialogue",
+        "text": "Before you continue, let me leave you with some parting words:",
+        "response": ">>",
+        "tone": "suspicious"
+      },
+      {
+        "speaker": "liber-vacui",
+        "kind": "finale",
+        "text": "I ARISE THE SAME BUT DIFFERENT",
+        "response": ""
+      }
+    ],
+    "PRODUCTION": [
+      {
+        "id": "beat-001",
+        "speaker": "liber-vacui",
+        "text": "Oh hello <name>!",
+        "response": ">>",
+        "effect": "opening-disturbance",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "opening-disturbance",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "opening-disturbance",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-002",
+        "speaker": "liber-vacui",
+        "text": "I am literally you.",
+        "response": "no you’re not..",
+        "effect": "name-loosen",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "name-loosen",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "name-loosen",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-003",
+        "speaker": "liber-vacui",
+        "text": "Okay let me explain. In this artifact, the liber vacui, the imaginary and real are the same thing.",
+        "response": "so I am playing pretend?",
+        "effect": "floor-inscription",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "floor-inscription",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "floor-inscription",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-004",
+        "speaker": "liber-vacui",
+        "text": "You could look at it that way, if you want. You actually prefer to define yourself with research backed terminology.",
+        "response": "why are you saying ‘you’",
+        "effect": "voice-pulse",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-005",
+        "speaker": "liber-vacui",
+        "text": "For instance, that is object-relational theory. By yourself identifying uh.. itself.. with..",
+        "response": "this is confusing",
+        "effect": "voice-pulse",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-006",
+        "speaker": "liber-vacui",
+        "text": "You’re right. After all, we are just starting this journey. We can cast a spell and summon some help.",
+        "response": "a spell?",
+        "effect": "voice-pulse",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-007",
+        "speaker": "liber-vacui",
+        "text": "Yes. On the next screen I will conjure up some text, type it and my friend out here in the imaginary world will come assist us.",
+        "response": "okay..",
+        "effect": "voice-pulse",
+        "mode": "choice",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-008",
+        "speaker": "liber-vacui",
+        "text": "",
+        "response": "",
+        "effect": "voice-pulse",
+        "mode": "action-lock",
+        "anchor": "near-focus",
+        "authority": "machine",
+        "surface": "ritual",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 450
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "until-action-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "advance"
+      },
+      {
+        "id": "beat-009",
+        "speaker": "wanderlust",
+        "text": "Oh, a new traveller! How exciting! Hello <you>, how are you?",
+        "response": "",
+        "effect": "infection",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 520,
+          "hold": 1700,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "infection",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "infection",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-010",
+        "speaker": "liber-vacui",
+        "text": "Scared, it's dark and cold.",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-011",
+        "speaker": "wanderlust",
+        "text": "OH! You're so right, let me fix that.",
+        "response": ">>",
+        "effect": "infection",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "infection",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "infection",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-012",
+        "speaker": "liber-vacui",
+        "text": "Nothing happened",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-013",
+        "speaker": "wanderlust",
+        "text": "Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends. I do love these guys.",
+        "response": ">>",
+        "effect": "room-cycle",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "room-cycle",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "room-cycle",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-014",
+        "speaker": "wanderlust",
+        "text": "WHOA.",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-015",
+        "speaker": "wanderlust",
+        "text": "Well we better make a poppet first and see what happens",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-016",
+        "speaker": "liber-vacui",
+        "text": "",
+        "response": "",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-017",
+        "speaker": "wanderlust",
+        "text": "OH! Aren’t you just precious!",
+        "response": "",
+        "effect": "finale-envelope",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 520,
+          "hold": 1700,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "finale-envelope",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "finale-envelope",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-018",
+        "speaker": "liber-vacui",
+        "text": "Yay!",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-019",
+        "speaker": "wanderlust",
+        "text": "Oh and monosyllabic too. Little <name> why don’t you ask for some more travellers?",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-020",
+        "speaker": "wanderlust",
+        "text": "WOW! That was amazing!",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-021",
+        "speaker": "liber-vacui",
+        "text": "THANKS!",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-022",
+        "speaker": "wanderlust",
+        "text": "No worries, buddy.",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-023",
+        "speaker": "wanderlust",
+        "text": "I think it’s time I let you explore. More changes are to come",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-024",
+        "speaker": "liber-vacui",
+        "text": "",
+        "response": "",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-025",
+        "speaker": "wanderlust",
+        "text": "The fourth wall breaks. RAT — thank you for the watch. Go carefully.",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-026",
+        "speaker": "rat",
+        "text": "Understood. I built this; I can let it go. Good luck in there.",
+        "response": ">>",
+        "effect": "skulks-away",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "rat",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "skulks-away",
+          "relationship": null
+        },
+        "enter": "body:rat",
+        "hold": "line-complete",
+        "exit": "withdraw",
+        "consequence": "skulks-away",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-027",
+        "speaker": "wanderlust",
+        "text": "Before you continue, let me leave you with some parting words:",
+        "response": ">>",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "upper-right",
+        "authority": "wanderlust",
+        "surface": "cast-box",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:wanderlust",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      },
+      {
+        "id": "beat-028",
+        "speaker": "liber-vacui",
+        "text": "I ARISE THE SAME BUT DIFFERENT",
+        "response": "",
+        "effect": "voice-pulse",
+        "mode": "advance",
+        "anchor": "near-focus",
+        "authority": "liber-vacui",
+        "surface": "full-machine",
+        "timing": {
+          "enter": 0,
+          "hold": 0,
+          "handoff": 0
+        },
+        "carry": {
+          "residue": "voice-pulse",
+          "relationship": null
+        },
+        "enter": "body:liber-vacui",
+        "hold": "line-complete",
+        "exit": "settle",
+        "consequence": "voice-pulse",
+        "nextMode": "dialogue"
+      }
+    ]
+  },
+  "LiberPrompts": {
+    "wanderlust": [
+      "what did you want to say, in the moment you decided not to say it?",
+      "whose permission are you still waiting for, and when did you last check whether they were watching?",
+      "name something you are good at that you have never once said out loud.",
+      "if the thing you want were allowed, what would you do first?",
+      "who taught you that wanting was a kind of rudeness?",
+      "what would you ask for, if asking cost nothing?",
+      "you have a voice today that you did not have then. what does it say to then?",
+      "what did you learn to call \"fine\" so you would not have to call it anything else?",
+      "what would you be doing right now if no one would ever hear about it?",
+      "there is something you keep almost bringing up. what is it?"
+    ],
+    "physius": [
+      "what are you carving away, and what are you afraid is underneath?",
+      "you have been working on the same edge for a while. what would finished even look like?",
+      "name one thing you are holding up that could stand on its own.",
+      "what did you build carefully that you no longer need?",
+      "which part of this is structural, and which part is decoration you are defending?",
+      "what would you keep if you had to put most of it down?",
+      "where are you using force because you have not found the grain?",
+      "you learned to make yourself useful. what were you like before that?",
+      "what are you making, and who is it for, honestly?",
+      "something in you was shaped by a hand that is no longer here. what shape did it leave?"
+    ],
+    "the mad scribe": [
+      "what version of this do you tell people, and what do you leave out?",
+      "if you read your own account back as a stranger, what would you not believe?",
+      "what would you like this record to hold, if anything?",
+      "is there one line here you would like to reread with more kindness? you can pass.",
+      "what did writing this help you notice, if anything?",
+      "whose perspective do you hear in this line, if anyone?",
+      "what would the entry say if you wrote it kindly and still honestly?",
+      "is there a page you would rather leave closed today? you can pass.",
+      "is there a belief about yourself you would like to revisit, or leave as it is?",
+      "what would you have to stop proving if the record were already closed?"
+    ],
+    "riason": [
+      "what does not fit anywhere in the system you have built?",
+      "you have a category for almost everything. what have you never named?",
+      "which rule of yours has outlived the situation that made it necessary?",
+      "what would you have to reorganise if that one thing turned out to be true?",
+      "name something you sorted into \"dealt with\" that is not.",
+      "what are you keeping in order so you do not have to look inside it?",
+      "which of your reasons is actually a feeling wearing a coat?",
+      "what did you learn to explain instead of feel?",
+      "if you could only keep three of your rules, which three?",
+      "what have you filed under someone else’s name that belongs under yours?"
+    ],
+    "insightful inquiry": [
+      "what image has come back more than once, and what does it refuse to explain?",
+      "if you wish, which image would you like to keep or write about?",
+      "imagine a mark on a wall asking a question; what might it ask?",
+      "name the last thing you woke up already feeling.",
+      "if you appeared in the dream, what role did you have? if not, what image stood out?",
+      "something keeps appearing at the edge of it. what is at the edge?",
+      "what words, if any, would you give this image?",
+      "what was your first thought about that image? it need not be worse or right.",
+      "if you were in the dream, what did you notice? if not, what did you notice from outside it?",
+      "if a door appeared, what might it open onto? if not, choose another image."
+    ],
+    "arcana": [
+      "what pattern do you keep finding, and what would it mean if it were not a coincidence?",
+      "if this were a card, which one, and would you accept the reading?",
+      "name the outcome you are quietly planning for.",
+      "what are you calling fate that is actually a decision you have made nine times?",
+      "which future have you already ruled out, and on whose authority?",
+      "what would you have to believe about yourself for the good reading to be the accurate one?",
+      "the chart has one star too many. what have you added to the sky?",
+      "what are you waiting for a sign about, when you already know?",
+      "if the answer were yes, what becomes your responsibility?",
+      "what have you been reading as a warning that might be an invitation?"
+    ],
+    "vanir": [
+      "what are you carrying that was never yours to carry?",
+      "the tide marks are not level. which of them did you draw?",
+      "what would float if you stopped holding it under?",
+      "name the weight you would put down first, if putting down were allowed.",
+      "what rises in you when the room goes quiet?",
+      "whose water is this, and when did it start coming in?",
+      "what have you been bailing out instead of finding the leak?",
+      "if you let it go, what are you afraid comes back?",
+      "what is at the bottom, and what have you decided about it without looking?",
+      "you have held this a long time. who told you it was yours?"
+    ],
+    "whimsy wow": [
+      "what did you love doing before you found out you were not good at it?",
+      "one of every prize, and none of them taken home. what have you won and never claimed?",
+      "when did playing start counting as time wasted, and who decided?",
+      "name something you would do badly and happily.",
+      "what did you give up because someone watched you do it?",
+      "what would you pick up again if no one graded it?",
+      "who were you at nine, and what would they think of your week?",
+      "what are you too old for, according to whom?",
+      "the paint is worn where the hand goes. what did you hold that often?",
+      "what would count as enough fun, and when did you last have it?"
+    ],
+    "pip": [
+      "what does it feel like in your hands right now?",
+      "the powder got as far as the drain and no further. what did you nearly finish?",
+      "name one thing you can do in five minutes that you have put off for a month.",
+      "what is the smallest true version of the thing you are avoiding?",
+      "what would be different if you were not holding your breath?",
+      "where in your body is this, and what temperature is it?",
+      "what do you do with your hands when you are lying?",
+      "what did you make a mess of, and clean up too quickly to look at?",
+      "if you did the tiny version now, what happens?",
+      "what is the fold you keep pressing flat, and it keeps coming back?"
+    ],
+    "ruby": [
+      "what has outgrown the pot you keep it in?",
+      "the wipe in the condensation was never finished. what did you start clearing and leave?",
+      "what are you tending that is not growing, and what are you neglecting that is?",
+      "name the one bloom on a plant that is otherwise all leaf.",
+      "what needs less attention from you than you are giving it?",
+      "what did you plant on purpose, and what came up anyway?",
+      "what are you keeping alive out of obligation?",
+      "if you repotted it, what would you have to admit had got bigger?",
+      "what are you protecting from weather it could survive?",
+      "what would grow if you stopped pruning it to a shape you chose years ago?"
+    ],
+    "pete": [
+      "what did you throw out that you have gone back for?",
+      "something came up beside the marker anyway. what grew where you were not tending?",
+      "name a thing you were told was rubbish that you kept.",
+      "what got softer at the edges because you kept visiting it?",
+      "what would you bring back, and what reason would you give it?",
+      "what did you bury rather than finish?",
+      "what have you called a failure that was mostly a cost?",
+      "you bent that flat by hand and kept it. what is it?",
+      "what is not lost, only piled?",
+      "what part of the wreck is worth the salvage, and who decides?"
+    ]
+  },
+  "warningHtml": "\n        <p>Hi there!</p>\n        <p>My name is RAT, and this is my project. Before you begin there are a few honest things first, for safety.</p>\n        <p>This is an art therapy tool! Like a workbook you might pick up in a self help section. I built this from real research; I'm a student, not your therapist. You should not use it as a replacement for therapy, and if you are in crisis you should call a crisis line, not use this tool for any reason.</p>\n        <p>Crisis lines, if you need one right now:<br/>\n          US — call or text <a href=\"tel:988\">988</a><br/>\n          Canada — call or text <a href=\"tel:988\">988</a><br/>\n          UK &amp; Ireland — Samaritans, <a href=\"tel:116123\">116 123</a><br/>\n          Anywhere else — search “helpline” plus your town.</p>\n        <p>If things get heavy inside the tool, three places are built for it: the games room’s quiet floor teaches a distress-tolerance skill set, the sea lets you give something heavy to water that takes without asking, and the dream lens keeps readings honest — one lens, never a verdict.</p>\n        <p>This tool is based on IFS and “Amplification,” a concept in analytical psychology. It can make things worse if you are carrying immediate, unprocessed trauma or have C-PTSD and exploring other “parts” of the identity could be harmful.</p>\n        <p>If you have feedback for this, please send me an email here:<br/><a href=\"mailto:libervacui@gmail.com\">libervacui@gmail.com</a></p>\n        <p>Thanks for trying out my tool!</p>\n      "
+}

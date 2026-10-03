@@ -71,7 +71,7 @@ window.LiberRooms = {
   journal: {
     id: 'journal',
     place: 'the study',
-    traveller: 'the mad scribe',
+    traveller: 'riason',
     substrate: 'indexed vellum, brass clasps, oak, ink',
     light: 'one green-glass banker\u2019s lamp, warm; the window dark behind its curtain',
     tells: [

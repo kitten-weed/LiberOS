@@ -349,6 +349,11 @@ html.bare-frame .crt-bay,
 html.bare-frame #crt-bay-tray,
 html.bare-frame .door-leave { display: none !important; }
 html.bare-frame .bezel > :not(.screen) { display: none !important; }
+html.bare-frame .bezel::before,
+html.bare-frame .bezel::after {
+  content: none;
+  display: none;
+}
 html.bare-frame body.in-machine .doorway {
   position: fixed;
   inset: 14px;

@@ -124,6 +124,23 @@
     if (page) window.location.href = page;
   }
 
+  function mayLeave(destination) {
+    return window.dispatchEvent(new CustomEvent('liber:before-room-leave', {
+      cancelable: true,
+      detail: {to: destination}
+    }));
+  }
+
+  function cancelDeparture(id) {
+    var grid = tray && tray.querySelector('.crt-tray-grid');
+    if (grid) grid.classList.remove('entering');
+    var selected = document.getElementById('crt-cartridge-' + id);
+    if (selected) {
+      selected.classList.remove('selected');
+      selected.setAttribute('aria-selected', 'false');
+    }
+  }
+
   // Resolve the destination from the stable cartridge id at launch time. The
   // old handlers relied on parallel array indexes and two separate timeout
   // paths; after the tray animation moved, a stale index could send a click to
@@ -135,12 +152,22 @@
       seating = false;
       return;
     }
+    var id = cart.id;
+    if (!mayLeave(destination)) {
+      cancelDeparture(id);
+      return;
+    }
     if (walked[cart.id]) return;
     walked[cart.id] = true;
     seating = true;
     clearTimeout(walkTimer);
-    var id = cart.id;
     walkTimer = setTimeout(function () {
+      if (!mayLeave(destination)) {
+        delete walked[id];
+        seating = false;
+        cancelDeparture(id);
+        return;
+      }
       shakeMachine();
       flashMachine();
       seat();

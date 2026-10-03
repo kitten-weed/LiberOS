@@ -433,6 +433,40 @@
   }
 
   var SCENE = { el: null, timers: [], afters: [], active: false, endMs: 0 };
+  var SCENE_WORK = null;
+
+  function suspendSceneWork() {
+    var wm = window.ARCANA_SHELL && window.ARCANA_SHELL.WM;
+    var entry = wm && wm.wins && wm.wins['arc-win-work'];
+    var node = entry && entry.node;
+    if (!node || SCENE_WORK) return;
+    SCENE_WORK = {
+      node: node,
+      hidden: node.hidden,
+      inert: node.inert,
+      ariaHidden: node.getAttribute('aria-hidden'),
+      alreadySuspended: node.classList.contains('scene-suspended'),
+      focus: document.activeElement
+    };
+    node.inert = true;
+    node.setAttribute('aria-hidden', 'true');
+    node.classList.add('scene-suspended');
+  }
+
+  function restoreSceneWork() {
+    if (!SCENE_WORK) return;
+    var prior = SCENE_WORK;
+    SCENE_WORK = null;
+    if (prior.node.hidden === prior.hidden) {
+      prior.node.inert = prior.inert;
+      if (prior.ariaHidden === null) prior.node.removeAttribute('aria-hidden');
+      else prior.node.setAttribute('aria-hidden', prior.ariaHidden);
+    }
+    if (!prior.alreadySuspended) prior.node.classList.remove('scene-suspended');
+    if (prior.focus && prior.node.hidden === prior.hidden && prior.node.contains(prior.focus) && !prior.node.hidden && !prior.node.inert) {
+      try { prior.focus.focus({preventScroll: true}); } catch (e) {}
+    }
+  }
 
   function after(ms, fn) {
     // schedule inside the scene's clock; Infinity = fire on endScene
@@ -647,6 +681,7 @@
     SCENE.active = false;
     var stage = V.host && V.host.parentNode;
     if (stage && stage.classList) stage.classList.remove('scene-live');
+    restoreSceneWork();
     var el = SCENE.el;
     var kill = function () {
       if (!el) return;
@@ -1313,6 +1348,7 @@
       var stage = V.host.parentNode || V.host;
       stage.appendChild(doc);
       if (stage.classList) stage.classList.add('scene-live');
+      suspendSceneWork();
       SCENE.el = doc; SCENE.timers = []; SCENE.afters = [];
       SCENE.active = true;
       SCENE.w = stage.clientWidth; SCENE.h = stage.clientHeight;
@@ -1396,6 +1432,7 @@
         landActions();
       });
       doc.appendChild(skip);
+      try { skip.focus({preventScroll: true}); } catch (e) {}
       at(950 + tl + 600 + typeMs, landActions);
 
       // if the stage is torn down before a choice (pane closed, menu hit),
@@ -1561,6 +1598,7 @@
   // then keep/discard inline. both other games land here.
   V.stageReading = function (o) {
     if (!SCENE.active) { if (o.fallback) o.fallback(); return 0; }
+    suspendSceneWork();
     var W = SCENE.w, H = SCENE.h;
     stamp(String(o.title || '').toUpperCase(), W * 0.56, H * 0.50,
       { color: o.color || '#80a0ff', hold: 400, holdFor: 2600 });

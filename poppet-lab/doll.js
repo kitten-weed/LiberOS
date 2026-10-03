@@ -154,16 +154,25 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
   const qClothX90 = new THREE.Quaternion().setFromAxisAngle(V(1, 0, 0), Math.PI / 2);
 
   function buildMeshes() {
-    while (body.children.length) {
-      const ch = body.children.pop();
-      ch.geometry.dispose();
-    }
-    ringSet.forEach(function (m) { scene.remove(m); if (m.geometry) m.geometry.dispose(); });
-    ringSet = [];
-    overlaySet.forEach(function (o) {
-      scene.remove(o.group || o);
-      if (o.geometry) o.geometry.dispose();
+    const oldRoots = body.children.slice()
+      .concat(ringSet, overlaySet.map(function (o) { return o.group || o; }))
+      .concat(Object.keys(glyphGroups).map(function (kind) { return glyphGroups[kind].group; }));
+    const oldGeometries = new Set();
+    const oldMaterials = new Set();
+    oldRoots.forEach(function (root) {
+      root.traverse(function (object) {
+        if (object.geometry) oldGeometries.add(object.geometry);
+        const materials = object.material
+          ? (Array.isArray(object.material) ? object.material : [object.material]) : [];
+        materials.forEach(function (material) { if (material) oldMaterials.add(material); });
+      });
     });
+    oldRoots.forEach(function (root) {
+      if (root.parent) root.parent.remove(root);
+    });
+    oldGeometries.forEach(function (geometry) { geometry.dispose(); });
+    oldMaterials.forEach(function (material) { material.dispose(); });
+    ringSet = [];
     overlaySet = [];
     glyphGroups = {};
     garments = {};
@@ -267,10 +276,7 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
     Object.keys(GLYPH_SHAPES).forEach(function (kind) { buildGlyphs(kind, Dc); });
   }
 
-  /* ── the face shell: a sphere hovering just outside the head, three zones.
-     Three nested partial spheres — hair (crown), eyes (band), face (bowl) —
-     each maps its full UV square to its own rect of the face canvas, so a
-     raycast hit tells you exactly which zone you're painting. ── */
+  /* ── the face shell: three UV-mapped zones following the head surface. ── */
   const FACE_RECTS = {
     hair: [0.02, 0.05, 0.96, 0.28],
     eyes: [0.02, 0.38, 0.96, 0.24],
@@ -280,19 +286,23 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
     ['hair', 0.0, 0.395],
     ['eyes', 0.405, 0.19],
     ['face', 0.605, 0.395]
-  ];   // hairline gaps — coincident seams z-fight, shared radii sort-flicker
+  ];   // small gaps keep the zone seams from z-fighting
   function buildFaceShell(Dc) {
     const order = { hair: 4, eyes: 5, face: 6 };
     FACE_BANDS.forEach(function (fb) {
-      const g = new THREE.SphereGeometry(Dc.R * 1.28, 36, 20, 0, Math.PI * 2, fb[1] * Math.PI, fb[2] * Math.PI);
+      const g = new THREE.SphereGeometry(Dc.R * 1.015, 36, 20, 0, Math.PI, fb[1] * Math.PI, fb[2] * Math.PI);
       mapRegion(g, FACE_RECTS[fb[0]]);
-      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: faceMaps[fb[0]].tex, transparent: true, roughness: 0.8, side: THREE.DoubleSide, depthWrite: false }));
+      const faceTex = faceMaps[fb[0]].tex;
+      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({
+        map: faceTex, emissive: 0xffffff, emissiveMap: faceTex, emissiveIntensity: 0.3,
+        transparent: true, roughness: 0.8, side: THREE.DoubleSide, depthWrite: false
+      }));
       m.userData.pi = IDX.head;
       m.userData.bodyPart = true;
       m.userData.faceZone = fb[0];
-      m.renderOrder = order[fb[0]];   // stable draw order kills the shell flicker
+      m.renderOrder = order[fb[0]];
       m.visible = state.faceOn;
-      scene.add(m);
+      body.add(m);
       overlaySet.push(m);
       M['face_' + fb[0]] = m;
     });
@@ -301,7 +311,8 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
   /* ── the clothes hulls: transparent tubes around each limb, own strips ── */
   function buildHulls(Dc) {
     const hullMat = new THREE.MeshStandardMaterial({
-      map: hullTex, transparent: true, opacity: hullInk ? 0.85 : 0.14,
+      map: hullTex, emissive: 0xffffff, emissiveMap: hullTex, emissiveIntensity: 0.3,
+      transparent: true, opacity: hullInk ? 0.85 : 0.14,
       roughness: 0.9, side: THREE.DoubleSide, depthWrite: false
     });
     const parts = [
@@ -713,13 +724,12 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
     ['shL', 'shR', 'elL', 'elR', 'hpL', 'hpR', 'knL', 'knR'].forEach(function (k) {
       M['j_' + k].position.copy(pts[IDX[k]].p);
     });
-    // face shell rides a little outside the head, along the neck→head line
+    // face zones stay aligned with the living head and its world transform
     if (M.face_hair) {
-      tmpA.subVectors(pts[I.head].p, pts[I.neck].p).normalize();
       ['face_hair', 'face_eyes', 'face_face'].forEach(function (k) {
         if (!M[k]) return;
-        M[k].position.copy(pts[I.head].p).addScaledVector(tmpA, D.cur.R * 0.3);
-        M[k].quaternion.slerp(qTmp.setFromUnitVectors(YAXIS, tmpA), 0.25);
+        M[k].position.copy(M.head.position);
+        M[k].quaternion.copy(M.head.quaternion);
       });
     }
     syncOverlays();

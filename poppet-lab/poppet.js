@@ -8,8 +8,6 @@
 
    The same sheet it paints is the sheet DOLL DRAW paints through (surface.js),
    so a stroke lands in the same pixels whether you work here or on the doll. */
-import { makeWorksurface as buildWorksurface } from './surface.js?v=lab53';
-
 const BODY_PARTS = ['head', 'chest', 'pelvis', 'waistBall', 'armLU', 'armLL', 'armRU', 'armRL', 'legLU', 'legLL', 'legRU', 'legRL', 'haL', 'haR', 'ftL', 'ftR'];
 const HULL_PARTS = ['armLU', 'armRU', 'armLL', 'armRL', 'legLU', 'legRU', 'legLL', 'legRL'];
 const LAYER_SHEETS = {
@@ -28,6 +26,22 @@ const LAYER_SHEETS = {
     { key: 'thoughts:thoughts', part: 'thoughts', name: 'THOUGHTS' }
   ]
 };
+
+export function mapOverlayPoint(e, rect, view, width, height) {
+  if (view) {
+    return {
+      x: view.sx + ((e.clientX - rect.left) / rect.width) * view.sw,
+      y: view.sy + ((e.clientY - rect.top) / rect.height) * view.sh
+    };
+  }
+  const fit = Math.min(rect.width / width, rect.height / height);
+  const ox = (rect.width - width * fit) / 2;
+  const oy = (rect.height - height * fit) / 2;
+  return {
+    x: (e.clientX - rect.left - ox) / fit,
+    y: (e.clientY - rect.top - oy) / fit
+  };
+}
 
 const THOUGHT_PALETTES = {
   fears: ['#b03a2a', '#7a2a20', '#c96a3a', '#4a1c14', '#e6a080'],
@@ -64,46 +78,19 @@ const PROMPTS = {
 };
 
 export function buildPoppetOverlay(mount, cfg) {
-  /* cfg: { doll, ink, brush, getMode, onStep, onFill(kind, hex), fillCloth, washAura } */  /* ── one worksurface per sheet, built lazily the first time it's shown ── */
-  const surfaces = {};
+  /* cfg: { doll, ink, brush, getSurface, canEdit, onStep, onChange } */
   function surf(key) {
-    if (surfaces[key]) return surfaces[key];
-    let s;
-    if (key === 'body') {
-      s = buildWorksurface({ cv: cfg.doll.bodyCv, tex: cfg.doll.bodyTex, el: el.cv, panels: bodyPanels(), bg: '#ead9b4' });
-    } else if (key.indexOf('face:') === 0) {
-      const z = key.slice(5);
-      s = buildWorksurface({ cv: cfg.doll.faceMaps[z].cv, tex: cfg.doll.faceMaps[z].tex, el: el.cv, checker: true, bg: 'transparent' });   // one zone = one sheet
-    } else if (key === 'clothes') {
-      s = buildWorksurface({ cv: cfg.doll.hullCanvas, tex: cfg.doll.hullTex, el: el.cv, panels: cfg.doll.hullRects, checker: true, bg: 'transparent' });
-      s.onFill = function () { cfg.doll.markHullPainted(); };
-    } else if (key.indexOf('thoughts:') === 0) {
-      const kind = key.slice(9);
-      s = buildWorksurface({ cv: cfg.wispCv(kind), tex: cfg.wispTex(kind), el: el.cv, panels: thoughtPanels(), bg: '#efe6cd' });
-    } else if (key === 'cloth') {
-      s = buildWorksurface({ cv: cfg.doll.clothCtx.canvas, tex: cfg.doll.clothTex, el: el.cv, bg: '#e6d7b2' });
-      s.weave = function (hex) { cfg.fillCloth(hex); };
-    }
-    s.weave = s.weave || cfg.weaveFor(key);
-    surfaces[key] = s;
-    return s;
-  }
-  function bodyPanels() {
-    const out = {};
-    Object.keys(cfg.doll.ATLAS).forEach(function (k) {
-      const r = cfg.doll.ATLAS[k];
-      out[k] = [r[0], 1 - (r[1] + r[3]), r[2], r[3]];   // uv v (bottom-up) → canvas-y (top-down)
-    });
-    return out;
-  }
-  function thoughtPanels() {
-    const out = {};
-    for (let i = 0; i < 5; i++) out[['fears', 'wishes', 'likes', 'dislikes', 'thoughts'][i]] = [i * 0.2, 0, 0.2, 1];
-    return out;
+    const surface = cfg.getSurface(key);
+    if (!surface) throw new Error('Unknown poppet worksurface: ' + key);
+    return surface;
   }
 
   /* ── the walkthrough state ── */
   const walk = { layer: 'body', idx: 0 };
+  let editingLocked = false;
+  function canEdit() {
+    return !editingLocked && (!cfg.canEdit || cfg.canEdit());
+  }
   function key() { return LAYER_SHEETS[walk.layer][walk.idx].key; }
   function part() { return LAYER_SHEETS[walk.layer][walk.idx].part; }
   function sheetName() { return LAYER_SHEETS[walk.layer][walk.idx].name; }
@@ -118,6 +105,7 @@ export function buildPoppetOverlay(mount, cfg) {
     return PROMPTS[p] || PROMPTS[k] || ('Paint the ' + sheetName().toLowerCase());
   }
   function setWalk(layer, idx) {
+    if (!canEdit()) return;
     walk.layer = layer;
     walk.idx = Math.max(0, Math.min(LAYER_SHEETS[layer].length - 1, idx));
     const s = surf(key());
@@ -139,43 +127,42 @@ export function buildPoppetOverlay(mount, cfg) {
   }
 
   /* ── the brush state — shared with DOLL DRAW mode via cfg ── */
-  const st = { tool: 'brush', ink: cfg.ink(), size: cfg.brush(), painting: false, last: null, erase: false };
+  const st = { tool: cfg.getTool ? cfg.getTool() : 'brush', ink: cfg.ink(), size: cfg.brush(), painting: false, last: null, erase: false };
   let activeKey = 'body';   // which sheet is on the easel right now
-  const undoStack = [];     // { key, data }
 
   /* ── DOM ── */
   const root = document.createElement('div');
   root.className = 'poppet-root';
   root.innerHTML =
     '<div class="poppet-card">' +
-    '<div class="poppet-head"><b>THE CANVAS — PIECE BY PIECE</b><span id="poppet-sub"></span><button type="button" class="poppet-x" title="close">×</button></div>' +
+    '<div class="poppet-head"><b>THE CANVAS — PIECE BY PIECE</b><span id="poppet-sub"></span><button type="button" class="poppet-x" title="close" aria-label="Close canvas">×</button></div>' +
     '<div class="poppet-body">' +
     '<div class="poppet-side">' +
     '<div class="poppet-sec">TOOL</div>' +
     '<div class="poppet-tools">' +
-    '<button type="button" data-tool="brush" class="on">◆ BRUSH</button>' +
-    '<button type="button" data-tool="bucket">◈ FILL</button>' +
-    '<button type="button" data-tool="erase">◌ ERASE</button>' +
+    '<button type="button" data-tool="brush" class="on" aria-pressed="true" aria-label="Brush tool">◆ BRUSH</button>' +
+    '<button type="button" data-tool="bucket" aria-pressed="false" aria-label="Fill tool">◈ FILL</button>' +
+    '<button type="button" data-tool="erase" aria-pressed="false" aria-label="Erase tool">◌ ERASE</button>' +
     '</div>' +
     '<div class="poppet-sec" id="poppet-ink-name">INKS</div>' +
     '<div class="poppet-inks"></div>' +
     '<div class="poppet-sec">BRUSH <span class="poppet-size-v"></span></div>' +
-    '<input type="range" class="poppet-size" min="2" max="48" value="10" step="1"/>' +
+    '<input type="range" class="poppet-size" min="2" max="48" value="10" step="1" aria-label="Brush size"/>' +
     '<div class="poppet-actions">' +
-    '<button type="button" class="poppet-undo">↶ UNDO</button>' +
-    '<button type="button" class="poppet-wash">WASH PANEL</button>' +
+    '<button type="button" class="poppet-undo" aria-label="Undo last paint stroke">↶ UNDO</button>' +
+    '<button type="button" class="poppet-wash" aria-label="Wash the active panel">WASH PANEL</button>' +
     '</div>' +
     '</div>' +
     '<div class="poppet-stage">' +
     '<div class="poppet-phase" id="poppet-phase" aria-live="polite"></div>' +
     '<canvas class="poppet-cv" width="1024" height="1024"></canvas>' +
-    '<div class="poppet-doll-btn" title="paint this on the doll itself">DOLL →</div>' +
+    '<button type="button" class="poppet-doll-btn" title="paint this on the doll itself" aria-label="Paint this part on the doll">DOLL →</button>' +
     '</div>' +
     '</div>' +
     '<div class="poppet-lesson">' +
-    '<button type="button" class="poppet-nav" id="poppet-prev">◀</button>' +
+    '<button type="button" class="poppet-nav" id="poppet-prev" aria-label="Previous piece">◀</button>' +
     '<div class="poppet-lmain"><div class="poppet-prog"></div><div class="poppet-prompt"></div></div>' +
-    '<button type="button" class="poppet-nav" id="poppet-next">▶</button>' +
+    '<button type="button" class="poppet-nav" id="poppet-next" aria-label="Next piece">▶</button>' +
     '</div>' +
     '</div>';
   mount.appendChild(root);
@@ -210,30 +197,64 @@ export function buildPoppetOverlay(mount, cfg) {
       b.className = 'ink-dot' + (st.ink === hex ? ' on' : '');
       b.style.background = hex;
       b.setAttribute('data-ink', hex);
-      b.addEventListener('click', function () { st.ink = hex; cfg.setInk(hex); refreshInks(); });
+      b.setAttribute('aria-label', hex + ' ink');
+      b.setAttribute('aria-pressed', st.ink === hex ? 'true' : 'false');
+      b.disabled = !canEdit();
+      b.addEventListener('click', function () {
+        if (!canEdit()) return;
+        st.ink = hex;
+        cfg.setInk(hex, true);
+        refreshInks();
+      });
       el.inks.appendChild(b);
     });
     if (activeKey.indexOf('thoughts:') === 0) {
       const kind = activeKey.slice(9);
       el.inkName.textContent = kind.toUpperCase() + ' — OWN PALETTE';
-      if (pal.indexOf(st.ink) < 0) { st.ink = pal[0]; cfg.setInk(st.ink); refreshInks(); }
+      if (pal.indexOf(st.ink) < 0) { st.ink = pal[0]; cfg.setInk(st.ink, false); refreshInks(); }
     } else {
       el.inkName.textContent = 'INKS';
     }
   }
 
+  function setTool(tool) {
+    if (!['brush', 'bucket', 'erase'].includes(tool)) throw new TypeError('Unknown poppet tool: ' + tool);
+    if (!canEdit()) return;
+    st.tool = tool;
+    el.tools.forEach(function (button) {
+      const selected = button.getAttribute('data-tool') === tool;
+      button.classList.toggle('on', selected);
+      button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+    if (cfg.setTool && cfg.getTool && cfg.getTool() !== tool) cfg.setTool(tool);
+  }
+
+  function setLocked(locked) {
+    editingLocked = !!locked;
+    root.classList.toggle('edits-locked', editingLocked);
+    el.cv.inert = editingLocked;
+    el.cv.setAttribute('aria-disabled', editingLocked ? 'true' : 'false');
+    el.tools.forEach(function (button) { button.disabled = editingLocked; });
+    el.size.disabled = editingLocked;
+    el.undo.disabled = editingLocked;
+    el.wash.disabled = editingLocked;
+    el.dollBtn.disabled = editingLocked;
+    el.inks.querySelectorAll('button').forEach(function (button) { button.disabled = editingLocked; });
+    updateLessonRow();
+  }
+
   /* ── painting through the shared worksurface ── */
   function s() { return surf(activeKey); }
   el.cv.addEventListener('pointerdown', function (e) {
+    if (!canEdit()) return;
     e.preventDefault();
     try { el.cv.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointers */ }
     const p = vpos(e);
-    undoStack.push({ key: activeKey, data: s().ctx.getImageData(0, 0, s().cv.width, s().cv.height) });
-    if (undoStack.length > 6) undoStack.shift();
+    s().pushUndo();
     st.painting = true;
     if (st.tool === 'bucket') {
       s().fillAt(p.x, p.y, st.ink, 40);
-      if (cfg.onFill) cfg.onFill(activeKey, st.ink);
+      if (cfg.onChange) cfg.onChange(activeKey);
       draw();
       st.painting = false;
       return;
@@ -241,51 +262,52 @@ export function buildPoppetOverlay(mount, cfg) {
     if (st.tool === 'erase') s().eraseDot(p.x, p.y, st.size / 2);
     else s().stamp(p.x, p.y, st.size / 2, st.ink);
     st.last = p;
+    if (cfg.onChange) cfg.onChange(activeKey);
     draw();
   });
   el.cv.addEventListener('pointermove', function (e) {
-    if (!st.painting || st.tool === 'bucket') return;
+    if (!st.painting || st.tool === 'bucket' || !canEdit()) return;
     const p = vpos(e);
     s().stampLine(st.last.x, st.last.y, p.x, p.y, st.size / 2, st.ink, st.tool === 'erase');
     st.last = p;
     draw();
-    if (cfg.onFill) cfg.onFill(null, null);
   });
   window.addEventListener('pointerup', function () {
     if (!st.painting) return;
     st.painting = false;
     st.last = null;
-    /* finished the walkthrough's current part? advance after a beat */
-    if (cfg.onStrokeEnd) cfg.onStrokeEnd(activeKey);
+    if (cfg.onChange) cfg.onChange(activeKey);
   });
 
   el.tools.forEach(function (t) {
     t.addEventListener('click', function () {
-      st.tool = t.getAttribute('data-tool');
-      el.tools.forEach(function (t2) { t2.classList.toggle('on', t2 === t); });
+      setTool(t.getAttribute('data-tool'));
     });
   });
-  el.size.addEventListener('input', function () { st.size = +el.size.value; cfg.setSize(st.size); el.sizeV.textContent = st.size + 'px'; });
+  el.size.addEventListener('input', function () {
+    if (!canEdit()) return;
+    st.size = +el.size.value;
+    cfg.setSize(st.size);
+    el.sizeV.textContent = st.size + 'px';
+  });
   el.undo.addEventListener('click', function () {
-    for (let i = undoStack.length - 1; i >= 0; i--) {
-      if (undoStack[i].key === activeKey) {
-        s().ctx.putImageData(undoStack[i].data, 0, 0);
-        if (s().tex) s().tex.needsUpdate = true;
-        undoStack.splice(i, 1);
-        break;
-      }
+    if (!canEdit()) return;
+    if (s().undo()) {
+      if (cfg.onChange) cfg.onChange(activeKey);
     }
     draw();
   });
   el.wash.addEventListener('click', function () {
-    undoStack.push({ key: activeKey, data: s().ctx.getImageData(0, 0, s().cv.width, s().cv.height) });
+    if (!canEdit()) return;
+    s().pushUndo();
     cfg.washSheet(activeKey, st.ink);
+    if (cfg.onChange) cfg.onChange(activeKey);
     draw();
   });
   el.prev.addEventListener('click', prevWalk);
   el.next.addEventListener('click', nextWalk);
   el.x.addEventListener('click', function () { api.close(); });
-  el.dollBtn.addEventListener('click', function () { if (cfg.onDoll) cfg.onDoll(); });
+  el.dollBtn.addEventListener('click', function () { if (canEdit() && cfg.onDoll) cfg.onDoll(); });
 
   /* ── draw + show ──
      The sheet moves WITH the walkthrough: instead of the whole atlas every
@@ -334,11 +356,7 @@ export function buildPoppetOverlay(mount, cfg) {
   function vpos(e) {
     var ws = s();
     var rect = el.cv.getBoundingClientRect();
-    if (!view) return ws.pos(e);
-    return {
-      x: view.sx + ((e.clientX - rect.left) / rect.width) * view.sw,
-      y: view.sy + ((e.clientY - rect.top) / rect.height) * view.sh
-    };
+    return mapOverlayPoint(e, rect, view, ws.cv.width, ws.cv.height);
   }
   function updateLessonRow() {
     const total = LAYER_SHEETS[walk.layer].length;
@@ -348,9 +366,9 @@ export function buildPoppetOverlay(mount, cfg) {
     el.prog.textContent = layerNames[walk.layer] + ' · PIECE ' + (walk.idx + 1) + ' OF ' + total + ' — ' + sheetName();
     if (el.phase) el.phase.textContent = phase[walk.layer] || '';
     el.prompt.textContent = walkPrompt();
-    el.prev.disabled = walk.layer === 'body' && walk.idx === 0;
+    el.prev.disabled = editingLocked || (walk.layer === 'body' && walk.idx === 0);
     const lastLayer = walk.layer === 'thoughts' && walk.idx === total - 1;
-    el.next.disabled = lastLayer;
+    el.next.disabled = editingLocked || lastLayer;
   }
   function show() {
     activeKey = key();
@@ -361,6 +379,7 @@ export function buildPoppetOverlay(mount, cfg) {
 
   const api = {
     open(layer, idx) {
+      if (!canEdit()) return;
       root.classList.add('open');
       // the sheet owns the middle of the room: dock Physius aside so her
       // box never covers the canvas it narrates.
@@ -374,11 +393,24 @@ export function buildPoppetOverlay(mount, cfg) {
     isOpen() { return root.classList.contains('open'); },
     setSub(text) { el.sub.textContent = text || ''; },
     /* DOLL DRAW hands its brush here so both share one ink + size */
-    syncBrush() { st.ink = cfg.ink(); st.size = cfg.brush(); refreshInks(); el.sizeV.textContent = st.size + 'px'; },
-    setTool(t) {
-      st.tool = t;
-      el.tools.forEach(function (t2) { t2.classList.toggle('on', t2.getAttribute('data-tool') === t); });
+    syncBrush() {
+      st.ink = cfg.ink();
+      st.size = cfg.brush();
+      if (cfg.getTool) {
+        st.tool = cfg.getTool();
+        el.tools.forEach(function (button) {
+          const selected = button.getAttribute('data-tool') === st.tool;
+          button.classList.toggle('on', selected);
+          button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        });
+      }
+      refreshInks();
+      el.sizeV.textContent = st.size + 'px';
     },
+    setTool(t) {
+      setTool(t);
+    },
+    setLocked: setLocked,
     /* the walkthrough, driven from outside too (auto-advance on the doll) */
     layerOf(keyK) { return keyK.split(':')[0]; },
     stepKey: key,

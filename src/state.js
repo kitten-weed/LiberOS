@@ -167,6 +167,89 @@
     emit('change', state);
   }
 
+  function trySet(patch) {
+    if (!patch || typeof patch !== 'object' || Array.isArray(patch)) {
+      diag('save-fail', { op: 'trySet', err: 'invalid patch' });
+      return false;
+    }
+    const next = Object.assign({}, state, patch);
+    try {
+      localStorage.setItem(KEY, JSON.stringify(next));
+    } catch (error) {
+      diag('save-fail', { err: String(error).slice(0, 120), op: 'trySet' });
+      return false;
+    }
+    state = next;
+    diag('save', { ok: 1, op: 'trySet' });
+    emit('change', state);
+    return true;
+  }
+
+  function stableJson(value) {
+    if (Array.isArray(value)) return '[' + value.map(stableJson).join(',') + ']';
+    if (value && typeof value === 'object') {
+      return '{' + Object.keys(value).sort().map(function (key) {
+        return JSON.stringify(key) + ':' + stableJson(value[key]);
+      }).join(',') + '}';
+    }
+    return JSON.stringify(value);
+  }
+
+  function tryAddArtifact(kind, entry, extraPatch) {
+    const collections = [
+      'buddy', 'divination', 'games', 'learn', 'abstract', 'sea',
+      'graveyard', 'crossing', 'journal', 'methodology', 'council',
+      'garden', 'dreams'
+    ];
+    if (collections.indexOf(kind) < 0 || !Array.isArray(state[kind]) ||
+        !entry || typeof entry !== 'object' || Array.isArray(entry) ||
+        typeof entry.id !== 'string' || !entry.id.trim() ||
+        !Number.isFinite(entry.ts)) {
+      diag('artifact-fail', { op: 'tryAddArtifact', kind: String(kind).slice(0, 40), err: 'invalid target or identity' });
+      return null;
+    }
+    if (extraPatch !== undefined &&
+        (!extraPatch || typeof extraPatch !== 'object' || Array.isArray(extraPatch))) {
+      diag('artifact-fail', { op: 'tryAddArtifact', kind: kind, err: 'invalid patch' });
+      return null;
+    }
+
+    let prepared;
+    try {
+      const encoded = JSON.stringify(entry);
+      if (typeof encoded !== 'string') throw new Error('entry is not serializable');
+      prepared = JSON.parse(encoded);
+    } catch (error) {
+      diag('artifact-fail', { op: 'tryAddArtifact', kind: kind, err: String(error).slice(0, 120) });
+      return null;
+    }
+
+    const current = state[kind];
+    const existing = current.find(function (item) {
+      return item && item.id === prepared.id;
+    });
+    if (existing) {
+      let identical = false;
+      try { identical = stableJson(existing) === stableJson(prepared); } catch (error) { identical = false; }
+      if (!identical) {
+        diag('artifact-fail', { op: 'tryAddArtifact', kind: kind, err: 'conflicting identity' });
+        return null;
+      }
+      if (extraPatch === undefined || Object.keys(extraPatch).length === 0) return existing;
+      const repeatPatch = Object.assign({}, extraPatch);
+      repeatPatch[kind] = current.slice();
+      return trySet(repeatPatch) ? existing : null;
+    }
+
+    const artifacts = current.slice();
+    artifacts.push(prepared);
+    const patch = Object.assign({}, extraPatch || {});
+    patch[kind] = artifacts;
+    if (!trySet(patch)) return null;
+    emit('artifact', { kind: kind, entry: prepared });
+    return prepared;
+  }
+
   function on(event, fn) {
     if (!subscribers[event]) subscribers[event] = [];
     subscribers[event].push(fn);
@@ -227,14 +310,12 @@
 
   function bindRelation(fromId, verb, toId) {
     var to = toId || 'buddy';
+    var relationVerb = verb || 'relates to';
     var relations = (state.relations || []).slice();
-    if (relations.some(function (r) { return r.from === fromId && r.verb === verb && ((r.to || 'buddy') === to); })) return null;
-    var rel = { from: fromId, to: to, verb: verb || 'relates to', ts: Date.now() };
+    if (relations.some(function (r) { return r.from === fromId && (r.verb || 'relates to') === relationVerb && ((r.to || 'buddy') === to); })) return null;
+    var rel = { from: fromId, to: to, verb: relationVerb, ts: Date.now() };
     relations.push(rel);
-    state = Object.assign({}, state, { relations: relations });
-    save(state);
-    emit('change', state);
-    return rel;
+    return trySet({ relations: relations }) ? rel : null;
   }
 
   function unbindRelation(fromId, toId) {
@@ -380,5 +461,5 @@
     window.location.reload();
   }
 
-  global.Liber.state = { get, set, on, reset, addArtifact, updateArtifact, bindRelation, unbindRelation, releaseArtifact, replaceSigil, getSlot, setSlot, setRelationNote, childrenOf, sanitizeBuddyCore, displayBuddyName, getBuddyTags, setBuddyTags, BUDDY_TAGS };
+  global.Liber.state = { get, set, trySet, tryAddArtifact, diagnose: diag, on, reset, addArtifact, updateArtifact, bindRelation, unbindRelation, releaseArtifact, replaceSigil, getSlot, setSlot, setRelationNote, childrenOf, sanitizeBuddyCore, displayBuddyName, getBuddyTags, setBuddyTags, BUDDY_TAGS };
 })(window);

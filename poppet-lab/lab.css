@@ -60,20 +60,20 @@ body {
 }
 .ledger {
   position: absolute;
-  top: 16px;
-  left: 20px;
-  width: 344px;
+  top: 64px;
+  right: 20px;
+  width: min(300px, calc(100% - 40px));
   background: linear-gradient(180deg, #efe6cd 0%, #e2d5b4 100%);
-  border: 2px solid #6a5218;
+  border: 1px solid rgba(106, 82, 24, 0.75);
   border-radius: 3px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(212, 175, 55, 0.28);
   padding: 7px 10px 8px;
   pointer-events: none;
   color: #241708;
 }
 .ledger h3 {
   margin: 0 0 4px;
-  font-size: 0.6rem;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.2em;
   color: #6a4a1a;
@@ -86,7 +86,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 1.5px 0;
-  font-size: 0.64rem;
+  font-size: 14px;
 }
 .ledger .row b {
   font-weight: 400;
@@ -107,7 +107,7 @@ body {
 }
 .ledger .sect {
   margin: 6px 0 4px;
-  font-size: 0.56rem;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.18em;
   color: #6a4a1a;
@@ -129,12 +129,12 @@ body {
 .lesson-card {
   position: absolute;
   left: 12px;
-  bottom: 12px;
+  bottom: 16px;
   transform: none;
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 300px;
+  max-width: min(520px, calc(100% - 24px));
   background: linear-gradient(180deg, #efe6cd 0%, #e2d5b4 100%);
   border: 2px solid #6a5218;
   border-radius: 5px;
@@ -146,8 +146,10 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   line-height: 1;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid #6a5218;
   border-radius: 4px;
   background: transparent;
@@ -159,14 +161,14 @@ body {
 .lesson-card .lc-nav:disabled { opacity: 0.3; cursor: default; }
 .lesson-card .lc-main { flex: 1; text-align: center; }
 .lesson-card .lc-prog {
-  font-size: 0.56rem;
-  letter-spacing: 0.22em;
+  font-size: 14px;
+  letter-spacing: 0.04em;
   color: #6a4a1a;
   margin-bottom: 2px;
 }
 .lesson-card .lc-prompt {
-  font-size: 0.95rem;
-  line-height: 1.25;
+  font-size: 16px;
+  line-height: 1.4;
   color: #241708;
 }
 .hint {
@@ -275,13 +277,14 @@ body {
   padding: 10px 14px;
   border-bottom: 2px solid rgba(106, 82, 24, 0.45);
 }
-.poppet-head b { font-size: 0.8rem; letter-spacing: 0.18em; color: #6a4a1a; }
-.poppet-head span { flex: 1; font-size: 0.62rem; color: rgba(36, 23, 8, 0.55); letter-spacing: 0.1em; }
+.poppet-head b { font-size: 14px; letter-spacing: 0.08em; color: #6a4a1a; }
+.poppet-head span { flex: 1; font-size: 14px; color: rgba(36, 23, 8, 0.68); letter-spacing: 0.04em; }
 .poppet-x {
   border: 1px solid #6a5218;
   background: transparent;
   color: #241708;
-  width: 26px; height: 26px;
+  width: 44px; height: 44px;
+  min-height: 44px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -296,7 +299,7 @@ body {
   overflow-y: auto;
 }
 .poppet-sec {
-  font-size: 0.56rem;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.16em;
   color: #6a4a1a;
@@ -305,8 +308,8 @@ body {
 .poppet-inks { display: flex; gap: 7px; flex-wrap: wrap; min-height: 24px; }
 /* ink dots read as ink: round wells, no native button chrome */
 .poppet-inks .ink-dot {
-  width: 26px;
-  height: 26px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid transparent;
   padding: 0;
@@ -329,9 +332,11 @@ body.sheet-open .ctv-body.pv-box {
 .poppet-tools button {
   flex: 1;
   font-family: inherit;
-  font-size: 0.56rem;
-  letter-spacing: 0.06em;
-  padding: 6px 2px;
+  font-size: 14px;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  padding: 6px 1px;
+  min-height: 44px;
   border: 1px solid #6a5218;
   background: transparent;
   color: #241708;
@@ -340,13 +345,15 @@ body.sheet-open .ctv-body.pv-box {
 }
 .poppet-tools button.on { background: #a8862e; font-weight: 600; }
 .poppet-side input[type=range] { width: 100%; accent-color: #a8862e; }
+.poppet-side input[type=range] { height: 44px; }
 .poppet-actions { display: flex; gap: 6px; margin-top: 10px; }
 .poppet-actions button {
-  flex: 1;
+  flex: 1 1 100%;
   font-family: inherit;
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
+  font-size: 14px;
+  letter-spacing: 0.04em;
   padding: 7px 0;
+  min-height: 44px;
   border: 1px solid #6a5218;
   background: transparent;
   color: #241708;
@@ -371,15 +378,17 @@ body.sheet-open .ctv-body.pv-box {
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
-  font-size: 0.72rem;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.08em;
   color: #f4ecd8;
   background: rgba(36, 23, 8, 0.82);
   border: 1px solid #a8862e;
   border-radius: 4px;
   padding: 7px 16px 7px 19px;
-  white-space: nowrap;
+  max-width: calc(100% - 20px);
+  white-space: normal;
+  text-align: center;
   pointer-events: none;
 }
 .poppet-cv {
@@ -397,8 +406,11 @@ body.sheet-open .ctv-body.pv-box {
   bottom: 22px;
   background: #a8862e;
   color: #241708;
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  min-width: 44px;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
   padding: 8px 14px;
   border: 2px solid #6a5218;
   border-radius: 5px;
@@ -419,7 +431,9 @@ body.sheet-open .ctv-body.pv-box {
   font-family: inherit;
   font-size: 1rem;
   line-height: 1;
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid #6a5218;
   border-radius: 4px;
   background: transparent;
@@ -430,8 +444,25 @@ body.sheet-open .ctv-body.pv-box {
 .poppet-nav:hover:not(:disabled) { background: rgba(106, 82, 24, 0.18); }
 .poppet-nav:disabled { opacity: 0.3; cursor: default; }
 .poppet-lmain { flex: 1; text-align: center; }
-.poppet-prog { font-size: 0.56rem; letter-spacing: 0.2em; color: #6a4a1a; margin-bottom: 3px; }
-.poppet-prompt { font-size: 0.95rem; line-height: 1.25; color: #241708; }
+.poppet-prog { font-size: 14px; letter-spacing: 0.04em; color: #6a4a1a; margin-bottom: 3px; }
+.poppet-prompt { font-size: 16px; line-height: 1.4; color: #241708; }
+body.sheet-open .lesson-card,
+body.sheet-open .hint { display: none; }
+body.sheet-open .ledger { visibility: hidden; }
+.poppet-tools button:disabled,
+.poppet-actions button:disabled,
+.poppet-nav:disabled,
+.poppet-x:disabled,
+.poppet-doll-btn:disabled,
+.poppet-inks .ink-dot:disabled { opacity: 0.48; cursor: not-allowed; }
+.poppet-root.edits-locked .poppet-cv { cursor: not-allowed; }
+.poppet-tools button:focus-visible,
+.poppet-actions button:focus-visible,
+.poppet-nav:focus-visible,
+.poppet-x:focus-visible,
+.poppet-doll-btn:focus-visible,
+.poppet-inks .ink-dot:focus-visible,
+.lesson-card .lc-nav:focus-visible { outline: 3px solid #3a66c8; outline-offset: 2px; }
 
 /* ── machine framing (2026-10-01): this page is a room like any other.
    Framed (default): the tube fills the screen box; the brass drops away
@@ -473,6 +504,11 @@ html.bare-frame .lab-leave { display: none !important; }
 /* the dissolved wrappers must not leak furniture: carvings, plate, led and
    scars lose their containing block under display:contents, so hide them. */
 html.bare-frame .bezel > :not(.screen) { display: none !important; }
+html.bare-frame .bezel::before,
+html.bare-frame .bezel::after {
+  content: none;
+  display: none;
+}
 html.bare-frame body.in-machine .tube {
   position: fixed;
   inset: 14px;

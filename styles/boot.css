@@ -210,26 +210,37 @@
 }
 
 .boot-warning .boot-letter {
-  max-height: 50vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   text-align: left;
-  font-size: clamp(1rem, 1.5vw, 1.05rem);
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
   color: #e8b8b8;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid #5a0000;
   padding: 1em 1.2em;
   margin-bottom: 1em;
 }
+.boot-warning .boot-letter-group + .boot-letter-group {
+  border-top: 1px solid rgba(240, 192, 192, 0.45);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.boot-warning .boot-letter-safety {
+  border-left: 3px solid #ff8080;
+  padding-left: 14px;
+}
 .boot-warning .boot-letter p { margin: 0 0 0.8em; }
 .boot-warning .boot-letter p:last-child { margin-bottom: 0; }
-.boot-warning .boot-letter a { color: #ff8080; }
+.boot-warning .boot-letter a { color: #ffe4c2; text-decoration: underline; text-underline-offset: 3px; }
 
 .boot-warning .boot-consent {
   display: flex;
   align-items: flex-start;
   gap: 0.6em;
-  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  min-height: 44px;
+  font-size: 16px;
+  line-height: 1.4;
   color: #f0c0c0;
   cursor: pointer;
   user-select: none;

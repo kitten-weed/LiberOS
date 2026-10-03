@@ -49,7 +49,8 @@
                 <button class="poppet-titlebar-leave" type="button" id="sigil-back" aria-label="leave">leave</button>
               </header>
               <div class="lab-frame-wrap" id="lab-frame-wrap">
-                <iframe id="lab-frame" class="lab-frame" src="poppet-lab.html?embed=frame&v=lab53" title="the poppet workshop"></iframe>
+                <div class="lab-frame-error" id="lab-restore-error" role="alert" hidden></div>
+                <iframe id="lab-frame" class="lab-frame" title="the poppet workshop"></iframe>
               </div>
             </div>
           </div>
@@ -75,6 +76,28 @@
     (function () {
       // leave → the desktop, where the home room now lives
       var backBtn = document.getElementById('sigil-back');
+      var frame = document.getElementById('lab-frame');
+      var restoreError = document.getElementById('lab-restore-error');
+      function showRestoreError(error) {
+        console.error('poppet keepsake entry failed', String(error).slice(0, 160));
+        restoreError.hidden = false;
+        restoreError.textContent = 'KEEP RESTORE FAILED — THE SAVED WORK WAS LEFT UNCHANGED';
+      }
+      if (frame) frame.addEventListener('load', function () {
+        try {
+          frame.contentWindow.dispatchEvent(new frame.contentWindow.Event('resize'));
+        } catch (error) {
+          showRestoreError(error);
+        }
+      });
+      import('./poppet-lab/keepsake.js?v=lab55').then(function (keepsake) {
+        var shelf = keepsake.readKeepsakes();
+        if (!shelf.length) {
+          location.replace('desktop.html?first-making=1');
+          return;
+        }
+        frame.src = 'poppet-lab.html?embed=frame&v=lab57';
+      }).catch(showRestoreError);
       // the lab is same-origin, so its unsaved-work flag is readable directly:
       // a doll with ink on it and no keepsake yet is half-made
       function labHalfMade() {
@@ -91,12 +114,13 @@
       // a kept poppet flies home: the desktop hosts the home room and its rug
       // catches the drop, so the keeping hands off through the parent frame.
       window.addEventListener('message', function (ev) {
+        if (ev.origin !== location.origin || ev.source !== frame.contentWindow) return;
         if (ev.data && ev.data.type === 'poppet-kept') location.href = 'desktop.html';
       });
     })();
   </script>
   <script src="src/cartridge-transit.js?v=off2"></script>
-  <script src="src/crt-bay.js?v=mem8"></script>
+  <script src="src/crt-bay.js?v=mem9"></script>
   <script src="vendor/pixi.min.js"></script>
   <script src="src/pixi-runtime.js"></script>
   <script src="src/pixi-palette.js?v=cleanup-20260922"></script>

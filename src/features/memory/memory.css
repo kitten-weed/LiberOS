@@ -200,7 +200,7 @@
   display: flex;
   gap: 6px;
   padding: 6px;
-  background: var(--panel);
+  background: #21150f;
   border: 1px solid rgba(216, 184, 119, 0.28);
   border-radius: 8px;
 }
@@ -298,20 +298,24 @@
 .mem-photo[hidden] { display: none; }
 .mem-photo-card {
   width: min(480px, 92%);
-  max-height: 92%;
+  max-height: calc(100% - 24px);
   overflow-y: auto;
   background: var(--panel);
   border: 1px solid rgba(216, 184, 119, 0.4);
   border-radius: 6px;
-  padding: 14px 16px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
 }
-.mem-photo-head { color: var(--amber); letter-spacing: 0.14em; font-size: 1.05rem; text-align: center; }
+.mem-photo-head { display: flex; align-items: center; gap: 12px; color: var(--amber); letter-spacing: 0.14em; font-size: 16px; }
+.mem-photo-head #mem-photo-title { flex: 1; min-width: 0; text-align: center; overflow-wrap: anywhere; }
+.mem-photo-head .mem-x { flex: 0 0 44px; }
 .mem-photo-img {
   width: 100%;
+  max-height: 220px;
+  object-fit: contain;
   border: 6px solid var(--photo);
   border-bottom-width: 24px;
   border-radius: 2px;
@@ -321,10 +325,11 @@
 }
 .mem-photo-img[hidden] { display: none; }
 .mem-photo-label-row { display: flex; flex-direction: column; gap: 4px; }
-.mem-photo-label-text { color: var(--dim); font-size: 0.95rem; }
+.mem-photo-label-text { color: var(--dim); font-size: 16px; line-height: 1.4; }
 .mem-photo-label {
   font-family: inherit;
-  font-size: 1.05rem;
+  font-size: 16px;
+  line-height: 1.4;
   color: var(--fg);
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--dimmer);
@@ -333,7 +338,7 @@
 }
 .mem-photo-label:focus { border-color: var(--line); outline: none; }
 .mem-photo-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.mem-photo-actions .mem-x { margin-left: auto; }
+.mem-photo-card .mem-btn { min-width: 44px; min-height: 44px; font-size: 16px; }
 .mem-photo-story { text-align: center; color: var(--fg); font-size: 1rem; line-height: 1.6; }
 .mem-photo-story .frame {
   display: block;
@@ -383,4 +388,3 @@
 @media (max-width: 700px) {
   .mem-shutter i, .mem-btn, .mem-tool { transition: none; }
 }
-

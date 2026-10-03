@@ -25,6 +25,15 @@
   // detached-but-cached wrapper for resume; null until the Physius mount.
   var poppetApi = null;
   var poppetBenchWrap = null;
+  var primaryKeepReader = null;
+  var primaryKeepReadPromise = null;
+  var keepCommitFactory = null;
+  var keepCommitFactoryPromise = null;
+  var riteControlState = null;
+  var riteCutsceneState = null;
+  var tutorialStartToken = 0;
+  var spellRoot = null;
+  var spellBodyInertStates = [];
 
   function st() {
     return (window.Liber && window.Liber.state) || null;
@@ -66,9 +75,40 @@
       .split('<you>').join(aliasOf());
   }
 
+  function rememberSpellBody(body) {
+    if (!spellRoot || !body) return;
+    for (var i = 0; i < spellBodyInertStates.length; i++) {
+      if (spellBodyInertStates[i].body === body) return;
+    }
+    spellBodyInertStates.push({ body: body, inert: !!body.inert });
+    body.inert = true;
+  }
+
+  function beginSpellPresentation(root) {
+    restoreSpellPresentation();
+    spellRoot = root;
+    root.classList.add('is-spell');
+    var bodies = root.querySelectorAll('.ctv-body');
+    for (var i = 0; i < bodies.length; i++) rememberSpellBody(bodies[i]);
+  }
+
+  function restoreSpellPresentation() {
+    if (!spellRoot) return;
+    spellRoot.classList.remove('is-spell');
+    for (var i = 0; i < spellBodyInertStates.length; i++) {
+      var saved = spellBodyInertStates[i];
+      saved.body.inert = saved.inert;
+    }
+    spellBodyInertStates = [];
+    spellRoot = null;
+  }
+
   function clearBox() {
     var old = el('cutscene');
-    if (old) old.remove();
+    if (old) {
+      restoreSpellPresentation();
+      old.remove();
+    }
   }
 
   function clearTransientTutorialNodes() {
@@ -122,7 +162,184 @@
   }
 
   function cursor(idx) {
-    if (st()) st().set({ tutorialBeat: idx });
+    var flow = window.LiberTutorialFlow;
+    if (!flow) {
+      reportTutorialFailure('tutorial-cursor-helper-missing', new Error('tutorial flow helper is unavailable'));
+      return;
+    }
+    if (st()) st().set(flow.patchAt(idx));
+  }
+
+  function reportTutorialFailure(event, error) {
+    var detail = { message: error && error.message ? String(error.message) : String(error || '') };
+    if (st() && st().diagnose) st().diagnose(event, detail);
+    else if (window.console && window.console.error) window.console.error(event, error);
+  }
+
+  function loadPrimaryKeepReader() {
+    if (primaryKeepReader) return Promise.resolve(primaryKeepReader);
+    if (!primaryKeepReadPromise) {
+      primaryKeepReadPromise = import('../poppet-lab/keepsake.js?v=lab55').then(function (module) {
+        if (!module || typeof module.readKeepsakes !== 'function') {
+          throw new Error('strict keepsake reader is unavailable');
+        }
+        primaryKeepReader = module.readKeepsakes;
+        return primaryKeepReader;
+      }).catch(function (error) {
+        primaryKeepReadPromise = null;
+        throw error;
+      });
+    }
+    return primaryKeepReadPromise;
+  }
+
+  function loadKeepCommitFactory() {
+    if (keepCommitFactory) return Promise.resolve(keepCommitFactory);
+    if (!keepCommitFactoryPromise) {
+      keepCommitFactoryPromise = import('../poppet-lab/keep-commit.js?v=commit1').then(function (module) {
+        if (!module || typeof module.createKeepCommit !== 'function') {
+          throw new Error('keepsake commit controller is unavailable');
+        }
+        keepCommitFactory = module.createKeepCommit;
+        return keepCommitFactory;
+      }).catch(function (error) {
+        keepCommitFactoryPromise = null;
+        throw error;
+      });
+    }
+    return keepCommitFactoryPromise;
+  }
+
+  function setRiteControlOwnership(owned) {
+    if (owned) {
+      if (riteControlState) return;
+      try {
+        if (window.LiberTraveROM && typeof window.LiberTraveROM.close === 'function') {
+          window.LiberTraveROM.close();
+        }
+      } catch (error) { reportTutorialFailure('rite-console-close-failed', error); }
+      try {
+        if (window.Liber && window.Liber.crtBay && typeof window.Liber.crtBay.closeTray === 'function') {
+          window.Liber.crtBay.closeTray();
+        }
+      } catch (error) { reportTutorialFailure('rite-cartridge-close-failed', error); }
+      riteControlState = [];
+      [
+        document.getElementById('desktop'),
+        document.querySelector('.crt-bay'),
+        document.getElementById('crt-bay-tray'),
+        document.querySelector('.traverom-stage')
+      ].forEach(function (node) {
+        if (!node || riteControlState.some(function (entry) { return entry.node === node; })) return;
+        riteControlState.push({ node: node, inert: !!node.inert });
+        node.inert = true;
+      });
+      return;
+    }
+    if (!riteControlState) return;
+    riteControlState.forEach(function (entry) {
+      if (entry.node) entry.node.inert = entry.inert;
+    });
+    riteControlState = null;
+  }
+
+  function yieldCutsceneToRite() {
+    var root = el('cutscene');
+    if (root && !riteCutsceneState) {
+      riteCutsceneState = { node: root, inert: !!root.inert };
+      root.classList.add('is-yielded');
+      root.inert = true;
+    }
+    setRiteControlOwnership(true);
+  }
+
+  function restoreCutsceneFromRite() {
+    if (riteCutsceneState) {
+      var state = riteCutsceneState;
+      if (state.node) {
+        state.node.classList.remove('is-yielded');
+        state.node.inert = state.inert;
+      }
+      riteCutsceneState = null;
+    }
+    setRiteControlOwnership(false);
+  }
+
+  function firstMakingRequested() {
+    return /(?:^|[?&])first-making=1(?:&|$)/.test(String(window.location.search || '').replace(/^\?/, ''));
+  }
+
+  function clearFirstMakingRequest() {
+    if (!firstMakingRequested() || !window.history || !window.history.replaceState) return;
+    var params = String(window.location.search || '').replace(/^\?/, '').split('&').filter(function (part) {
+      return part && !/^first-making=1$/.test(part);
+    });
+    window.history.replaceState(null, '', window.location.pathname
+      + (params.length ? '?' + params.join('&') : '')
+      + (window.location.hash || ''));
+  }
+
+  function openCompletedFirstMaking() {
+    if (!window.LiberPoppetRite) {
+      reportTutorialFailure('first-making-rite-unavailable', new Error('first-making rite is unavailable'));
+      return;
+    }
+    document.body.classList.add('ctv-poppet-glow');
+    setRiteControlOwnership(true);
+    var active = window.LiberPoppetRite.open({
+      onKeep: function (result, destination) {
+        void result;
+        document.body.classList.remove('ctv-poppet-glow');
+        clearFirstMakingRequest();
+        setRiteControlOwnership(false);
+        if (destination === 'workshop') {
+          window.location.href = 'sigil.html';
+          return;
+        }
+        renderDesktopResidue();
+      },
+      onDismiss: function () {
+        document.body.classList.remove('ctv-poppet-glow');
+        clearFirstMakingRequest();
+        setRiteControlOwnership(false);
+      },
+      onError: function (error) {
+        reportTutorialFailure('first-making-setup-failed', error);
+      }
+    });
+    if (!active) {
+      document.body.classList.remove('ctv-poppet-glow');
+      setRiteControlOwnership(false);
+    }
+  }
+
+  function resolveAndPlay(clearPause) {
+    var token = ++tutorialStartToken;
+    return loadPrimaryKeepReader().then(function (readKeepsakes) {
+      if (token !== tutorialStartToken) return;
+      var flow = window.LiberTutorialFlow;
+      if (!flow) throw new Error('tutorial flow helper is unavailable');
+      var shelf = readKeepsakes();
+      var resolved = flow.resolveCursor(store(), shelf.length > 0);
+      if (resolved.blocked) {
+        reportTutorialFailure('tutorial-cursor-blocked', new Error(resolved.reason + ': ' + String(resolved.id || '')));
+        liftVeil();
+        return;
+      }
+      if (st()) {
+        st().set(resolved.patch);
+        if (clearPause) st().set({ tutorialPaused: false });
+      }
+      if (resolved.index >= beats().length) {
+        endClean(true);
+        return;
+      }
+      playFrom(resolved.index);
+    }).catch(function (error) {
+      if (token !== tutorialStartToken) return;
+      reportTutorialFailure('tutorial-cursor-resolution-failed', error);
+      liftVeil();
+    });
   }
 
   // ── cast: speaker bodies ──────────────────────────────────────────────
@@ -172,6 +389,7 @@
     if (!c) return null;
     var b = bodyOf(speaker);
     if (b) {
+      rememberSpellBody(b);
       b.classList.remove('is-dim');
       placePoppetSidecar(b, speaker);
       return b;
@@ -187,6 +405,7 @@
       + '<div class="ctv-line" aria-live="polite"></div>'
       + '<div class="ctv-ink-trail" aria-hidden="true"></div>';
     c.appendChild(b);
+    rememberSpellBody(b);
     void b.offsetWidth;
     b.classList.add('is-live');
     placePoppetSidecar(b, speaker);
@@ -629,10 +848,8 @@
     materialOverlay(root, 'ctv-wander-weather', '<i></i><i></i><i></i>');
   }
 
-  // A plate that is taller than the stage is fitted, not cropped. The authored
-  // type is the design, so it is only stepped down when the line genuinely
-  // cannot sit in the room — and the body is told, so the narrower leading is
-  // authored in CSS rather than inline.
+  // A plate that is taller than the stage is fitted, not cropped; instruction
+  // text never drops below the readable 16px floor.
   function fitBody(body) {
     var root = el('cutscene');
     var line = body && body.querySelector('.ctv-line');
@@ -648,8 +865,8 @@
       var pastTop = body.offsetTop < 4;
       if (!tooTall && !pastTop) break;
       var current = parseFloat(window.getComputedStyle(line).fontSize) || 16;
-      if (current <= 11) break;
-      line.style.fontSize = Math.max(11, current * 0.9) + 'px';
+      if (current <= 16) break;
+      line.style.fontSize = Math.max(16, current * 0.9) + 'px';
       guard += 1;
     }
     if (line.style.fontSize) body.classList.add('is-fitted');
@@ -1101,16 +1318,8 @@
   function playRitual(next) {
     var root = el('cutscene');
     if (!root) { next(); return; }
-    // Y remains as the small muffled witness at the far edge while the
-    // inscription takes the stage. The ritual owns the hands, not the
-    // traveller's presence; removing Y here contradicts the V3 beat.
-    var witness = ensureBody('liber-vacui', null);
-    if (witness) {
-      witness.classList.add('is-ritual-witness');
-      witness.classList.remove('is-dim');
-      dimOthers('liber-vacui');
-    }
     closeGate('action-lock');
+    beginSpellPresentation(root);
     root.classList.add('ritual-active');
     var lines = data().RITUAL || [];
     var wrap = document.createElement('div');
@@ -1146,6 +1355,7 @@
     function armLine() {
       if (li >= lines.length) {
         if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+        restoreSpellPresentation();
         root.classList.remove('ritual-active');
         if (st()) st().set({ tutorialRitualLine: 0 });
         weather('warm', 0.35);
@@ -2058,24 +2268,67 @@
      own texture canvases with a live buddy beside them. Keeping lifts the
      park; walking away falls back to the tray seat (full lab). The beat
      parks here either way: the finale waits until a poppet is kept. */
-  function keptCount() {
-    // The same store poppet-lab's keepsakeCount() reads, plus the state mirror
-    // the lab writes when a poppet is seated, so the park lifts whichever way
-    // the keep landed.
-    try {
-      var kept = JSON.parse(localStorage.getItem('poppet.keepsakes.v1') || '[]');
-      if (Array.isArray(kept) && kept.length) return kept.length;
-    } catch (e) {}
-    try {
-      var g = st();
-      var buddies = g && g.buddy;
-      if (Array.isArray(buddies)) {
-        for (var i = 0; i < buddies.length; i++) {
-          if (buddies[i] && buddies[i].kind === 'poppet') return buddies.length;
-        }
-      }
-    } catch (e) {}
-    return 0;
+  function keptRecords() {
+    if (!primaryKeepReader) throw new Error('strict keepsake reader has not loaded');
+    return primaryKeepReader();
+  }
+
+  function recoverPrimaryMirror(record, next) {
+    var root = el('cutscene');
+    var rail = root && root.querySelector('.ctv-response-rail');
+    if (!root || !rail) {
+      reportTutorialFailure('tutorial-primary-mirror-surface-missing', new Error('tutorial response surface is unavailable'));
+      if (st()) st().set({ tutorialPaused: true });
+      return;
+    }
+    closeGate('advance');
+    rail.innerHTML = '';
+    var status = document.createElement('p');
+    status.className = 'ctv-rite-status';
+    status.setAttribute('role', 'status');
+    status.textContent = 'the poppet is kept, but its book mark failed. try again.';
+    var retry = document.createElement('button');
+    retry.className = 'ctv-response cutscene-option';
+    retry.type = 'button';
+    retry.textContent = 'try again';
+    rail.appendChild(status);
+    rail.appendChild(retry);
+    if (typeof retry.focus === 'function') retry.focus({preventScroll: true});
+    if (st()) st().set({ tutorialPaused: true });
+    var busy = false;
+    retry.addEventListener('click', function () {
+      if (busy) return;
+      busy = true;
+      retry.disabled = true;
+      Promise.all([loadKeepCommitFactory(), loadPrimaryKeepReader()]).then(function (modules) {
+        var createKeepCommit = modules[0];
+        var readKeepsakes = modules[1];
+        var flow = window.LiberTutorialFlow;
+        if (!flow || !Array.isArray(flow.ORDER)) throw new Error('tutorial cursor helper is unavailable');
+        var cursorIndex = flow.ORDER.indexOf('beat-017');
+        if (cursorIndex < 0) throw new Error('first-making return cursor is unavailable');
+        var latestShelf = readKeepsakes();
+        var pending = latestShelf.find(function (item) { return item.n === record.n; });
+        if (!pending) throw new Error('the saved poppet is no longer on the shelf');
+        var controller = createKeepCommit({
+          idPrefix: 'poppet-rite',
+          pending: { record: pending, count: latestShelf.length },
+          capture: function () { throw new Error('recovery cannot create a new poppet'); }
+        });
+        var result = controller.commit(Object.assign({}, flow.patchAt(cursorIndex), {
+          tutorialPaused: false
+        }));
+        if (!result.ok) throw result.error || new Error('the saved poppet could not be marked');
+        rail.innerHTML = '';
+        if (st()) st().set({ tutorialPaused: false });
+        next();
+      }).catch(function (error) {
+        reportTutorialFailure('tutorial-primary-mirror-retry-failed', error);
+        status.textContent = 'the poppet is kept, but its book mark failed. try again.';
+        retry.disabled = false;
+        busy = false;
+      });
+    });
   }
 
   function playHandoff(next) {
@@ -2083,31 +2336,30 @@
     // resuming from the parked cursor must walk straight into the finale,
     // never replay the tray seat (that replay is what made the returned
     // desktop feel dead: pause, tray, pause).
-    if (keptCount()) {
+    var shelf;
+    try {
+      shelf = keptRecords();
+    } catch (error) {
+      reportTutorialFailure('tutorial-primary-keep-read-failed', error);
+      if (st()) st().set({ tutorialPaused: true });
+      closeGate('action-lock');
+      return;
+    }
+    if (shelf.length) {
+      var latest = shelf[shelf.length - 1];
+      var buddy = store().buddy;
+      var hasMirror = Array.isArray(buddy) && buddy.some(function (entry) {
+        return entry && entry.kind === 'poppet' && entry.keepsakeN === latest.n;
+      });
+      if (!hasMirror) {
+        recoverPrimaryMirror(latest, next);
+        return;
+      }
       try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
       next();
       return;
     }
-    var dock = (window.Liber && window.Liber.crtBay) || null;
-    if (!dock || !dock.openTray) { setTimeout(function () { location.href = 'sigil.html'; }, 600); next(); return; }
     document.body.classList.add('ctv-poppet-glow');
-    // The first making happens HERE, on the desktop: the paint rite pulls up
-    // the doll's own texture canvases with a live buddy beside them, so the
-    // first passthrough never navigates the lab. Keeping lifts the park
-    // (keptCount sees the keepsake); walking away falls back to the tray,
-    // whose glowing cart still seats the full lab.
-    var seatedLab = function () {
-      setTimeout(function () {
-        try { dock.openTray(); } catch (e) {}
-        setTimeout(function () {
-          try {
-            if (window.LiberTraveROM && window.LiberTraveROM.soloPoppet) window.LiberTraveROM.soloPoppet();
-          } catch (e) {}
-          closeGate('action-lock');
-          try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
-        }, 700);
-      }, 500);
-    };
     if (window.LiberPoppetRite) {
       try {
         // Wanderlust does it herself: the machine shakes, the TraveROM
@@ -2119,21 +2371,53 @@
         } catch (e) {}
         shakeMachine(1200);
         setTimeout(function () {
-          window.LiberPoppetRite.open({
-            onKeep: function () {
+          closeGate('action-lock');
+          try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
+          yieldCutsceneToRite();
+          var active = window.LiberPoppetRite.open({
+            onKeep: function (result, destination) {
+              void result;
               document.body.classList.remove('ctv-poppet-glow');
-              try { if (st()) st().set({ tutorialPaused: false }); } catch (e) {}
+              clearFirstMakingRequest();
+              restoreCutsceneFromRite();
+              if (destination === 'workshop') {
+                window.location.href = 'sigil.html';
+                return;
+              }
               next();
             },
-            onDismiss: function () { seatedLab(); }
+            onDismiss: function () {
+              document.body.classList.remove('ctv-poppet-glow');
+              clearFirstMakingRequest();
+              restoreCutsceneFromRite();
+              endClean(false);
+            },
+            onError: function (error) {
+              reportTutorialFailure('first-making-setup-failed', error);
+            }
           });
+          if (!active) {
+            document.body.classList.remove('ctv-poppet-glow');
+            restoreCutsceneFromRite();
+            reportTutorialFailure('first-making-open-failed', new Error('first-making rite could not be mounted'));
+            if (st()) st().set({ tutorialPaused: true });
+          }
         }, 900);
         closeGate('action-lock');
         try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
         return;
-      } catch (e) { /* fall through to the lab seat */ }
+      } catch (error) {
+        document.body.classList.remove('ctv-poppet-glow');
+        restoreCutsceneFromRite();
+        reportTutorialFailure('first-making-open-failed', error);
+        if (st()) st().set({ tutorialPaused: true });
+        closeGate('action-lock');
+        return;
+      }
     }
-    seatedLab();
+    reportTutorialFailure('first-making-rite-unavailable', new Error('first-making rite is unavailable'));
+    if (st()) st().set({ tutorialPaused: true });
+    closeGate('action-lock');
   }
 
   /* summon: Wanderlust's four-line rhyming call, staged like the opening */
@@ -2201,6 +2485,7 @@
     // Escape is a safe cancellation, not a completed lesson: preserve the
     // saved cursor and let the user reopen the same beat.
     var canceled = forceComplete !== true;
+    restoreSpellPresentation();
     clearTransientTutorialNodes();
     clearBox();
     poppetBenchWrap = null;
@@ -2244,9 +2529,7 @@
   function resumeTutorial() {
     var g = store();
     if (g.tutorialDone) return;
-    var at = typeof g.tutorialBeat === 'number' && g.tutorialBeat >= 0 ? g.tutorialBeat : 0;
-    if (st()) st().set({ tutorialPaused: false });
-    playFrom(at);
+    resolveAndPlay(true);
   }
 
   window.Cutscene = window.Cutscene || {};
@@ -2278,12 +2561,15 @@
       });
     }
     var g = store();
+    if (firstMakingRequested() && !g.enterRiteDone) {
+      liftVeil();
+      return;
+    }
     // Returning from the workshop (or any app) while the tutorial is paused:
     // resume the cursor directly. Without this the visitor lands on a dead
     // desktop — paused with no player — and the next advance appears to do
     // nothing. Never replay the tray handoff on return.
     if (g.tutorialPaused && !g.tutorialDone && g.enterRiteDone) {
-      if (st()) st().set({ tutorialPaused: false });
       resumeTutorial();
       return;
     }
@@ -2296,7 +2582,13 @@
       document.body.appendChild(transition);
       liftVeil(); // the transition owns the screen from this repaint on
       setTimeout(function () { if (transition.parentNode) transition.parentNode.removeChild(transition); }, 1600);
-      setTimeout(function () { playFrom(0); }, 650);
+      setTimeout(function () { resolveAndPlay(false); }, 650);
+      return;
+    }
+    if (g.tutorialDone && firstMakingRequested()) {
+      liftVeil();
+      renderDesktopResidue();
+      openCompletedFirstMaking();
       return;
     }
     if (g.tutorialPaused) { liftVeil(); return; }
@@ -2314,15 +2606,22 @@
     // desktop behind it is the current behavior, not the flash (which is the
     // post-name reload path, covered by mountRoot).
     if (!g.enterRiteDone) { liftVeil(); return; }
-    var at = typeof g.tutorialBeat === 'number' && g.tutorialBeat >= 0 ? g.tutorialBeat : 0;
-    if (at >= beats().length) { endClean(true); return; }
-    playFrom(at);
+    resolveAndPlay(false);
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && el('cutscene')) {
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('poppet-rite') && window.LiberPoppetRite &&
+        typeof window.LiberPoppetRite.requestDismiss === 'function') {
+      e.preventDefault();
+      e.stopPropagation();
+      window.LiberPoppetRite.requestDismiss();
+      return;
+    }
+    if (el('cutscene')) {
       var tray = document.getElementById('crt-bay-tray');
       if (tray && tray.classList.contains('out')) return;
+      e.preventDefault();
       e.stopPropagation();
       endClean(false);
     }

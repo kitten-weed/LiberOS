@@ -7,7 +7,8 @@ Liber Vacui ShipBuild: static multi-page game (index/about/arcana/desktop/divina
 
 ## Run / verify (always after edits)
 - `npm start` → http://localhost:8080
-- `npm test` → boots `serve.cjs` on :8124, asserts index 200 + "Liber Vacui" marker, `api/health.json` `{status:"ok"}`, 404 fallback
+- `npm test` → runs the zero-dependency smoke checks (boots `serve.cjs` on :8124; asserts index 200 + "Liber Vacui" marker, `api/health.json` `{status:"ok"}`, and 404 fallback) and the deterministic native regression suites in `tests/refinement/`.
+- Refinement tests cover source-level and simulated behavior invariants; they do not replace rendered, pointer/keyboard acceptance checks in a browser.
 
 ## Deploy
 Push to `main` → `.github/workflows/pages.yml` stamps `api/health.json.sha`, uploads `./`, deploys. Pages source: GitHub Actions. PRs get `preview-<sha>` artifact from `ci.yml`.

@@ -17,6 +17,18 @@
   animation: cutscene-in 0.4s ease-out;
 }
 
+.cutscene.ctv.is-yielded {
+  display: none;
+  pointer-events: none;
+}
+
+.ctv-rite-status {
+  color: #e8c890;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
 @keyframes cutscene-in {
   from { opacity: 0; }
   to { opacity: 1; }

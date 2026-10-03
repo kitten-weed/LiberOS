@@ -4,13 +4,16 @@
 import * as THREE from '../vendor/three.module.js';
 import { V, buildScene } from './lab.js?v=lab53';
 import { IDX, TOTAL, dims, makeRng } from './rig.js?v=lab53';
-import { createDoll, weaveFill } from './doll.js?v=lab53';
+import { createDoll, weaveFill } from './doll.js?v=lab57';
 import { buildDesk } from './desk.js?v=lab53';
 import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab53';
-import { saveKeepsake, keepsakeCount, atlasCoverage, snapshotDollSheets, KEYP_KEY } from './keepsake.js?v=lab53';
-import { buildPoppetOverlay } from './poppet.js?v=lab53';
+import { readKeepsakes, keepsakeCount, atlasCoverage, snapshotDollSheets } from './keepsake.js?v=lab55';
+import { createKeepCommit, keepEditsLocked } from './keep-commit.js?v=lab54';
+import { restoreKeptDoll } from './restore-kept.js?v=lab54';
+import { buildPoppetOverlay } from './poppet.js?v=lab54';
 import { makeWorksurface } from './surface.js?v=lab53';
-import { beginKeeping } from './keepdrop.js?v=lab53';
+import { beginKeeping } from './keepdrop.js?v=lab54';
+import { dollFrameGoal } from './frame-doll.js?v=lab54';
 
 const canvas = document.getElementById('view');
 const L = buildScene(canvas);
@@ -47,6 +50,19 @@ let lastThoughtSheet = null;   // the thought sheet the last stroke touched
 
 let rng = makeRng((Date.now() & 0xffffff) >>> 0);
 let gen = 0;
+let labReady = false;
+let keepBusy = false;
+let keepCommit = null;
+let specimenName = 'Poppet Nº 1';
+let manualView = false;
+
+function editsLocked() {
+  return keepEditsLocked(keepBusy, keepCommit);
+}
+
+function hasPendingMirror() {
+  return !!(keepCommit && keepCommit.pending);
+}
 
 /* ── the doll: its atlas canvas is data — the desk sheet displays it ── */
 const atlasCv = document.createElement('canvas');
@@ -148,6 +164,7 @@ function lessonRegion() {
   return null;
 }
 function setLesson(layer, idx) {
+  if (editsLocked()) return;
   lesson.layer = layer;
   lesson.idx = Math.max(0, Math.min(MAPPING[layer].length - 1, idx || 0));
   /* in the thoughts layer every body part carries the active thought sheet */
@@ -181,9 +198,9 @@ function updateLessonCard() {
   const layerNames = { body: 'BODY', face: 'FACE & HAIR', clothes: 'CLOTHES', thoughts: 'THOUGHTS' };
   const prog = layerNames[lesson.layer] + ' · PIECE ' + (lesson.idx + 1) + ' OF ' + MAPPING[lesson.layer].length + ' — ' + nm.toUpperCase();
   bar.innerHTML =
-    '<button type="button" class="lc-nav" id="lc-prev"' + (lesson.layer === 'body' && lesson.idx === 0 ? ' disabled' : '') + '>◀</button>' +
+    '<button type="button" class="lc-nav" id="lc-prev" aria-label="Previous piece"' + (editsLocked() || (lesson.layer === 'body' && lesson.idx === 0) ? ' disabled' : '') + '>◀</button>' +
     '<div class="lc-main"><div class="lc-prog"></div><div class="lc-prompt"></div></div>' +
-    '<button type="button" class="lc-nav" id="lc-next"' + (lesson.layer === 'thoughts' && lesson.idx === MAPPING[lesson.layer].length - 1 ? ' disabled' : '') + '>▶</button>';
+    '<button type="button" class="lc-nav" id="lc-next" aria-label="Next piece"' + (editsLocked() || (lesson.layer === 'thoughts' && lesson.idx === MAPPING[lesson.layer].length - 1) ? ' disabled' : '') + '>▶</button>';
   bar.querySelector('.lc-prog').textContent = prog;
   bar.querySelector('.lc-prompt').textContent = partPrompt(lesson.layer, nm);
   const pv = bar.querySelector('#lc-prev'), nx = bar.querySelector('#lc-next');
@@ -263,6 +280,7 @@ function hotFor(sheet, x, y) {
 /* unsaved work on the sheet — sigil.html's leave guard reads this flag */
 function markDirty() { window.__labDirty = true; }
 function paintProxy(sheet, x, y) {
+  if (!labReady || editsLocked()) return;
   const sl = getSheet(sheet);
   if (!sl) return;
   markDirty();
@@ -309,11 +327,12 @@ function regionFromUV(mesh, uv) {
   return null;
 }
 function bucketAt(p) {
-  if (!p) return false;
+  if (!p || !labReady || editsLocked()) return false;
   markDirty();
   if (p.sheet === 'atlas') {
     const reg = uvToRegion(p.x / atlasCv.width, 1 - p.y / atlasCv.height);   // canvas y → uv v
     if (reg) {
+      undoPush('body');
       floodFillRegionAt(doll.bodyCtx, p.x, p.y, brushes.body.ink, doll.ATLAS[reg], 40);
       doll.bodyTex.needsUpdate = true;
       strokeHot = hotFor('body', p.x, p.y);   // the panel's own name — advances the walkthrough
@@ -334,6 +353,7 @@ function applyLayerLook() {   // the visual state a layer owns — safe to re-as
   applyRoomTint(LAYER_TINT[activeLayer]);
 }
 function setLayer(key) {
+  if (editsLocked()) return;
   if (dollPaint) setDollPaint(false);   // layers and DOLL DRAW toggle separately
   activeLayer = key;
   applyLayerLook();
@@ -390,9 +410,20 @@ function syncLedger() {
 
 /* ── brush size + erase: the slider mini-menu is the way ── */
 let eraseMode = false;   // ◌ eraser — lifts ink instead of laying it
+function setBrushTool(tool) {
+  if (editsLocked()) return;
+  if (tool !== 'brush' && tool !== 'bucket' && tool !== 'erase') throw new TypeError('Unknown paint tool');
+  inkMode = tool === 'erase' ? 'brush' : tool;
+  eraseMode = tool === 'erase';
+  refreshSliderTools();
+  if (popOverlay && popOverlay.isOpen()) popOverlay.setTool(tool);
+  hint();
+  syncLedger();
+}
 
 /* ── DOLL DRAW: paint straight onto the poppet (toggles with CANVAS) ── */
 function setDollPaint(on) {
+  if (editsLocked() && on) return;
   dollPaint = !!on;
   const db = desk.panelButtons.doll;
   db.plate.material = dollPaint ? brassActive : desk.baseBrass;
@@ -410,63 +441,115 @@ function setDollPaint(on) {
   syncLedger();
 }
 
-/* ── keepsake readiness: every layer must carry ink before the button lights ── */
+/* ── the restored doll and durable commit own the keepsake gate ── */
 function keepsakeReady() {
-  if (sheetHasInk('body') === false) return false;
-  const faceDone = ['eyes', 'face', 'hair'].every(function (z) {
-    const fm = doll.faceMaps[z];
-    const d = fm.ctx.getImageData(0, 0, fm.cv.width, fm.cv.height).data;
-    for (let i = 3; i < d.length; i += 64) if (d[i] > 40) return true;
-    return false;
-  });
-  if (!faceDone) return false;
-  if (sheetHasInk('clothes') === false) return false;
-  if (!THOUGHT_KINDS.every(function (k) { return sheetHasInk('thoughts:' + k); })) return false;
-  return true;
+  return labReady && !keepBusy;
 }
 
-/* ── keepsake: save the specimen with its full making, then fly it home ── */
-function pressKeepsake(force) {
-  if (!force && !keepsakeReady()) {
+function captureKeepsake() {
+  const D = dims(P);
+  const paintSheets = snapshotDollSheets(doll);
+  return {
+    atlasCv: atlasCv,
+    clothCv: doll.clothCtx.canvas,
+    spec: {
+      P: P,
+      pose: P.pose,
+      worn: P.worn,
+      ink: brushes.body.ink,
+      brush: brushes.body.size,
+      heightHeads: +(TOTAL / D.headD).toFixed(2),
+      name: specimenName,
+      lesson: {layer: lesson.layer, step: lesson.idx + 1, of: MAPPING[lesson.layer].length, part: lessonKey()},
+      coverage: atlasCoverage(doll.bodyCtx, doll.ATLAS),
+      face: paintSheets.face,
+      hull: paintSheets.hull,
+      aura3: thoughtCvs.fears.toDataURL('image/png'),
+      aura4: thoughtCvs.thoughts.toDataURL('image/png'),
+      thoughts: Object.fromEntries(THOUGHT_KINDS.map(function (kind) {
+        return [kind, thoughtCvs[kind].toDataURL('image/png')];
+      }))
+    }
+  };
+}
+
+function canonicalState() {
+  try {
+    const root = window.parent && window.parent !== window ? window.parent : window;
+    return root.Liber && root.Liber.state || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function mirrorPending(record, count) {
+  const state = canonicalState();
+  const snapshot = state && state.get();
+  const mirrored = snapshot && Array.isArray(snapshot.buddy) &&
+    snapshot.buddy.some(function (entry) {
+      return entry && entry.kind === 'poppet' && entry.keepsakeN === record.n;
+    });
+  return mirrored ? null : {record: record, count: count};
+}
+
+function diagnoseKeepError(kind, error) {
+  const detail = {err: String(error).slice(0, 160)};
+  const state = canonicalState();
+  try {
+    if (state && typeof state.diagnose === 'function') state.diagnose(kind, detail);
+    else console.error(kind, detail.err);
+  } catch (diagnosticError) {
+    console.error(kind + ' diagnostic failed', String(diagnosticError).slice(0, 160));
+  }
+}
+
+function syncEditControls() {
+  const locked = editsLocked();
+  popOverlay.setLocked(locked);
+  if (sliderEls.props) sliderEls.props.forEach(function (input) { input.disabled = locked; });
+  if (sliderEls.size) sliderEls.size.disabled = locked;
+  if (sliderEls.tools) sliderEls.tools.forEach(function (button) { button.disabled = locked; });
+  updateLessonCard();
+}
+
+/* ── keep only after the primary snapshot and its durable mirror both succeed ── */
+function pressKeepsake() {
+  if (keepBusy) return;
+  if (!hasPendingMirror() && !keepsakeReady()) {
     desk.flashKeepsakeLocked();   // the button itself says: draw on every layer first
     hint();
     return;
   }
-  const D = dims(P);
-  const paintSheets = snapshotDollSheets(doll);
-  var n;
-  try {
-    n = saveKeepsake(atlasCv, doll.clothCtx.canvas, {
-    P: P,
-    pose: P.pose,
-    worn: P.worn,
-    ink: brushes.body.ink,
-    brush: brushes.body.size,
-    heightHeads: +(TOTAL / D.headD).toFixed(2),
-    name: 'Poppet Nº ' + (gen + 1),
-    lesson: { layer: lesson.layer, step: lesson.idx + 1, of: MAPPING[lesson.layer].length, part: lessonKey() },
-    coverage: atlasCoverage(doll.bodyCtx, doll.ATLAS),
-    face: paintSheets.face,
-    hull: paintSheets.hull,
-    aura3: thoughtCvs.fears.toDataURL('image/png'),
-    aura4: thoughtCvs.thoughts.toDataURL('image/png'),
-    thoughts: (function () {
-      const out = {};
-      THOUGHT_KINDS.forEach(function (kind) { out[kind] = thoughtCvs[kind].toDataURL('image/png'); });
-      return out;
-    })(),
-  });
-  } catch (e) {
-    // storage (usually quota) refused the keep: say so on the plaque instead
-    // of stranding the traveller on a done step with no way home.
-    updatePlaque('THE KEEP FAILED — STORAGE FULL?');
+  keepBusy = true;
+  syncEditControls();
+  desk.setKeepsakeReady(false);
+  if (!keepCommit) keepCommit = createKeepCommit({capture: captureKeepsake, idPrefix: 'poppet-lab'});
+  const result = keepCommit.commit();
+  if (!result.ok) {
+    keepBusy = false;
+    syncEditControls();
+    desk.setKeepsakeReady(keepsakeReady());
+    const message = result.stage === 'mirror' ?
+      'THE KEEP BOOKMARK FAILED — PRESS KEEP TO RETRY' : 'THE KEEP FAILED — STORAGE FULL?';
+    updatePlaque(message);
+    diagnoseKeepError('keep-commit-fail', result.error);
     hint();
     return;
   }
-  updatePlaque('SAVED ' + n);
+  // Keep mutation surfaces closed until the existing keep presentation leaves.
+  keepBusy = true;
+  syncEditControls();
+  keepCommit = null;
+  try {
+    localStorage.setItem('poppet.keepsake.fresh', String(Date.now()));
+  } catch (error) {
+    diagnoseKeepError('keep-hint-fail', error);
+  }
+  window.__labDirty = false;
+  updatePlaque('SAVED ' + result.record.n);
   hint();
   syncLedger();
-  beginKeeping();   // shrink · vignette · sweep · dark — home drops the poppet in
+  beginKeeping();   // the durable keep is complete before its 3200ms presentation
 }
 
 /* ── raycast plumbing ── */
@@ -480,6 +563,8 @@ const VIEWS = {
   poppet: { target: V(0, 1.05, 0), theta: 0.5, phi: 1.25, dist: 4.2 }
 };
 function setViewLock(key) {
+  if (editsLocked()) return;
+  manualView = true;
   viewLock = key;
   hint();
   syncLedger();
@@ -558,7 +643,6 @@ function sheetHasInk(key) {
   }
   return false;
 }
-const undoCache = {};
 let undoArmed = false;   // one snapshot per stroke, not per move
 function armUndo(key) { if (undoArmed) { undoPush(key); undoArmed = false; } }
 function undoSheetKey() {   // the sheet the active layer paints into
@@ -568,6 +652,7 @@ function undoSheetKey() {   // the sheet the active layer paints into
   return 'body';
 }
 window.addEventListener('keydown', function (e) {
+  if (!labReady || editsLocked()) return;
   if ((e.metaKey || e.ctrlKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
     sheetUndo(undoSheetKey());
     syncLedger();
@@ -575,30 +660,32 @@ window.addEventListener('keydown', function (e) {
   }
 });
 function undoPush(key) {
-  const sl = getSheet(key);
-  if (!sl) return;
-  if (!undoCache[key]) undoCache[key] = [];
-  undoCache[key].push(sl.ctx.getImageData(0, 0, sl.cv.width, sl.cv.height));
-  if (undoCache[key].length > 5) undoCache[key].shift();
+  const surface = getSheet(key);
+  if (!surface) throw new Error('Unknown paint sheet: ' + key);
+  surface.pushUndo();
 }
 function sheetUndo(key) {
-  const st = undoCache[key];
-  const sl = getSheet(key);
-  if (!st || !st.length || !sl) return;
-  sl.ctx.putImageData(st.pop(), 0, 0);
-  if (sl.tex) sl.tex.needsUpdate = true;
+  const surface = getSheet(key);
+  if (!surface) throw new Error('Unknown paint sheet: ' + key);
+  if (!surface.undo()) return false;
+  markDirty();
+  if (key === 'clothes') doll.markHullPainted();
+  if (key.indexOf('thoughts:') === 0) rebuildThoughtGlyphs(key.slice(9));
+  return true;
 }
 /* the brush used for the ACTIVE layer — body sizes for face/hull sheets too */
 function layerBrush() {
   return brushes.body;
 }
 function stampFace(zone, x, y) {
+  if (!labReady || editsLocked()) return;
   markDirty();
   const fm = doll.faceMaps[zone];
   daub(fm.ctx, x, y, brushes.body.size / 2, brushes.body.ink);
   fm.tex.needsUpdate = true;
 }
 function stampHull(x, y) {
+  if (!labReady || editsLocked()) return;
   markDirty();
   daub(doll.hullCtx, x, y, brushes.body.size / 2, brushes.body.ink);
   doll.hullTex.needsUpdate = true;
@@ -654,6 +741,7 @@ function deskPickables() {
 
 /* ── CANVAS: opens the expand overlay — the walkthrough of the whole mapping ── */
 function canvasLaunch() {
+  if (editsLocked()) return;
   if (dollPaint) setDollPaint(false);
   setLayer(activeLayer);          // sync the walkthrough to the active layer
   popOverlay.syncBrush();
@@ -663,6 +751,7 @@ function canvasLaunch() {
 // Guide paint steps open the same texture sheet the tutorial rite paints:
 // the traveller should never have to discover the desk buttons mid-lesson.
 function openSheetPart(layer, idx) {
+  if (editsLocked()) return;
   if (dollPaint) setDollPaint(false);
   setLesson(layer, idx);
   popOverlay.syncBrush();
@@ -674,8 +763,23 @@ const popOverlay = buildPoppetOverlay(document.body, {
   doll: doll,
   ink: function () { return brushes.body.ink; },
   brush: function () { return brushes.body.size; },
-  setInk: function (hex) { brushes.body.ink = hex; syncLedger(); updatePlaque(); },
-  setSize: function (px) { brushes.body.size = px; updatePlaque(); },
+  getTool: function () { return eraseMode ? 'erase' : inkMode; },
+  setTool: setBrushTool,
+  getSurface: getSheet,
+  canEdit: function () { return !editsLocked(); },
+  setInk: function (hex, userChanged) {
+    if (editsLocked()) return;
+    brushes.body.ink = hex;
+    if (userChanged) markDirty();
+    syncLedger();
+    updatePlaque();
+  },
+  setSize: function (px) {
+    if (editsLocked()) return;
+    brushes.body.size = px;
+    markDirty();
+    updatePlaque();
+  },
   wispCv: function (kind) { return thoughtCvs[kind]; },
   wispTex: function (kind) { return thoughtTexs[kind]; },
   weaveFor: function (key) {
@@ -698,10 +802,10 @@ const popOverlay = buildPoppetOverlay(document.body, {
     popOverlay.close();
     setDollPaint(true);
   },
-  onStrokeEnd: function (sheetKey) {
-    /* a stroke finished in the overlay: thought glyphs refresh, hull wakes, gate re-checks */
-    if (sheetKey === 'clothes') doll.markHullPainted();
-    if (sheetKey.indexOf('thoughts:') === 0) rebuildThoughtGlyphs(sheetKey.slice(9));
+  onChange: function (key) {
+    markDirty();
+    if (key === 'clothes') doll.markHullPainted();
+    if (key.indexOf('thoughts:') === 0) rebuildThoughtGlyphs(key.slice(9));
     desk.setKeepsakeReady(keepsakeReady());
   }
 });
@@ -719,18 +823,18 @@ function buildSliderMenu() {
   root.className = 'slider-root';
   let rows = '';
   PROP_META.forEach(function (m) {
-    rows += '<div class="slider-row"><b>' + m[1] + '</b><input type="range" min="' + m[2] + '" max="' + m[3] + '" step="0.01" data-prop="' + m[0] + '"/></div>';
+    rows += '<div class="slider-row"><b>' + m[1] + '</b><input type="range" min="' + m[2] + '" max="' + m[3] + '" step="0.01" data-prop="' + m[0] + '" aria-label="' + m[1] + ' proportion"/></div>';
   });
   root.innerHTML =
     '<div class="slider-card">' +
     '<div class="slider-head"><b>PROPORTIONS</b><button type="button" class="slider-x">×</button></div>' +
     rows +
     '<div class="slider-sec">BRUSH Ø <span class="slider-size-v"></span></div>' +
-    '<input type="range" class="slider-size" min="2" max="48" step="1"/>' +
+    '<input type="range" class="slider-size" min="2" max="48" step="1" aria-label="Brush size"/>' +
     '<div class="slider-tools">' +
-    '<button type="button" data-tool="brush">◆ BRUSH</button>' +
-    '<button type="button" data-tool="bucket">◈ BUCKET</button>' +
-    '<button type="button" data-tool="erase">◌ ERASER</button>' +
+    '<button type="button" data-tool="brush" aria-pressed="false">◆ BRUSH</button>' +
+    '<button type="button" data-tool="bucket" aria-pressed="false">◈ BUCKET</button>' +
+    '<button type="button" data-tool="erase" aria-pressed="false">◌ ERASER</button>' +
     '</div>' +
     '</div>';
   document.body.appendChild(root);
@@ -741,24 +845,23 @@ function buildSliderMenu() {
   sliderEls.tools = Array.prototype.slice.call(root.querySelectorAll('[data-tool]'));
   sliderEls.props.forEach(function (inp) {
     inp.addEventListener('input', function () {
+      if (editsLocked()) return;
       P[inp.getAttribute('data-prop')] = +inp.value;
+      markDirty();
       queueRebuild();
       updatePlaque();
     });
   });
   sliderEls.size.addEventListener('input', function () {
+    if (editsLocked()) return;
     brushes.body.size = +sliderEls.size.value;
+    markDirty();
     sliderEls.sizeV.textContent = brushes.body.size + 'px';
     if (popOverlay.isOpen()) popOverlay.syncBrush();
   });
   sliderEls.tools.forEach(function (t) {
     t.addEventListener('click', function () {
-      const tool = t.getAttribute('data-tool');
-      inkMode = tool === 'erase' ? 'brush' : tool;
-      eraseMode = tool === 'erase';
-      refreshSliderTools();
-      if (popOverlay.isOpen()) popOverlay.setTool(eraseMode ? 'erase' : inkMode);
-      syncLedger();
+      setBrushTool(t.getAttribute('data-tool'));
     });
   });
   root.querySelector('.slider-x').addEventListener('click', function () { root.classList.remove('open'); });
@@ -767,10 +870,14 @@ function refreshSliderTools() {
   if (!sliderEls.tools) return;
   sliderEls.tools.forEach(function (t) {
     const tool = t.getAttribute('data-tool');
-    t.classList.toggle('on', eraseMode ? tool === 'erase' : tool === inkMode);
+    const selected = eraseMode ? tool === 'erase' : tool === inkMode;
+    t.classList.toggle('on', selected);
+    t.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    t.disabled = editsLocked();
   });
 }
 function openSliderMenu(noSync) {
+  if (editsLocked()) return;
   buildSliderMenu();
   sliderEls.props.forEach(function (inp) { inp.value = P[inp.getAttribute('data-prop')]; });
   sliderEls.size.value = brushes.body.size;
@@ -784,11 +891,17 @@ function closeSliderMenu() {
 }
 
 canvas.addEventListener('pointerdown', function (e) {
+  if (!labReady || keepBusy) return;
   try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointers */ }
   px = e.clientX; py = e.clientY;
   idle = 0;
   ghost.last = null; ghost.sheet = null; ghost.hullPart = null;
   undoArmed = true;   // strokes snapshot once, at their start
+  if (hasPendingMirror()) {
+    const retryHit = pick(e, deskPickables());
+    if (retryHit && retryHit.object.userData.panelBtn === 'keepsake') pressKeepsake();
+    return;
+  }
   /* desk objects first */
   const dh = pick(e, deskPickables());
   if (dh) {
@@ -862,8 +975,12 @@ canvas.addEventListener('pointerdown', function (e) {
         return;
       }
       if (ob.material.opacity < 0.5 && !eraseMode) ob.material.opacity = 0.85;   // the hull appears
-      if (eraseMode) getSheet('clothes').eraseDot(pxs.cx, pxs.cy, brushes.body.size / 2);
-      else { armUndo('clothes'); stampHull(pxs.cx, pxs.cy); }
+      armUndo('clothes');
+      if (eraseMode) {
+        markDirty();
+        getSheet('clothes').eraseDot(pxs.cx, pxs.cy, brushes.body.size / 2);
+      }
+      else stampHull(pxs.cx, pxs.cy);
       strokeHot = lessonKey();   // hull strokes speak in part names, like paintProxy
       painting = true; ghost.sheet = 'doll'; ghost.hullPart = part;
       ghost.last = { x: pxs.cx, y: pxs.cy, sheet: 'clothes' };
@@ -879,8 +996,12 @@ canvas.addEventListener('pointerdown', function (e) {
       const sheet = 'face:' + ob.userData.faceZone;
       const pxy = hitUVpx(sheet, hit.uv);
       if (inkMode === 'bucket') { paintProxy(sheet, pxy.x, pxy.y); return; }
-      if (eraseMode) getSheet(sheet).eraseDot(pxy.x, pxy.y, brushes.body.size / 2);
-      else { armUndo(sheet); stampFace(ob.userData.faceZone, pxy.x, pxy.y); }
+      armUndo(sheet);
+      if (eraseMode) {
+        markDirty();
+        getSheet(sheet).eraseDot(pxy.x, pxy.y, brushes.body.size / 2);
+      }
+      else stampFace(ob.userData.faceZone, pxy.x, pxy.y);
       strokeHot = lessonKey();   // face strokes speak in zone names, like paintProxy
       painting = true; ghost.sheet = 'doll';
       ghost.last = { x: pxy.x, y: pxy.y, sheet: sheet };
@@ -970,9 +1091,13 @@ canvas.addEventListener('pointermove', function (e) {
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
     ray.setFromCamera(ndc, camera);
     const hit = tmpC.clone();
-    if (ray.ray.intersectPlane(doll.dragPlane, hit)) doll.dragPoint.copy(hit);
+    if (ray.ray.intersectPlane(doll.dragPlane, hit)) {
+      doll.dragPoint.copy(hit);
+      markDirty();
+    }
   } else if (orbiting) {
     if (viewLock) return;   // locked views don't orbit
+    manualView = true;
     theta -= (e.clientX - px) * 0.006;
     phi = Math.max(0.3, Math.min(1.52, phi - (e.clientY - py) * 0.005));
     px = e.clientX; py = e.clientY;
@@ -1011,7 +1136,8 @@ canvas.addEventListener('pointerup', release);
 canvas.addEventListener('pointercancel', release);
 canvas.addEventListener('wheel', function (e) {
   e.preventDefault();
-  if (viewLock) return;   // locked views ignore zoom
+  if (viewLock || keepBusy) return;   // locked views and the keep presentation ignore zoom
+  manualView = true;
   dist = Math.max(2.4, Math.min(9, dist + e.deltaY * 0.004));
   idle = 0;
 }, { passive: false });
@@ -1027,9 +1153,11 @@ function doRebuild() {
   rebuildQueued = false;
   doll.rebuild(P.pose);
   setLesson(activeLayer);   // shell / hull / thought-paint flags ride the rebuild
+  if (!manualView) fitDefaultDoll();
   updatePlaque();
 }
 function queueRebuild() {
+  if (editsLocked()) return;
   if (performance.now() - lastRebuildT > 120) doRebuild();
   else rebuildQueued = true;
 }
@@ -1043,6 +1171,17 @@ const burn = {
 };
 let orbiting = false, theta = 0.38, phi = 1.1, dist = 5.9, idle = 0;   // default frames desk + poppet
 let dropZoom = 0, startDist = 5.9, startPhi = 1.1;   // the keeping's camera pull
+function fitDefaultDoll() {
+  if (manualView || viewLock || keepBusy || burn.phase !== 'idle') return;
+  place();
+  const goal = dollFrameGoal(camera, doll, 'all', 0.1);
+  const offset = goal.pos.clone().sub(goal.look);
+  camTarget.copy(goal.look);
+  dist = goal.distance;
+  theta = Math.atan2(offset.x, offset.z);
+  phi = Math.acos(Math.max(-1, Math.min(1, offset.y / dist)));
+  place();
+}
 function startBurn() {
   if (burn.phase !== 'idle') return;
   burn.phase = 'jar';
@@ -1177,12 +1316,54 @@ function freshP() {
   P.flop = 0.35 + rng() * 0.3; P.pose = 'stand';
   P.worn = { robe: false, dress: false, top: false, hoodie: false, pants: false, bralet: false };
   P.thoughts = { fears: [], wishes: [], likes: [], dislikes: [], thoughts: [] };
+  specimenName = 'Poppet Nº ' + (gen + 1);
+}
+
+let restoreError = null;
+async function restoreExistingKeep() {
+  const shelf = readKeepsakes();
+  if (!shelf.length) {
+    labReady = true;
+    window.__labDirty = false;
+    return;
+  }
+  const record = shelf[shelf.length - 1];
+  const result = await restoreKeptDoll({
+    doll: doll,
+    record: record,
+    params: P,
+    thoughtCanvases: thoughtCvs,
+    thoughtTextures: thoughtTexs,
+    isCurrent: function () { return true; }
+  });
+  if (result.status !== 'restored') throw new Error('initial keepsake restoration was cancelled');
+  if (record.ink != null) brushes.body.ink = record.ink;
+  if (record.brush != null) brushes.body.size = record.brush;
+  specimenName = result.name || ('Poppet Nº ' + record.n);
+  gen = Math.max(gen, record.n - 1);
+  const pending = mirrorPending(record, shelf.length);
+  if (pending) {
+    keepCommit = createKeepCommit({
+      capture: captureKeepsake,
+      idPrefix: 'poppet-lab',
+      pending: pending
+    });
+  }
+  THOUGHT_KINDS.forEach(rebuildThoughtGlyphs);
+  labReady = true;
+  window.__labDirty = false;
+}
+try {
+  await restoreExistingKeep();
+} catch (error) {
+  restoreError = error;
+  diagnoseKeepError('keep-restore-fail', error);
 }
 
 /* ── boot ── */
 updateLessonCard();
 updatePlaque();
-doll.rebuild('stand');
+doll.rebuild(P.pose || 'stand');
 doll.setSpike(true, L.SPIKE_TIP_Y);
 setLayer('body');
 openSliderMenu(true);   // sliders mirror P before the first open
@@ -1190,10 +1371,17 @@ sliderEls.root.classList.remove('open');
 THOUGHT_KINDS.forEach(rebuildThoughtGlyphs);   // glyph counts match the sheets
 desk.setKeepsakeReady(keepsakeReady());        // the KEEPSAKE gate starts where the work is
 setDollPaint(true);   // the lab opens ready to paint the poppet itself
+syncEditControls();
+if (hasPendingMirror()) updatePlaque('THE KEEP BOOKMARK FAILED — PRESS KEEP TO RETRY');
+if (restoreError) {
+  updatePlaque('RESTORE FAILED');
+  const hintEl = document.getElementById('mode-hint');
+  if (hintEl) hintEl.textContent = 'RESTORE FAILED — THE SAVED PAINT WAS NOT REPLACED';
+}
 
 /* the guided first-run workshop: Physius welcomes, the bell summons, and the
    walkthrough advances by real paint detection (guide.js, release script) */
-if (window.PoppetGuide) {
+if (window.PoppetGuide && labReady) {
   window.PoppetGuide.maybeStart({
     doll: doll,
     name: function () {
@@ -1220,7 +1408,6 @@ if (window.PoppetGuide) {
     setLessonPart: function (layer, idx) { activeLayer = layer; openSheetPart(layer, idx); },
     setLessonFree: function () { setLesson('clothes', 0); openSheetPart('clothes', 0); },
     keep: function () {
-      try { localStorage.setItem('poppet.keepsake.fresh', String(Date.now())); } catch (e) {}
       pressKeepsake(true);   // the guided workshop keeps whatever stage it reached
     }
   });
@@ -1231,9 +1418,15 @@ function resize() {
   renderer.setSize(r.width, r.height, false);
   camera.aspect = r.width / Math.max(1, r.height);
   camera.updateProjectionMatrix();
+  if (!manualView) fitDefaultDoll();
 }
 window.addEventListener('resize', resize);
 resize();
+if (typeof ResizeObserver === 'function') {
+  // The parent CRT can reveal this canvas without resizing the iframe window.
+  const canvasResizeObserver = new ResizeObserver(resize);
+  canvasResizeObserver.observe(canvas);
+}
 place();
 
 let last = performance.now();
@@ -1244,7 +1437,7 @@ function tick(now) {
   if (document.hidden) return; // dt-clamped: skipping hidden frames can't jump the clock
   idle += dt;
   popOverlay.tick && popOverlay.tick(dt);
-  if (rebuildQueued && (burn.phase === 'idle' || burn.phase === 'settle')) doRebuild();
+  if (rebuildQueued && !editsLocked() && (burn.phase === 'idle' || burn.phase === 'settle')) doRebuild();
   if (burn.phase === 'idle' || burn.phase === 'settle') doll.physicsFrame(dt);
   stepBurn(dt);
   if (desk.gear) desk.gear.tick(dt);

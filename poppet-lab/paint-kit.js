@@ -23,6 +23,26 @@ export function inkName(hex) {
   return { '#2b2016': 'ink', '#b03a2a': 'blood', '#c9962e': 'gold', '#7fb069': 'moss' }[hex] || 'ink';
 }
 
+function canvasPanelsFromUvRects(rects) {
+  return Object.fromEntries(Object.entries(rects).map(([name, rect]) => [
+    name,
+    [rect[0], 1 - rect[1] - rect[3], rect[2], rect[3]]
+  ]));
+}
+
+function canvasPanelFromMeshUv(mesh) {
+  const uv = mesh && mesh.geometry && mesh.geometry.attributes.uv;
+  if (!uv || !uv.count) throw new Error('poppet paint surface has no UV geometry');
+  let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+  for (let i = 0; i < uv.count; i++) {
+    minU = Math.min(minU, uv.getX(i));
+    maxU = Math.max(maxU, uv.getX(i));
+    minV = Math.min(minV, uv.getY(i));
+    maxV = Math.max(maxV, uv.getY(i));
+  }
+  return [minU, 1 - maxV, maxU - minU, maxV - minV];
+}
+
 /* One worksurface per doll canvas. ws.el is set (the display canvas for
    pointer mapping) — without it pos() collapses to 0,0 and every stroke
    lands in a corner. */
@@ -31,14 +51,28 @@ export function buildSheetSet(doll, atlasCv) {
     let made;
     if (surf === 'face' || surf === 'eyes') {
       const fm = surf === 'eyes' ? doll.faceMaps.eyes : doll.faceMaps.face;
-      made = makeWorksurface({ cv: fm.cv, tex: fm.tex, key: surf });
+      const mesh = doll.M()['face_' + surf];
+      made = makeWorksurface({
+        cv: fm.cv, tex: fm.tex, key: surf,
+        panels: { [surf]: canvasPanelFromMeshUv(mesh) }
+      });
     } else if (surf === 'hair') {
       const hm = doll.faceMaps.hair;
-      made = makeWorksurface({ cv: hm.cv, tex: hm.tex, key: 'hair' });
+      const mesh = doll.M().face_hair;
+      made = makeWorksurface({
+        cv: hm.cv, tex: hm.tex, key: 'hair',
+        panels: { hair: canvasPanelFromMeshUv(mesh) }
+      });
     } else if (surf === 'clothes') {
-      made = makeWorksurface({ cv: doll.hullCanvas, tex: doll.hullTex, key: 'clothes', panels: doll.hullRects });
+      made = makeWorksurface({
+        cv: doll.hullCanvas, tex: doll.hullTex, key: 'clothes',
+        panels: canvasPanelsFromUvRects(doll.hullRects)
+      });
     } else {
-      made = makeWorksurface({ cv: atlasCv, tex: doll.bodyTex, key: 'body', panels: doll.ATLAS });
+      made = makeWorksurface({
+        cv: atlasCv, tex: doll.bodyTex, key: 'body',
+        panels: canvasPanelsFromUvRects(doll.ATLAS)
+      });
     }
     made.ws.el = made.ws.cv;
     return made;

@@ -8,7 +8,9 @@
    unbound ones orbit the poppet, related ones perch on the furniture. */
 import * as THREE from '../vendor/three.module.js';
 import { V } from '../poppet-lab/lab.js?v=lab53';
-import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab53';
+import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab54';
+import { readKeepsakes } from '../poppet-lab/keepsake.js?v=lab55';
+import { restoreKeptDoll } from '../poppet-lab/restore-kept.js?v=lab54';
 
 const tmpWP = new THREE.Vector3();
 
@@ -574,7 +576,7 @@ const HP = {
 };
 const atlasCv = document.createElement('canvas');
 atlasCv.width = atlasCv.height = 1024;
-const { createDoll } = await import('../poppet-lab/doll.js?v=lab53');
+const { createDoll } = await import('../poppet-lab/doll.js?v=lab57');
 const doll = createDoll(scene, atlasCv, null, { rng: null, brush: function () { return { ink: '#2b2016', size: 10 }; } });
 doll.state.groundOn = false;      // the lab's floor ring does not belong in the living room
 doll.setParams(HP);
@@ -583,62 +585,60 @@ doll.setKinematic(true);          // bones, not physics — the head keeps a spr
 const arrived = consumeDrop(doll, camera);   // kept in the lab? drop onto the rug
 doll.setHome(0, 0.35);   // lives on the rug
 
-/* the poppet keeps its lab self: adopt the latest keepsake's proportions,
-   clothes and painted atlas so the doll that fell in is the doll that was made. */
-function adoptKept() {
-  const list = keepsakeMod.loadKeepsakes();
-  if (!list.length) return false;
-  const k = list[list.length - 1];
+/* The same async restoration path serves the workshop and the living room. */
+let restoredKeepsakeN = null;
+let restoreGeneration = 0;
+let restoreErrorHintOriginal = null;
+function reportRestoreError(error) {
+  const detail = String(error).slice(0, 160);
+  console.error('poppet keepsake restoration failed', detail);
+  const hint = document.querySelector('.hint');
+  if (hint) {
+    if (restoreErrorHintOriginal === null) restoreErrorHintOriginal = hint.textContent;
+    hint.textContent = 'the saved paint could not be read. nothing has been replaced.';
+  }
+  const state = parentState();
   try {
-    if (k.P) Object.assign(HP, k.P);
-    HP.worn = Object.assign({ robe: false, dress: false, top: false, hoodie: false, pants: false, bralet: false }, k.worn || {});
-    doll.setParams(HP);
-    if (k.atlas) {
-      const im = new Image();
-      im.onload = function () {
-        const g = doll.bodyCtx;
-        g.clearRect(0, 0, atlasCv.width, atlasCv.height);
-        g.drawImage(im, 0, 0, atlasCv.width, atlasCv.height);
-        doll.bodyTex.needsUpdate = true;
-      };
-      im.src = k.atlas;
-    }
-    // face + hulls travel with the keep too — without them the rug doll
-    // loses its painted face, hair and tubes. Shells stay on in the room.
-    try {
-      if (k.face) {
-        for (const z of ['eyes', 'face', 'hair']) {
-          if (!k.face[z] || !doll.faceMaps[z]) continue;
-          const im = new Image();
-          im.onload = (function (zz) {
-            return function () {
-              const fm = doll.faceMaps[zz];
-              fm.ctx.clearRect(0, 0, fm.cv.width, fm.cv.height);
-              fm.ctx.drawImage(im, 0, 0, fm.cv.width, fm.cv.height);
-              fm.tex.needsUpdate = true;
-            };
-          })(z);
-          im.src = k.face[z];
-        }
-      }
-      if (k.hull) {
-        const him = new Image();
-        him.onload = function () {
-          doll.hullCtx.clearRect(0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
-          doll.hullCtx.drawImage(him, 0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
-          doll.hullTex.needsUpdate = true;
-          try { doll.markHullPainted(); } catch (e) {}
-        };
-        him.src = k.hull;
-      }
-      doll.setFaceShell(true);
-      doll.setHulls(true);
-    } catch (err) { /* paint layers stay as they were */ }
-    doll.rebuild(k.pose || 'stand');
-    doll.setKinematic(true);   // rebuild() drops back to pose targets; re-arm
-    hideRings();               // rebuild() also rebuilds the lab rings — hide again
+    if (state && typeof state.diagnose === 'function') state.diagnose('keep-restore-fail', {err: detail});
+  } catch (diagnosticError) {
+    console.error('poppet keepsake restoration diagnostic failed', String(diagnosticError).slice(0, 160));
+  }
+}
+function clearRestoreError() {
+  if (restoreErrorHintOriginal === null) return;
+  const hint = document.querySelector('.hint');
+  if (hint) hint.textContent = restoreErrorHintOriginal;
+  restoreErrorHintOriginal = null;
+}
+async function adoptKept() {
+  let list;
+  try {
+    list = readKeepsakes();
+  } catch (error) {
+    reportRestoreError(error);
+    return false;
+  }
+  if (!list.length) return false;
+  const record = list[list.length - 1];
+  if (record.n === restoredKeepsakeN) return false;
+  const generation = ++restoreGeneration;
+  try {
+    const result = await restoreKeptDoll({
+      doll: doll,
+      record: record,
+      params: HP,
+      isCurrent: function () { return generation === restoreGeneration; }
+    });
+    if (result.status !== 'restored') return false;
+    restoredKeepsakeN = record.n;
+    clearRestoreError();
+    doll.setKinematic(true);
+    hideRings();
     return true;
-  } catch (err) { return false; }
+  } catch (error) {
+    reportRestoreError(error);
+    return false;
+  }
 }
 // no lab rings in the living room
 function hideRings() {
@@ -655,8 +655,7 @@ hideRings();
    opens its card — with the fields its own game kept — and unbound
    tokens offer "relate this", which opens the desktop's orbit rail.
    ══════════════════════════════════════════════════════════════════ */
-const keepsakeMod = await import('../poppet-lab/keepsake.js?v=lab53');
-adoptKept();   // now that the keepsake store is loaded: become the poppet that was kept
+await adoptKept();
 doll.body.scale.setScalar(0.55);   // room scale: head against the bed and hearth, not the walls
 const keepGroup = new THREE.Group();      // orbit group, rides the poppet
 scene.add(keepGroup);
@@ -683,7 +682,7 @@ function snapKeeps() {
 // what each kept store becomes in the room
 const TRAVELLERS = {
   crossing: 'vanir', divination: 'arcana', games: 'whimsy wow', sea: 'vanir',
-  garden: 'ruby', dreams: 'insightful inquiry', journal: 'the mad scribe',
+  garden: 'ruby', dreams: 'insightful inquiry', journal: 'riason',
   abstract: 'physius', learn: 'riason', methodology: 'riason',
   graveyard: 'pete', council: 'wanderlust', buddy: 'wanderlust'
 };
@@ -916,6 +915,25 @@ const TOKEN_BUILDERS = {
 function esc(s) {
   return String(s == null ? '' : s).replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; });
 }
+function dreamSourceExists(id) {
+  const ps = parentState() || (window.Liber && window.Liber.state);
+  const dreams = ps && ps.get().dreams || [];
+  return dreams.some(function (dream) { return dream && dream.id === id; });
+}
+function artifactProvenance(store, d) {
+  if (store === 'dreams') return 'dream source';
+  if (store === 'journal' && d.kind === 'dream' && d.ref) {
+    return 'book copy' + (dreamSourceExists(d.ref) ? '' : ' · source unavailable');
+  }
+  return '';
+}
+function cardProvenance(store, d) {
+  const label = artifactProvenance(store, d);
+  if (!label) return '';
+  const parts = label.split(' · ');
+  return '<div class="kc-row"><span>' + esc(parts[0]) + '</span>' +
+    (parts[1] ? esc(parts[1]) : '') + '</div>';
+}
 function cardRows(store, d) {
   const quote = function (s) { return s ? '<div class="kc-quote">' + esc(String(s).slice(0, 180)) + '</div>' : ''; };
   switch (store) {
@@ -936,10 +954,10 @@ function cardRows(store, d) {
       return quote(d.text) +
         (d.intensity !== undefined ? '<div class="kc-row"><span>TIDE</span>' + esc(d.intensity) + '</div>' : '');
     case 'dreams':
-      return quote(d.text) +
+      return cardProvenance(store, d) + quote(d.text) +
         (d.title ? '<div class="kc-row"><span>DREAM</span>' + esc(d.title) + '</div>' : '');
     case 'journal':
-      return quote(d.text || d.body || d.excerpt) +
+      return cardProvenance(store, d) + quote(d.text || d.body || d.excerpt) +
         (d.title ? '<div class="kc-row"><span>ENTRY</span>' + esc(d.title) + '</div>' : '');
     default:
       return quote(d.text || d.thought || d.reading || d.title || d.result);
@@ -977,6 +995,13 @@ const PERCHES = [
 let perchUsed = 0;
 
 function buildTokens() {
+  let kept;
+  try {
+    kept = readKeepsakes();
+  } catch (error) {
+    reportRestoreError(error);
+    return;
+  }
   tokens.forEach(function (k) {
     if (k.obj && k.obj.parent) k.obj.parent.remove(k.obj);
   });
@@ -1004,20 +1029,22 @@ function buildTokens() {
   // portrait canvases used to orbit here; the doll itself is the artifact
   // now, so keeps live on the shelf (journal) instead of the orbit. The
   // count still names them: tokens plus lab-kept poppets.
-  const kept = keepsakeMod.loadKeepsakes().length;
-  const total = tokens.length + kept;
+  const total = tokens.length + kept.length;
   document.getElementById('keep-count').textContent = total ?
     total + ' KEEP' + (total > 1 ? 'S' : '') : 'NO KEEPS YET';
 }
 function addToken(store, entry, bound) {
   const obj = tokenBuilderFor(store, entry)(entry);
   obj.scale.setScalar(1.15);
+  let name = entry.name || entry.title || entry.label || 'a kept thing';
+  if (store === 'journal' && entry.kind === 'spoken' && entry.traveller === 'the mad scribe'
+    && name === 'the mad scribe asked') name = 'riason asked';
   const tok = {
     id: entry.id,
     store: store,
     data: entry,
     traveller: TRAVELLERS[store] || 'wanderlust',
-    name: entry.name || entry.title || entry.label || 'a kept thing',
+    name: name,
     obj: obj,
     bound: bound,
     perch: null,
@@ -1165,6 +1192,8 @@ function showArtifact(tok) {
       (d.atlas ? '<div class="av-section"><span class="av-label">THE PAINT</span><img class="av-shot" style="max-width:220px;image-rendering:auto" src="' + d.atlas + '" alt=""/></div>' : '');
   } else {
     body = artBody(tok.store, d);
+    const provenance = artifactProvenance(tok.store, d);
+    if (provenance) body = '<div class="av-keywords">' + esc(provenance) + '</div>' + body;
   }
   artView.innerHTML = '<div class="av-sheet ' + cls + '">' +
     '<button type="button" class="av-close" title="close">✕</button>' +
@@ -1201,7 +1230,10 @@ window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && artO
     } catch (err) { /* older API */ }
   }
   window.addEventListener('storage', function (e) {
-    if (e.key && e.key.indexOf('liber_vacui_v1') === 0) buildTokens();
+    if (e.key === 'poppet.keepsakes.v1') {
+      buildTokens();
+      adoptKept();
+    } else if (e.key && e.key.indexOf('liber_vacui_v1') === 0) buildTokens();
   });
 })();
 

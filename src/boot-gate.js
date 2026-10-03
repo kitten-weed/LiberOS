@@ -7,8 +7,8 @@
 (function () {
   'use strict';
   var granted = null;
-  try { granted = localStorage.getItem('liber_vacui_consent'); } catch (e) { granted = '0'; }
-  if (granted) return; // consented: this page mounts normally
+  try { granted = localStorage.getItem('liber_vacui_consent'); } catch (e) { granted = null; }
+  if (granted === '1') return; // consented: this page mounts normally
 
   // Ignore the gate on the boot page itself.
   var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();

@@ -20,6 +20,7 @@
 import * as THREE from '../../../vendor/three.module.js';
 import { requestVisibleFrame } from '../../three-shared.js';
 import { createSand, HALF } from './sand.js?v=tool3';
+import { createMemorySaver } from './save-controller.js?v=save1';
 import {
   TOYS, MACHINES, buildFigure, makeMachine, randomizeFigure, shadowDoubleOf,
   makeCrate, makeToolMesh, woodTexture,
@@ -785,11 +786,6 @@ import {
 
   /* ── the tray remembers: serialize / restore ───────────────────────── */
 
-  let saveTimer = null;
-  function saveSoon() {
-    if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveNow, 1200);
-  }
   function thumbOf(dataUrl, w) {
     try {
       const img = new Image();
@@ -803,26 +799,45 @@ import {
       return c.toDataURL('image/jpeg', 0.62);
     } catch (e) { return dataUrl; }
   }
+  function captureMemory() {
+    return {
+      ts: Date.now(),
+      figScaleEpoch: 2,
+      figures: S.placed.map((f) => ({
+        kind: f.userData.kind, name: f.userData.name || '',
+        scale: f.userData.scale || 1, shadowed: !!f.userData.shadowed,
+        tipped: !!f.userData.tipped,
+        x: +f.position.x.toFixed(2), z: +f.position.z.toFixed(2),
+        ry: +f.rotation.y.toFixed(2),
+      })),
+      sand: sand.serialize(),
+      lampOn: lampOn,
+      photos: S.photos.map((p) => ({ label: p.label || '', img: thumbOf(p.dataUrl) })),
+    };
+  }
+  const saver = createMemorySaver({
+    capture: captureMemory,
+    commit: (payload) => {
+      const state = st();
+      if (!state) throw new Error('memory state is unavailable');
+      return state.trySet({memory: payload});
+    },
+    onError: (error) => {
+      const message = 'the tray could not be kept. your work is still here.';
+      say(message);
+      const wrap = document.getElementById('mem-photo');
+      const title = document.getElementById('mem-photo-title');
+      if (wrap && !wrap.hidden && title) title.textContent = message;
+      const state = st();
+      if (state) state.diagnose('memory-save-fail', {op: 'memory', err: error.name});
+      else console.error('memory-save-fail: state unavailable');
+    }
+  });
+  function saveSoon() {
+    saver.schedule();
+  }
   function saveNow() {
-    if (!st()) return;
-    saveTimer = null;
-    try {
-      const payload = {
-        ts: Date.now(),
-        figScaleEpoch: 2,
-        figures: S.placed.map((f) => ({
-          kind: f.userData.kind, name: f.userData.name || '',
-          scale: f.userData.scale || 1, shadowed: !!f.userData.shadowed,
-          tipped: !!f.userData.tipped,
-          x: +f.position.x.toFixed(2), z: +f.position.z.toFixed(2),
-          ry: +f.rotation.y.toFixed(2),
-        })),
-        sand: sand.serialize(),
-        lampOn: lampOn,
-        photos: S.photos.map((p) => ({ label: p.label || '', img: thumbOf(p.dataUrl) })),
-      };
-      st().set({ memory: payload });
-    } catch (e) { /* a full shelf is not a broken room */ }
+    return saver.flush();
   }
   function restore() {
     const mem = getState().memory;
@@ -959,7 +974,7 @@ import {
   }
 
   fieldEl.addEventListener('pointerdown', (e) => {
-    if (S.busy) return;
+    if (S.busy || editingLocked()) return;
     downXY = [e.clientX, e.clientY];
     const fig = figureAt(e);
     if (fig) {
@@ -1032,6 +1047,7 @@ import {
   });
 
   fieldEl.addEventListener('pointermove', (e) => {
+    if (editingLocked()) return;
     if (drag && drag.fig) {
       const p = groundPoint(e);
       if (!p) return;
@@ -1094,6 +1110,7 @@ import {
 
   // a click (no drag) on a placed figure names it
   fieldEl.addEventListener('click', (e) => {
+    if (editingLocked()) return;
     if (downXY && Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]) > 8) return;
     const fig = figureAt(e);
     if (fig && S.tool === 'hand') renameFigure(fig);   // the tools work; only the hand names
@@ -1124,6 +1141,7 @@ import {
       nm.textContent = def.named ? player() : def.label;
       b.appendChild(nm);
       b.addEventListener('click', () => {
+        if (editingLocked()) return;
         const name = def.named ? player() : '';
         const fig = placeFigure(def.key, name);
         if (!def.named) renameFigure(fig);
@@ -1155,7 +1173,11 @@ import {
       b.setAttribute('aria-pressed', S.tool === t.key ? 'true' : 'false');
       b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">' + t.icon + '</svg>'
         + '<span>' + t.label + '</span><span class="t-sub">' + t.sub + '</span>';
-      b.addEventListener('click', () => { setTool(t.key); toolHop(t.key); });
+      b.addEventListener('click', () => {
+        if (editingLocked()) return;
+        setTool(t.key);
+        toolHop(t.key);
+      });
       rail.appendChild(b);
     }
   }
@@ -1195,6 +1217,7 @@ import {
       b.setAttribute('aria-checked', S.paintColor === c ? 'true' : 'false');
       b.setAttribute('aria-label', 'paint ' + c);
       b.addEventListener('click', () => {
+        if (editingLocked()) return;
         S.paintColor = c;
         for (const bb of pal.querySelectorAll('.mem-paint')) {
           const on = bb === b;
@@ -1216,8 +1239,41 @@ import {
   const photoLabel = document.getElementById('mem-photo-label');
   const photoCommit = document.getElementById('mem-photo-commit');
   const photoStory = document.getElementById('mem-photo-story');
+  const studiesPanel = document.getElementById('mem-raison');
+  const photoClose = document.getElementById('mem-photo-close');
+  const trayEditControls = [
+    fieldEl,
+    labelsEl,
+    stringEl,
+    document.getElementById('mem-tools'),
+    document.getElementById('mem-palette')
+  ];
+  const modalBackground = [
+    ...trayEditControls,
+    document.getElementById('mem-shutter'),
+    document.getElementById('mem-studies-btn'),
+    document.getElementById('mem-new')
+  ];
   let pendingShot = null;
   let snapCamera = null;   // the tray-portrait camera, built on first shot
+  let pendingStory = null;
+
+  function foregroundLocked() {
+    return !photoWrap.hidden || !studiesPanel.hidden;
+  }
+
+  function editingLocked() {
+    return foregroundLocked() || pendingStory !== null;
+  }
+
+  function syncModalOwnership() {
+    const modalOpen = foregroundLocked();
+    for (const control of modalBackground) {
+      if (control) {
+        control.inert = modalOpen || (pendingStory !== null && trayEditControls.includes(control));
+      }
+    }
+  }
 
   function snapshot() {
     // the photograph is a tray-portrait, not a room snapshot: a second
@@ -1263,6 +1319,8 @@ import {
     photoStory.innerHTML = '';
     photoWrap.hidden = false;
     photoWrap.removeAttribute('inert');
+    syncModalOwnership();
+    photoClose.focus();
   }
 
   function openPhotoUI() {
@@ -1275,6 +1333,8 @@ import {
     photoActions.style.display = '';
     photoLabelRow.hidden = true;
     photoStory.innerHTML = '';
+    syncModalOwnership();
+    photoClose.focus();
   }
 
   function closePhotoUI() {
@@ -1282,6 +1342,8 @@ import {
     photoWrap.hidden = true;
     photoWrap.setAttribute('inert', '');
     pendingShot = null;
+    syncModalOwnership();
+    document.getElementById('mem-shutter').focus();
   }
 
   function hangInFrame(i, dataUrl) {
@@ -1343,12 +1405,12 @@ import {
       const b = document.createElement('b');
       b.textContent = (order[i] || ('frame ' + (i + 1))) + ' · ' + (p.label || 'untitled');
       span.appendChild(b);
-      const img = document.createElement('img');
-      img.alt = '';
       if (typeof p.dataUrl === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(p.dataUrl)) {
+        const img = document.createElement('img');
+        img.alt = '';
         img.src = p.dataUrl;
+        span.appendChild(img);
       }
-      span.appendChild(img);
       photoStory.appendChild(span);
     });
     const keep = document.createElement('button');
@@ -1360,41 +1422,61 @@ import {
     keep.addEventListener('click', saveStory);
     photoWrap.hidden = false;
     photoWrap.removeAttribute('inert');
+    syncModalOwnership();
+    keep.focus();
   }
 
   function saveStory() {
-    if (!st() || !S.photos.length) return;
-    const payload = {
-      kind: 'memory',
-      name: 'a story in three frames',
-      glyph: '▤',
-      frames: S.photos.map((p) => ({ img: p.dataUrl, label: p.label })),
-      figures: S.placed.map((f) => ({ kind: f.userData.kind, name: f.userData.name, scale: f.userData.scale, shadowed: !!f.userData.shadowed })),
-      ts: Date.now(),
-    };
-    st().addArtifact('journal', payload);
+    if (S.done || !S.photos.length) return;
+    if (!pendingStory) {
+      pendingStory = {
+        id: 'journal-memory-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        kind: 'memory',
+        name: 'a story in three frames',
+        glyph: '▤',
+        frames: S.photos.map((p) => ({ img: p.dataUrl, label: p.label })),
+        figures: S.placed.map((f) => ({ kind: f.userData.kind, name: f.userData.name, scale: f.userData.scale, shadowed: !!f.userData.shadowed })),
+        ts: Date.now(),
+      };
+    }
+    const story = pendingStory;
+    const saved = saver.flush({
+      memoryPatch: {...captureMemory(), photos: []},
+      write: (memory) => {
+        const state = st();
+        if (!state) throw new Error('memory state is unavailable');
+        return Boolean(state.tryAddArtifact('journal', story, {memory}));
+      }
+    });
+    if (!saved) {
+      syncModalOwnership();
+      return;
+    }
     S.done = true;
+    S.photos = [];
+    pendingStory = null;
+    buildString();
     say('the tray settles onto the shelf. the room keeps it.');
     closePhotoUI();
     chime();
-    S.photos = [];
-    saveSoon();
   }
 
   document.getElementById('mem-shutter').addEventListener('click', () => {
-    if (S.busy) return;
+    if (S.busy || foregroundLocked()) return;
+    if (pendingStory) { showStory(); return; }
     pendingShot = snapshot();
     if (!pendingShot) { say('the camera jams. (the canvas refused its pixels.)'); return; }
     thunk();
     openPhotoUI();
   });
   document.getElementById('mem-photo-retake').addEventListener('click', () => { pendingShot = null; closePhotoUI(); });
-  document.getElementById('mem-photo-close').addEventListener('click', closePhotoUI);
+  photoClose.addEventListener('click', closePhotoUI);
   document.getElementById('mem-photo-save').addEventListener('click', () => {
     if (!pendingShot) return;
     const soFar = S.photos.length;
     hangPhoto(pendingShot, '');
     pendingShot = null;
+    photoActions.style.display = 'none';
     if (soFar < 2) {
       photoTitle.textContent = '— write it on the back —';
       photoImg.src = S.photos[soFar].dataUrl;
@@ -1425,18 +1507,30 @@ import {
 
   /* ── studies, new tray, exit ───────────────────────────────────────── */
 
-  const raison = document.getElementById('mem-raison');
+  const raison = studiesPanel;
   document.getElementById('mem-studies-btn').addEventListener('click', () => {
+    if (foregroundLocked()) return;
     raison.hidden = false; raison.removeAttribute('inert');
+    syncModalOwnership();
   });
   document.getElementById('mem-raison-close').addEventListener('click', () => {
     raison.hidden = true; raison.setAttribute('inert', '');
+    syncModalOwnership();
   });
-  raison.addEventListener('click', (e) => { if (e.target === raison) { raison.hidden = true; raison.setAttribute('inert', ''); } });
+  raison.addEventListener('click', (e) => {
+    if (e.target === raison) {
+      raison.hidden = true;
+      raison.setAttribute('inert', '');
+      syncModalOwnership();
+    }
+  });
 
   document.getElementById('mem-new').addEventListener('click', () => {
-    if (S.busy) return;
+    if (S.busy || foregroundLocked()) return;
     if ((S.photos.length > 0 || S.placed.length > 0) && !window.confirm('the tray holds unkept work; clear it anyway?')) return;
+    pendingStory = null;
+    S.done = false;
+    syncModalOwnership();
     for (const fig of S.placed.slice()) liftFigure(fig);
     sand.reset();
     sand.rebuild();
@@ -1444,11 +1538,16 @@ import {
     buildString();
     say('the tray is empty again. the wall keeps what hung there.');
     thunk();
+    saveSoon();
   });
 
   document.getElementById('mem-exit').addEventListener('click', () => {
-    location.href = 'desktop.html';
+    if (saveNow()) location.href = 'desktop.html';
   });
+  window.addEventListener('liber:before-room-leave', (event) => {
+    if (!saveNow()) event.preventDefault();
+  });
+  window.addEventListener('pagehide', () => { saveNow(); });
 
   /* ── the frame loop ────────────────────────────────────────────────── */
 

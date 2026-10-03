@@ -16,6 +16,18 @@ var WHEEL_EMOTIONS = [
 
 var WHEEL_COLORS = ['#C02424', '#E09320', '#F2F200', '#79B879', '#2a8a8a', '#4a6ad4', '#7a3aaa', '#BE8FBE'];
 
+function wheelLabelInk(hex) {
+  function luminance(color) {
+    var c = color.match(/[a-f0-9]{2}/gi).map(function (v) {
+      var n = parseInt(v, 16) / 255;
+      return n <= 0.04045 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  var l = luminance(hex), dark = luminance('#000000'), light = luminance('#ffffff');
+  return (l + 0.05) / (dark + 0.05) >= (light + 0.05) / (l + 0.05) ? '#000000' : '#ffffff';
+}
+
 function polar(r, a) {
   return [150 + r * Math.cos(a), 150 + r * Math.sin(a)];
 }
@@ -37,7 +49,7 @@ function playWheel(ctx, b, body) {
     var lp = polar(108, mid);
     svg += '<path d="' + wedgePath(i, n) + '" fill="' + e.hex + '" stroke="#0a0a0a" stroke-width="2" data-wedge="' + i + '"/>'
       + '<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle"'
-      + ' font-size="10" fill="#f0e8d8" transform="rotate(' + ((mid * 180 / Math.PI) + 90).toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">'
+      + ' font-size="10" fill="' + wheelLabelInk(e.hex) + '" transform="rotate(' + ((mid * 180 / Math.PI) + 90).toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">'
       + ctx.esc(e.name.split(' ')[0]) + '</text>';
   }
   svg += '<circle cx="150" cy="150" r="16" fill="#d4af37" stroke="#0a0a0a" stroke-width="2"/></svg>';

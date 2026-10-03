@@ -134,7 +134,19 @@
     if (type === 'learn') return d.topic || '';
     if (type === 'abstract') return d.label || '';
     if (type === 'methodology') return d.topic || d.name || '';
-    if (type === 'journal') return d.text || d.excerpt || d.name || d.kind || '';
+    if (type === 'journal') {
+      try {
+        return window.LiberJournalText(d);
+      } catch (error) {
+        var status = document.getElementById('journal-pen-say');
+        if (status) {
+          status.textContent = 'this entry could not be displayed.';
+          status.classList.add('show');
+        }
+        console.error('journal entry text could not be resolved', error.name || 'Error');
+        return '';
+      }
+    }
     if (type === 'relation') return relationLabel(d);
     return d.name || d.title || d.text || '';
   }
@@ -155,7 +167,12 @@
     relation: ['desktop.html', 'the constellation']
   };
 
-  function slipFor(type) { return HOME[type] || null; }
+  function slipFor(type, data) {
+    if (type === 'journal' && data && data.kind === 'dream' && data.ref) {
+      return dreamSourceExists(data.ref) ? HOME.dreams : null;
+    }
+    return HOME[type] || null;
+  }
 
   function isUnread(type, id) {
     if (type === 'stone' || type === 'relation' || type === 'buddy') return false;
@@ -343,13 +360,32 @@
       return (d.kind === 'poppet' ? (d.name || 'unnamed poppet') : (d.intention || '(no intention)')).substring(0, 60);
     }
     if (type === 'relation') return relationLabel(d);
-    return String(d.name || d.title || d.topic || d.label || (d.text || '').slice(0, 60) || type).substring(0, 60);
+    var label = String(d.name || d.title || d.topic || d.label || (d.text || '').slice(0, 60) || type);
+    if (type === 'journal' && window.LiberJournalLabel) label = window.LiberJournalLabel(label, d);
+    return label.substring(0, 60);
+  }
+
+  function provenance(type, data) {
+    if (type === 'dreams') return 'dream source';
+    if (type === 'journal' && data.kind === 'dream' && data.ref) return 'book copy';
+    return '';
+  }
+
+  function dreamSourceExists(id) {
+    var dreams = getS().dreams || [];
+    for (var i = 0; i < dreams.length; i++) {
+      if (dreams[i] && dreams[i].id === id) return true;
+    }
+    return false;
   }
 
   function metaOf(type, d) {
+    var origin = provenance(type, d);
+    if (origin === 'book copy' && !dreamSourceExists(d.ref)) origin += ' · source unavailable';
+    if (origin) origin += ' · ';
     if (type === 'stone') return (d.kind === 'poppet' ? 'poppet' : (d.element || 'earth')) + (d.ts ? ' · ' + fmtDate(d.ts) : '');
-    if (type === 'relation') return d.ts ? 'relation · ' + fmtDate(d.ts) : 'desktop relation';
-    return type + (d.ts ? ' · ' + fmtDate(d.ts) : '');
+    if (type === 'relation') return origin + (d.ts ? 'relation · ' + fmtDate(d.ts) : 'desktop relation');
+    return origin + type + (d.ts ? ' · ' + fmtDate(d.ts) : '');
   }
 
   function collect(tabName) {
@@ -556,7 +592,9 @@
       : 'a buddy · ' + (d.element || 'earth');
     if (item.type === 'relation') return relationLabel(d);
     if (item.type === 'buddy') return 'a sealed chat';
-    return String(d.name || d.title || d.topic || d.label || item.type || 'kept').substring(0, 40);
+    var label = String(d.name || d.title || d.topic || d.label || item.type || 'kept');
+    if (item.type === 'journal' && window.LiberJournalLabel) label = window.LiberJournalLabel(label, d);
+    return label.substring(0, 40);
   }
 
   function openNote(tabName, type, id, idx) {
@@ -575,7 +613,7 @@
     paintEditor(baseTextOf(item), item.data.marks);
     markRead(item);
     if (slipEl) {
-      var home = slipFor(item.type);
+      var home = slipFor(item.type, item.data);
       if (home) { slipEl.hidden = false; slipEl.textContent = 'slip out to ' + home[1]; }
       else slipEl.hidden = true;
     }
@@ -878,7 +916,8 @@
     if (slipEl) slipEl.addEventListener('click', function () {
       if (!current) return;
       try { persist(true); } catch (e) {}
-      var home = slipFor(current.type);
+      var item = resolveItem(current.type, current.id, current.idx);
+      var home = item && slipFor(current.type, item.data);
       if (home) location.href = home[0];
     });
 

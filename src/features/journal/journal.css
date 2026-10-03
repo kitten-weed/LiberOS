@@ -337,8 +337,11 @@
 /* ── recto: the leaf ─────────────────────────────────────────────────── */
 
 .journal-note-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
   border-bottom: 1px solid rgba(80, 50, 20, 0.32);
-  padding-bottom: 6px;
+  padding-bottom: 10px;
   margin-bottom: 10px;
   text-align: center;
   position: relative;
@@ -347,6 +350,8 @@
 
 .journal-note-title {
   font-size: 1.4rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
   font-variant: small-caps;
   letter-spacing: 0.15em;
   color: #3a1a08;
@@ -392,10 +397,11 @@
    of the instrument band at the page's foot. */
 .journal-editor {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
   font-family: 'Shine Typewriter', 'Segoe Script', 'Bradley Hand', cursive;
-  font-size: 1.28rem;
-  line-height: 30px;
+  font-size: max(16px, 1.28rem);
+  line-height: 1.55;
   color: #2a1004;
   outline: none;
   padding: 0 2px 110px;
@@ -593,22 +599,24 @@
 .journal-note:hover .journal-stamp { opacity: 0.9; }
 
 .journal-slip {
-  position: absolute;
-  top: 6px;
-  right: 8px;
+  position: static;
+  justify-self: end;
+  max-width: 100%;
   font-family: inherit;
-  font-size: 1.05rem;
+  font-size: 16px;
+  line-height: 1.35;
   font-style: italic;
   letter-spacing: 0.04em;
   color: #6a3010;
   background: linear-gradient(180deg, #f4e8c8 0%, #e2d0a0 100%);
   border: 1px solid #aa7838;
   border-radius: 2px;
-  padding: 3px 12px 4px;
+  padding: 6px 12px;
+  min-height: 44px;
+  white-space: normal;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 252, 235, 0.7);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  z-index: 6;
 }
 
 .journal-slip:hover {
@@ -629,7 +637,7 @@
      hangs past the edge. Out of the reader's way. */
   top: 96px;
   right: -18px;
-  width: 30px;
+  width: 44px;
   height: 130px;
   z-index: 30;
   padding: 0;
@@ -637,7 +645,7 @@
   background: none;
   cursor: pointer;
 }
-.journal-exit-ribbon:focus-visible { outline: 2px solid #e8c890; outline-offset: 4px; border-radius: 6px; }
+.journal-exit-ribbon:focus-visible { outline: 2px solid #6a3010; outline-offset: 3px; border-radius: 6px; }
 .journal-exit-ribbon::before {
   content: '';
   position: absolute;
@@ -653,19 +661,21 @@
 .journal-exit-ribbon::after {
   content: 'leave';
   position: absolute;
-  top: calc(100% + 8px);
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.9rem;
-  letter-spacing: 0.18em;
+  writing-mode: vertical-rl;
+  font-size: 16px;
+  letter-spacing: 0.08em;
   /* legible at rest — an exit you can find is an exit that works;
      it warms to full ink on approach */
-  color: rgba(232, 200, 144, 0.62);
+  color: #fff1c9;
+  opacity: 1;
   transition: color 0.15s ease;
   pointer-events: none;
 }
 .journal-exit-ribbon:hover::after,
-.journal-exit-ribbon:focus-visible::after { color: rgba(232, 200, 144, 0.8); }
+.journal-exit-ribbon:focus-visible::after { color: #fff1c9; }
 
 /* ── the summon bell: small brass, pinned beside the ribbon ──────────── */
 .journal-summon-bell {
@@ -1062,8 +1072,7 @@
   .journal-note { flex: 1; border-radius: 0 0 6px 6px; }
   /* the ribbon still marks the page on a narrow book — it just trails from
      the top edge, above the drawers, instead of hanging off the fore-edge */
-  .journal-exit-ribbon { top: 6px; right: 10px; width: 26px; height: 88px; z-index: 40; }
-  .journal-exit-ribbon::after { color: rgba(232, 200, 144, 0.6); font-size: 0.72rem; top: calc(100% + 2px); }
+  .journal-exit-ribbon { top: 6px; right: 10px; width: 44px; height: 88px; z-index: 40; }
   .journal-summon-bell { z-index: 40; }
   .journal-chat, .journal-recall { width: 94%; }
 }

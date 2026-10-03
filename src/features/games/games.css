@@ -42,6 +42,13 @@
   color: var(--cream);
 }
 
+.games-stage-body:has(#wheel-wrap) {
+  gap: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.games-stage-body:has(#wheel-wrap) .games-actions { margin-top: 0; }
+
 .games-app::before,
 .games-app::after {
   content: '';
@@ -214,6 +221,8 @@
 .games-marquee-text {
   display: inline-block;
 }
+
+.games-tent:has(.games-stage:not([inert])) .games-marquee { display: none; }
 
 .games-ticket {
   font-style: italic;
@@ -885,6 +894,7 @@
 }
 
 .games-stage-head::before {
+  display: none;
   content: 'LIVE AT THE MIDWAY';
   position: absolute;
   left: 50%;
@@ -909,6 +919,8 @@
 
 .games-stage-name {
   font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
   letter-spacing: 0.12em;
   color: var(--gold-pale);
   text-shadow: 0 1px 0 #000;
@@ -973,7 +985,7 @@
 
 .games-action {
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.06em;
   background: linear-gradient(180deg, rgba(212, 175, 55, 0.32) 0%, rgba(60, 20, 8, 0.55) 100%);
@@ -997,6 +1009,7 @@
 
 .games-result {
   font-style: italic;
+  font-size: 16px;
   color: #ffe6a8;
   margin-top: 8px;
   line-height: 1.5;
@@ -1052,10 +1065,10 @@
 
 .wheel-colors {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .wheel-color {
@@ -1076,8 +1089,8 @@
 .wheel-hint {
   text-align: center;
   font-style: normal;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.4;
   color: #f4e8d2;
   margin-top: 6px;
 }
@@ -2504,8 +2517,8 @@
   transform: translateX(-50%);
   color: rgba(255, 221, 140, 0.48);
   font-family: 'VT323', 'Courier New', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
