@@ -118,8 +118,8 @@ test('live craft and home entry points invalidate the changed doll modules', asy
   const sources = await Promise.all(paths.map(path =>
     fs.readFile(new URL(`../../${path}`, import.meta.url), 'utf8')
   ));
-  assert.match(sources[0], /src\/poppet-rite\.js\?v=rite28/);
-  assert.match(sources[0], /styles\/poppet-rite\.css\?v=rite22/);
+  assert.match(sources[0], /src\/poppet-rite\.js\?v=rite29/);
+  assert.match(sources[0], /styles\/poppet-rite\.css\?v=rite23/);
   assert.match(sources[1], /\.\.\/poppet-lab\/doll\.js\?v=rite-draw6/);
   assert.match(sources[2], /\.\/doll\.js\?v=rite-draw6/);
   assert.match(sources[3], /\.\.\/poppet-lab\/doll\.js\?v=rite-draw6/);
