@@ -179,7 +179,7 @@
   function loadPrimaryKeepReader() {
     if (primaryKeepReader) return Promise.resolve(primaryKeepReader);
     if (!primaryKeepReadPromise) {
-      primaryKeepReadPromise = import('../poppet-lab/keepsake.js?v=lab55').then(function (module) {
+      primaryKeepReadPromise = import('../poppet-lab/keepsake.js?v=rite-draw3').then(function (module) {
         if (!module || typeof module.readKeepsakes !== 'function') {
           throw new Error('strict keepsake reader is unavailable');
         }
@@ -287,15 +287,11 @@
     document.body.classList.add('ctv-poppet-glow');
     setRiteControlOwnership(true);
     var active = window.LiberPoppetRite.open({
-      onKeep: function (result, destination) {
+      onKeep: function (result) {
         void result;
         document.body.classList.remove('ctv-poppet-glow');
         clearFirstMakingRequest();
         setRiteControlOwnership(false);
-        if (destination === 'workshop') {
-          window.location.href = 'sigil.html';
-          return;
-        }
         renderDesktopResidue();
       },
       onDismiss: function () {
@@ -305,7 +301,8 @@
       },
       onError: function (error) {
         reportTutorialFailure('first-making-setup-failed', error);
-      }
+      },
+      returnToDesktop: true
     });
     if (!active) {
       document.body.classList.remove('ctv-poppet-glow');
@@ -2264,10 +2261,7 @@
 
   // ── the new-opening and desktop-finale beats ───────────────────────────
 
-  /* handoff: the tutorial opens the paint rite on the desktop — the doll's
-     own texture canvases with a live buddy beside them. Keeping lifts the
-     park; walking away falls back to the tray seat (full lab). The beat
-     parks here either way: the finale waits until a poppet is kept. */
+  /* The beat-016 handoff owns the first rite; Keep resumes at beat-017. */
   function keptRecords() {
     if (!primaryKeepReader) throw new Error('strict keepsake reader has not loaded');
     return primaryKeepReader();
@@ -2375,15 +2369,11 @@
           try { if (st()) st().set({ tutorialPaused: true }); } catch (e) {}
           yieldCutsceneToRite();
           var active = window.LiberPoppetRite.open({
-            onKeep: function (result, destination) {
+            onKeep: function (result) {
               void result;
               document.body.classList.remove('ctv-poppet-glow');
               clearFirstMakingRequest();
               restoreCutsceneFromRite();
-              if (destination === 'workshop') {
-                window.location.href = 'sigil.html';
-                return;
-              }
               next();
             },
             onDismiss: function () {

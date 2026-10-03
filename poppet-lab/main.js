@@ -4,14 +4,14 @@
 import * as THREE from '../vendor/three.module.js';
 import { V, buildScene } from './lab.js?v=lab53';
 import { IDX, TOTAL, dims, makeRng } from './rig.js?v=lab53';
-import { createDoll, weaveFill } from './doll.js?v=lab57';
+import { createDoll, weaveFill } from './doll.js?v=rite-draw6';
 import { buildDesk } from './desk.js?v=lab53';
 import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab53';
-import { readKeepsakes, keepsakeCount, atlasCoverage, snapshotDollSheets } from './keepsake.js?v=lab55';
+import { readKeepsakes, keepsakeCount, atlasCoverage, snapshotDollSheets, snapshotRiteDrawings } from './keepsake.js?v=rite-draw3';
 import { createKeepCommit, keepEditsLocked } from './keep-commit.js?v=lab54';
-import { restoreKeptDoll } from './restore-kept.js?v=lab54';
-import { buildPoppetOverlay } from './poppet.js?v=lab54';
-import { makeWorksurface } from './surface.js?v=lab53';
+import { restoreKeptDoll } from './restore-kept.js?v=rite-draw3';
+import { buildPoppetOverlay } from './poppet.js?v=rite-crop1';
+import { makeWorksurface } from './surface.js?v=rite-crop1';
 import { beginKeeping } from './keepdrop.js?v=lab54';
 import { dollFrameGoal } from './frame-doll.js?v=lab54';
 
@@ -51,6 +51,7 @@ let lastThoughtSheet = null;   // the thought sheet the last stroke touched
 let rng = makeRng((Date.now() & 0xffffff) >>> 0);
 let gen = 0;
 let labReady = false;
+let initialFramePending = true;
 let keepBusy = false;
 let keepCommit = null;
 let specimenName = 'Poppet Nº 1';
@@ -464,6 +465,7 @@ function captureKeepsake() {
       coverage: atlasCoverage(doll.bodyCtx, doll.ATLAS),
       face: paintSheets.face,
       hull: paintSheets.hull,
+      riteDrawings: snapshotRiteDrawings(doll),
       aura3: thoughtCvs.fears.toDataURL('image/png'),
       aura4: thoughtCvs.thoughts.toDataURL('image/png'),
       thoughts: Object.fromEntries(THOUGHT_KINDS.map(function (kind) {
@@ -1172,7 +1174,7 @@ const burn = {
 let orbiting = false, theta = 0.38, phi = 1.1, dist = 5.9, idle = 0;   // default frames desk + poppet
 let dropZoom = 0, startDist = 5.9, startPhi = 1.1;   // the keeping's camera pull
 function fitDefaultDoll() {
-  if (manualView || viewLock || keepBusy || burn.phase !== 'idle') return;
+  if (initialFramePending || manualView || viewLock || keepBusy || burn.phase !== 'idle') return;
   place();
   const goal = dollFrameGoal(camera, doll, 'all', 0.1);
   const offset = goal.pos.clone().sub(goal.look);
@@ -1352,6 +1354,7 @@ async function restoreExistingKeep() {
   THOUGHT_KINDS.forEach(rebuildThoughtGlyphs);
   labReady = true;
   window.__labDirty = false;
+  initialFramePending = true;
 }
 try {
   await restoreExistingKeep();
@@ -1439,6 +1442,10 @@ function tick(now) {
   popOverlay.tick && popOverlay.tick(dt);
   if (rebuildQueued && !editsLocked() && (burn.phase === 'idle' || burn.phase === 'settle')) doRebuild();
   if (burn.phase === 'idle' || burn.phase === 'settle') doll.physicsFrame(dt);
+  if (initialFramePending) {
+    initialFramePending = false;
+    if (!manualView) fitDefaultDoll();
+  }
   stepBurn(dt);
   if (desk.gear) desk.gear.tick(dt);
   if (desk.updateKeepsake) desk.updateKeepsake(now / 1000);

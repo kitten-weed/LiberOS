@@ -121,7 +121,7 @@ test('photo naming hides review actions and reopening review restores them witho
   assert.equal(header.children.includes(close), true);
 });
 
-test('rite instruction and tool text meet minimum sizes without clipping', async () => {
+test('rite instructions and current controls remain readable and tappable', async () => {
   const css = await fs.readFile(new URL('../../styles/poppet-rite.css', import.meta.url), 'utf8');
   function rule(selector) {
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -141,16 +141,18 @@ test('rite instruction and tool text meet minimum sizes without clipping', async
 
   const line = rule('.rite-line');
   const progress = rule('.rite-progress');
-  const tool = rule('.rite-tool');
-  const tab = rule('.rite-tab');
-  const retry = rule('.rite-retry');
+  const tool = css.match(/\.rite-tool,\s*\.rite-ink,\s*\.rite-size\s*\{([^}]*)\}/)?.[1];
+  assert.ok(tool, 'missing current rite tool controls');
+  const chapter = rule('#poppet-rite .rite-chapter');
+  const button = rule('#poppet-rite button');
   const close = rule('.rite-x');
   assert.ok(px(line, 'font-size') >= 16);
   assert.ok(px(progress, 'font-size') >= 14);
   assert.ok(px(tool, 'font-size') >= 16);
-  assert.ok(px(tab, 'font-size') >= 16);
-  assert.ok(px(retry, 'font-size') >= 16);
-  assert.equal(declaration(close, 'font-family'), 'inherit');
+  assert.ok(px(chapter, 'min-height') >= 44);
+  assert.ok(px(button, 'min-height') >= 44);
+  assert.equal(declaration(button, 'font'), 'inherit');
+  assert.ok(px(close, 'font-size') >= 25);
   for (const block of [line, progress]) {
     assert.notEqual(declaration(block, 'overflow'), 'hidden');
     assert.notEqual(declaration(block, 'text-overflow'), 'ellipsis');

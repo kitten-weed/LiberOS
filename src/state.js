@@ -20,6 +20,7 @@
     tutorialPaused: false,
     tutorialRitualLine: 0,
     tutorialStage: null,
+    firstRite: null,          // versioned opening quiz and specimen-choice recovery
     enterRiteDone: false,
     keysNamed: false,      // Wanderlust named the console in the opening;
                            // the dock stays quiet until then (crt-bay.js)

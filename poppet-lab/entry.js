@@ -1,4 +1,4 @@
-import {readKeepsakes} from './keepsake.js?v=lab55';
+import {readKeepsakes} from './keepsake.js?v=rite-draw3';
 
 function showRestoreError(error) {
   console.error('poppet keepsake entry failed', String(error).slice(0, 160));
@@ -18,7 +18,7 @@ async function enterWorkshop() {
     }
   }
   try {
-    await import('./main.js?v=lab57');
+    await import('./main.js?v=rite-draw10');
   } catch (error) {
     showRestoreError(error);
   }

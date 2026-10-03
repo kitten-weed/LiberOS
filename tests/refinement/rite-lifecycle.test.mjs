@@ -48,7 +48,7 @@ test('dismissed loading rite cannot remount when imports resolve', async () => {
   assert.equal(r.window.LiberPoppetRite.open(), session);
   assert.equal(stage.children.length, 1);
   await nextTurn();
-  assert.equal(pending.length, 7);
+  assert.equal(pending.length, 8);
   assert.equal(typeof r.window.LiberPoppetRite.requestDismiss, 'function');
   assert.equal(r.window.LiberPoppetRite.requestDismiss(), true);
   assert.equal(r.window.LiberPoppetRite.requestDismiss(), false);
@@ -98,14 +98,14 @@ test('failed rite setup stays open with an explicit retry instead of dismissing'
   await nextTurn();
   assert.equal(calls.error, 1);
   assert.equal(calls.dismiss, 0);
-  assert.match(shell.innerHTML, /the pigments did not wake\. try again\./);
+  assert.match(shell.innerHTML, /the first rite could not start\. try again\./);
   assert.equal(stage.children.length, 1);
   assert.equal(typeof retryHandler, 'function');
 
   retryHandler();
   await nextTurn();
   assert.equal(calls.error, 2);
-  assert.equal(importAttempts, 14);
+  assert.equal(importAttempts, 16);
   assert.equal(stage.children.length, 1);
   assert.equal(r.window.LiberPoppetRite.requestDismiss(), true);
   assert.equal(calls.dismiss, 1);

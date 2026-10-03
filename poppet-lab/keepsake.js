@@ -4,6 +4,10 @@
    lets the saved specimens orbit the living poppet. */
 
 const KEYP = 'poppet.keepsakes.v1';
+const RITE_DRAWING_IDS = [
+  'personal-unconscious-1', 'personal-unconscious-2',
+  'shadow-surrender-1', 'shadow-surrender-2'
+];
 
 export function loadKeepsakes() {
   try {
@@ -36,6 +40,29 @@ function validateKeepsake(record) {
     for (const key of keys) {
       if (record[field]?.[key] != null && !image(record[field][key]))
         throw new Error('keepsake ' + field + ' sheet is malformed');
+    }
+    if (record.riteDrawings != null) {
+      const drawings = record.riteDrawings;
+      if (!object(drawings) || drawings.version !== 1 || !Array.isArray(drawings.squares) ||
+          drawings.squares.length !== RITE_DRAWING_IDS.length) {
+        throw new Error('keepsake rite drawings are malformed');
+      }
+      drawings.squares.forEach(function (square, index) {
+        if (!object(square) || square.id !== RITE_DRAWING_IDS[index] || !image(square.source)) {
+          throw new Error('keepsake rite drawing is malformed');
+        }
+      });
+    }
+    if (record.firstRite != null) {
+      if (!object(record.firstRite) || record.firstRite.version !== 1 ||
+          typeof record.firstRite.resultId !== 'string' ||
+          typeof record.firstRite.templateId !== 'string' ||
+          typeof record.firstRite.paletteId !== 'string' ||
+          !Array.isArray(record.firstRite.inks) || record.firstRite.inks.length !== 6 ||
+          new Set(record.firstRite.inks.map(ink => ink && ink.hex)).size !== 6 ||
+          record.firstRite.inks.some(ink => !object(ink) || typeof ink.name !== 'string' || !/^#[0-9a-f]{6}$/i.test(ink.hex))) {
+        throw new Error('keepsake first-rite record is malformed');
+      }
     }
   }
 }
@@ -123,8 +150,30 @@ export function snapshotDollSheets(doll) {
       out.face[z] = m ? cvToData(m.cv, 256) : null;
     }
   }
+
   if (doll && doll.hullCanvas) out.hull = cvToData(doll.hullCanvas, 512);
   return out;
+}
+
+export function snapshotRiteDrawings(doll) {
+  if (!doll || typeof doll.getRiteDrawings !== 'function') return null;
+  const drawings = doll.getRiteDrawings();
+  if (!drawings.length) return null;
+  const ids = [
+    'personal-unconscious-1', 'personal-unconscious-2',
+    'shadow-surrender-1', 'shadow-surrender-2'
+  ];
+  if (drawings.length !== 4 || drawings.some((entry, index) =>
+    !entry || entry.id !== ids[index] || !entry.canvas)) {
+    throw new Error('first-rite drawings are incomplete');
+  }
+  return {
+    version: 1,
+    squares: drawings.map((entry, index) => ({
+      id: ids[index],
+      source: cvToData(entry.canvas, 128)
+    }))
+  };
 }
 
 /* Save one specimen snapshot; the caller coordinates its durable mirror. */
@@ -147,6 +196,8 @@ export function saveKeepsake(atlasCv, clothCv, spec) {
     face: spec.face || null,              // face trio snapshots {eyes,face,hair}
     hull: spec.hull || null,              // clothes hull snapshot
     thoughts: spec.thoughts || null,      // the five thought sheets, one dataURL each
+    riteDrawings: spec.riteDrawings || null,
+    firstRite: spec.firstRite || null,
     atlas: cvToData(atlasCv, 512),
     cloth: clothCv ? cvToData(clothCv, 512) : null
   };

@@ -9,8 +9,8 @@
 import * as THREE from '../vendor/three.module.js';
 import { V } from '../poppet-lab/lab.js?v=lab53';
 import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab54';
-import { readKeepsakes } from '../poppet-lab/keepsake.js?v=lab55';
-import { restoreKeptDoll } from '../poppet-lab/restore-kept.js?v=lab54';
+import { readKeepsakes } from '../poppet-lab/keepsake.js?v=rite-draw3';
+import { restoreKeptDoll } from '../poppet-lab/restore-kept.js?v=rite-draw3';
 
 const tmpWP = new THREE.Vector3();
 
@@ -576,7 +576,7 @@ const HP = {
 };
 const atlasCv = document.createElement('canvas');
 atlasCv.width = atlasCv.height = 1024;
-const { createDoll } = await import('../poppet-lab/doll.js?v=lab57');
+const { createDoll } = await import('../poppet-lab/doll.js?v=rite-draw6');
 const doll = createDoll(scene, atlasCv, null, { rng: null, brush: function () { return { ink: '#2b2016', size: 10 }; } });
 doll.state.groundOn = false;      // the lab's floor ring does not belong in the living room
 doll.setParams(HP);

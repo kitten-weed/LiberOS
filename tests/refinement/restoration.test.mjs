@@ -43,7 +43,8 @@ function fixture() {
     rebuild(pose) { calls.push(['rebuild', pose]); },
     setFaceShell(on) { calls.push(['faceShell', on]); },
     setHulls(on) { calls.push(['hulls', on]); },
-    markHullPainted() { calls.push(['hullPainted']); }
+    markHullPainted() { calls.push(['hullPainted']); },
+    setRiteDrawings(drawings) { calls.push(['riteDrawings', drawings]); }
   };
   r.context.Image = class {};
   return {r, writes, body, cloth, hull, faces, thoughts, textures, calls, doll};
@@ -120,6 +121,7 @@ test('workshop restore applies saved brush metadata before control synchronizati
       specimenName: 'not restored',
       gen: 0,
       labReady: false,
+      initialFramePending: false,
       mirrorPending: () => null,
       captureKeepsake() {},
       createKeepCommit() {},
@@ -135,18 +137,20 @@ test('workshop restore applies saved brush metadata before control synchronizati
     vm.runInContext(declaration[0], f.r.context);
     await vm.runInContext('restoreExistingKeep()', f.r.context);
     vm.runInContext('syncEditControls()', f.r.context);
-    return {brushes, synchronized};
+    return {brushes, synchronized, initialFramePending: f.r.context.initialFramePending};
   }
 
   const supplied = await restore(validRecord({ink: '#aabbcc', brush: 23}));
   assert.deepEqual(supplied.synchronized, [{ink: '#aabbcc', size: 23}]);
   assert.equal(supplied.brushes.body.ink, '#aabbcc');
   assert.equal(supplied.brushes.body.size, 23);
+  assert.equal(supplied.initialFramePending, true);
 
   const legacy = await restore(validRecord());
   assert.deepEqual(legacy.synchronized, [{ink: '#default', size: 7}]);
   assert.equal(legacy.brushes.body.ink, '#default');
   assert.equal(legacy.brushes.body.size, 7);
+  assert.equal(legacy.initialFramePending, true);
 });
 
 test('all supplied images decode before any destination is changed', async () => {
@@ -180,6 +184,40 @@ test('all supplied images decode before any destination is changed', async () =>
   assert.equal(f.doll.bodyTex.needsUpdate, true);
   assert.equal(f.textures.thoughts.needsUpdate, true);
   assert.equal(result.name, 'the kept name');
+});
+
+test('all four rite drawings restore as ordered personal and shadow slips', async () => {
+  const f = fixture();
+  const ids = [
+    'personal-unconscious-1', 'personal-unconscious-2',
+    'shadow-surrender-1', 'shadow-surrender-2'
+  ];
+  const record = validRecord({
+    riteDrawings: {
+      version: 1,
+      squares: ids.map((id, index) => ({id, source: image('rite-' + index)}))
+    }
+  });
+  const pending = controlledImages(f.r);
+  const {restoreKeptDoll} = await loadModule('poppet-lab/restore-kept.js?v=rite-draw3', f.r);
+  const waiting = restoreKeptDoll({
+    doll: f.doll,
+    record,
+    params: {},
+    thoughtCanvases: {},
+    isCurrent: () => true
+  });
+  assert.equal(pending.length, 15);
+  pending.forEach(release => release());
+  const result = await waiting;
+  assert.equal(result.riteDrawingCount, 4);
+  const restored = f.calls.find(call => call[0] === 'riteDrawings')[1];
+  assert.deepEqual(plain(restored.map(item => [item.id, item.layer])), [
+    ['personal-unconscious-1', 'personal-unconscious'],
+    ['personal-unconscious-2', 'personal-unconscious'],
+    ['shadow-surrender-1', 'shadow-surrender'],
+    ['shadow-surrender-2', 'shadow-surrender']
+  ]);
 });
 
 test('older records may omit optional paint sheets without clearing existing canvases', async () => {

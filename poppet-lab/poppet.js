@@ -1,3 +1,5 @@
+import { sourceViewTransform, mapSourceViewPoint } from './source-view.js?v=source-view1';
+
 /* poppet.js — the EXPAND overlay. Opens from the big CANVAS button and walks
    you through the doll piece by piece: each arrow-press (or finished part)
    moves the walkthrough to the next mapped part — in the correct spots, on the
@@ -28,19 +30,12 @@ const LAYER_SHEETS = {
 };
 
 export function mapOverlayPoint(e, rect, view, width, height) {
-  if (view) {
-    return {
-      x: view.sx + ((e.clientX - rect.left) / rect.width) * view.sw,
-      y: view.sy + ((e.clientY - rect.top) / rect.height) * view.sh
-    };
-  }
-  const fit = Math.min(rect.width / width, rect.height / height);
-  const ox = (rect.width - width * fit) / 2;
-  const oy = (rect.height - height * fit) / 2;
-  return {
-    x: (e.clientX - rect.left - ox) / fit,
-    y: (e.clientY - rect.top - oy) / fit
-  };
+  const transform = sourceViewTransform(
+    width, height, view ? [view.sx, view.sy, view.sw, view.sh] : null,
+    rect.width, rect.height, !view
+  );
+  const point = mapSourceViewPoint(e.clientX, e.clientY, rect, transform);
+  return {x: point.x, y: point.y};
 }
 
 const THOUGHT_PALETTES = {

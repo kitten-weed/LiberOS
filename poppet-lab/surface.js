@@ -8,6 +8,7 @@
    Key format: 'body' | 'face:eyes' | 'face:face' | 'face:hair' |
                'clothes' | 'thoughts:fears' | … | 'cloth' | 'aura3' | 'aura4' */
 import { daub, spacedStamps, floodFillAt, floodFillRegionAt } from './painter.js?v=lab53';
+import { sourceViewTransform, mapSourceViewPoint } from './source-view.js?v=source-view1';
 
 export function makeWorksurface(opts) {
   const o = opts || {};
@@ -21,6 +22,8 @@ export function makeWorksurface(opts) {
     transparent: !!o.checker || !!o.transparent,   // opaque sheets erase back to bg, not to alpha
     panels: o.panels || null,   // { name: [u, v, w, h] } in canvas-y coords
     outline: null,              // the hot panel (the lesson's current part)
+    cropRect: null,
+    activePanel: null,
     bg: o.bg || '#ead9b4',
     checker: !!o.checker,       // transparent sheets draw over a loom checker
     undo: [],
@@ -30,6 +33,25 @@ export function makeWorksurface(opts) {
     if (!ws.panels) return null;
     if (ws.key.indexOf('face:') === 0) return ws.panels[ws.key.slice(5)] || null;
     return ws.panels[ws.key] || null;
+  }
+  function pixelRect(rect) {
+    if (!rect) return null;
+    return [rect[0] * cv.width, rect[1] * cv.height, rect[2] * cv.width, rect[3] * cv.height];
+  }
+  function currentSourceRect() {
+    return pixelRect(ws.cropRect);
+  }
+  function clipPaint(callback) {
+    const rect = currentSourceRect();
+    if (!rect) return callback();
+    ws.ctx.save();
+    ws.ctx.beginPath();
+    ws.ctx.rect(rect[0], rect[1], rect[2], rect[3]);
+    ws.ctx.clip();
+    try { callback(); } finally { ws.ctx.restore(); }
+  }
+  function sourceTransform(W, H) {
+    return sourceViewTransform(cv.width, cv.height, currentSourceRect(), W, H, true);
   }
   function pushUndo() {
     ws.undo.push(ws.ctx.getImageData(0, 0, cv.width, cv.height));
@@ -44,6 +66,19 @@ export function makeWorksurface(opts) {
     setKey(k) { ws.key = k; ws.outline = ws.panels && ws.panels[k] ? k : null; },
     setPanels(p) { ws.panels = p; },
     setOutline(k) { ws.outline = k; },
+    setCrop(rect, panel) {
+      if (rect && (!Array.isArray(rect) || rect.length !== 4 || rect.some(value => !Number.isFinite(value)))) {
+        throw new TypeError('worksurface crop must be a four-number rectangle');
+      }
+      ws.cropRect = rect ? rect.slice() : null;
+      ws.activePanel = panel || null;
+    },
+    contains(x, y) {
+      const rect = currentSourceRect();
+      return Number.isFinite(x) && Number.isFinite(y) && x >= 0 && y >= 0 &&
+        x < cv.width && y < cv.height && (!rect ||
+          (x >= rect[0] && y >= rect[1] && x < rect[0] + rect[2] && y < rect[1] + rect[3]));
+    },
     pushUndo: pushUndo,
     undo() {
       const u = ws.undo.pop();
@@ -56,15 +91,16 @@ export function makeWorksurface(opts) {
     pos(e) {
       if (!ws.el) return { x: 0, y: 0 };   // doll-side slates aren't displayed
       const r = ws.el.getBoundingClientRect();
-      const fit = Math.min(r.width / cv.width, r.height / cv.height);
-      const dw = cv.width * fit, dh = cv.height * fit;
-      const ox = (r.width - dw) / 2, oy = (r.height - dh) / 2;
-      return {
-        x: ((e.clientX - r.left) - ox) / fit,
-        y: ((e.clientY - r.top) - oy) / fit
-      };
+      const point = mapSourceViewPoint(e.clientX, e.clientY, r, sourceTransform(r.width, r.height));
+      return {x: point.x, y: point.y, inside: point.inside};
     },
     panelAt(x, y) {
+      if (!api.contains(x, y)) return null;
+      if (ws.activePanel) {
+        const rect = pixelRect(ws.panels && ws.panels[ws.activePanel]);
+        return rect && x >= rect[0] && y >= rect[1] &&
+          x < rect[0] + rect[2] && y < rect[1] + rect[3] ? ws.activePanel : null;
+      }
       if (!ws.panels) return null;
       if (ws.key.indexOf('face:') === 0) {
         const want = ws.key.slice(5);
@@ -95,46 +131,51 @@ export function makeWorksurface(opts) {
       };
     },
     stamp(x, y, r, hex) {
-      daub(ws.ctx, x, y, r, hex);
+      clipPaint(() => daub(ws.ctx, x, y, r, hex));
       if (ws.tex) ws.tex.needsUpdate = true;
     },
     stampLine(x0, y0, x1, y1, r, hex, erase) {
       const ctx = ws.ctx;
-      if (erase) {
+      clipPaint(function () {
+        if (erase) {
+          ctx.save();
+          if (ws.transparent) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = '#000';
+          } else {
+            ctx.fillStyle = ws.bg;   // opaque sheet: erase to paper
+          }
+          spacedStamps(x0, y0, x1, y1, Math.max(1, r / 2)).forEach(function (s) {
+            ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.fill();
+          });
+          ctx.restore();
+        } else {
+          spacedStamps(x0, y0, x1, y1, Math.max(1, r / 3)).forEach(function (s) {
+            daub(ws.ctx, s.x, s.y, r, hex);
+          });
+        }
+      });
+      if (ws.tex) ws.tex.needsUpdate = true;
+    },
+    eraseDot(x, y, r) {
+      const ctx = ws.ctx;
+      clipPaint(function () {
         ctx.save();
         if (ws.transparent) {
           ctx.globalCompositeOperation = 'destination-out';
           ctx.fillStyle = '#000';
         } else {
-          ctx.fillStyle = ws.bg;   // opaque sheet: erase to paper
+          ctx.fillStyle = ws.bg;   // opaque sheet: erasing restores the paper, never black
         }
-        spacedStamps(x0, y0, x1, y1, Math.max(1, r / 2)).forEach(function (s) {
-          ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.fill();
-        });
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
-      } else {
-        spacedStamps(x0, y0, x1, y1, Math.max(1, r / 3)).forEach(function (s) {
-          daub(ws.ctx, s.x, s.y, r, hex);
-        });
-      }
-      if (ws.tex) ws.tex.needsUpdate = true;
-    },
-    eraseDot(x, y, r) {
-      const ctx = ws.ctx;
-      ctx.save();
-      if (ws.transparent) {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = '#000';
-      } else {
-        ctx.fillStyle = ws.bg;   // opaque sheet: erasing restores the paper, never black
-      }
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
+      });
       if (ws.tex) ws.tex.needsUpdate = true;
     },
     /* the bucket — flood one panel, or the whole sheet when there are no panels */
     fillAt(x, y, hex, tol) {
       const reg = api.panelAt(x, y);
+      if ((ws.cropRect || ws.activePanel) && !reg) return null;
       const rect = reg ? ws.panels[reg] : [0, 0, 1, 1];
       floodFillRegionAt(ws.ctx, x, y, hex, rect, tol === undefined ? 40 : tol);
       if (ws.tex) ws.tex.needsUpdate = true;
@@ -158,10 +199,11 @@ export function makeWorksurface(opts) {
     weave: null,
     /* redraw the overlay canvas: content + panel outlines + labels + hot panel */
     redraw(g, W, H) {
+      if (!(W > 0 && H > 0)) return;
       g.clearRect(0, 0, W, H);
-      const fit = Math.min(W / cv.width, H / cv.height);
-      const dw = cv.width * fit, dh = cv.height * fit;
-      const ox = (W - dw) / 2, oy = (H - dh) / 2;
+      const transform = sourceTransform(W, H);
+      const fit = Math.min(transform.fitX, transform.fitY);
+      const {sx, sy, sw, sh, dw, dh, ox, oy} = transform;
       if (ws.checker) {
         g.save();
         g.beginPath(); g.rect(ox, oy, dw, dh); g.clip();
@@ -179,8 +221,8 @@ export function makeWorksurface(opts) {
         g.fillStyle = '#efe6cd';
         g.fillRect(ox, oy, dw, dh);
       }
-      g.drawImage(cv, ox, oy, dw, dh);
-      if (ws.panels) {
+      g.drawImage(cv, sx, sy, sw, sh, ox, oy, dw, dh);
+      if (ws.panels && !ws.cropRect) {
         g.strokeStyle = 'rgba(90, 66, 34, 0.5)';
         g.lineWidth = 2;
         g.font = '600 ' + Math.max(13, Math.min(26, 1024 / 46)) + 'px "House Font", Germania, Georgia, serif';
@@ -203,9 +245,8 @@ export function makeWorksurface(opts) {
       }
     },
     fitBox(W, H) {
-      const fit = Math.min(W / cv.width, H / cv.height);
-      const dw = cv.width * fit, dh = cv.height * fit;
-      return { ox: (W - dw) / 2, oy: (H - dh) / 2, fit: fit, dw: dw, dh: dh };
+      const transform = sourceTransform(W, H);
+      return Object.assign({}, transform, {fit: Math.min(transform.fitX, transform.fitY)});
     },
     clearUndo() { ws.undo = []; }
   };

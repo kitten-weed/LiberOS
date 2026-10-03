@@ -4,6 +4,12 @@
 import * as THREE from '../vendor/three.module.js';
 import { V } from './lab.js?v=lab53';
 import { IDX, N, TOTAL, POSES, dims, fkPose, fkConfig, buildSticks } from './rig.js?v=lab53';
+import { createDrawingMesh, disposeDrawingMeshes } from './rite-drawings.js?v=rite-draw1';
+
+const RITE_DRAWING_IDS = [
+  'personal-unconscious-1', 'personal-unconscious-2',
+  'shadow-surrender-1', 'shadow-surrender-2'
+];
 
 export function weaveFill(ctx, w, h, base) {
   ctx.fillStyle = base;
@@ -137,6 +143,12 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
   let overlaySet = [];        // face shell + hulls — scene children, rebuilt with the doll
   let glyphGroups = {};       // kind → { group, meshes } — the orbiting thought glyphs
   let glyphSpin = 0;
+  let riteDrawingCanvases = [];
+  let riteDrawingOrbit = null;
+  let riteDrawingSets = [];
+  let riteDrawingSpin = 0;
+  const reduceRiteMotion = typeof matchMedia === 'function' &&
+    matchMedia('(prefers-reduced-motion: reduce)').matches;
   let pts = [], sticks = [], anchors = [], poseTarget = null;
   let spikeP = null, spikeOff = 0;
   const home = { x: 0, z: 0 };   // walk offset for the home-screen doll
@@ -154,6 +166,8 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
   const qClothX90 = new THREE.Quaternion().setFromAxisAngle(V(1, 0, 0), Math.PI / 2);
 
   function buildMeshes() {
+    const savedRiteDrawings = riteDrawingCanvases.slice();
+    clearRiteDrawings(true);
     const oldRoots = body.children.slice()
       .concat(ringSet, overlaySet.map(function (o) { return o.group || o; }))
       .concat(Object.keys(glyphGroups).map(function (kind) { return glyphGroups[kind].group; }));
@@ -274,6 +288,7 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
     buildFaceShell(Dc);
     buildHulls(Dc);
     Object.keys(GLYPH_SHAPES).forEach(function (kind) { buildGlyphs(kind, Dc); });
+    if (savedRiteDrawings.length) setRiteDrawings(savedRiteDrawings);
   }
 
   /* ── the face shell: three UV-mapped zones following the head surface. ── */
@@ -368,6 +383,10 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
   /* per-frame: orbit + bob the glyphs; the face shell and hull ride their parts */
   function syncOverlays() {
     glyphSpin += 0.0035;
+    if (!reduceRiteMotion && riteDrawingOrbit) {
+      riteDrawingSpin += 0.002;
+      riteDrawingOrbit.rotation.y = Math.sin(riteDrawingSpin) * 0.16;
+    }
     const cx = spikeP ? spikeP.x : home.x, cz = spikeP ? spikeP.z : home.z;
     const kinds = Object.keys(glyphGroups);
     for (let ki = 0; ki < kinds.length; ki++) {
@@ -384,6 +403,53 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
         m.rotation.y = -a + Math.PI / 2;
       }
     }
+  }
+  function clearRiteDrawings(keepSources) {
+    riteDrawingSets.forEach(disposeDrawingMeshes);
+    riteDrawingSets = [];
+    if (!keepSources) riteDrawingCanvases = [];
+    if (riteDrawingOrbit && riteDrawingOrbit.parent) riteDrawingOrbit.parent.remove(riteDrawingOrbit);
+    riteDrawingOrbit = null;
+  }
+  function setRiteDrawings(drawings) {
+    if (!Array.isArray(drawings) || (drawings.length !== 0 && drawings.length !== RITE_DRAWING_IDS.length) ||
+        drawings.some(function (entry, index) {
+          return !entry || entry.id !== RITE_DRAWING_IDS[index] || !(entry.canvas || entry.source);
+        })) {
+      throw new Error('first-rite drawings must be four ordered canvas slips');
+    }
+    clearRiteDrawings();
+    riteDrawingCanvases = drawings.slice();
+    if (!M.head) return 0;
+    const headRadius = M.head.geometry && M.head.geometry.parameters && M.head.geometry.parameters.radius;
+    if (!Number.isFinite(headRadius) || headRadius <= 0) {
+      throw new Error('poppet head radius is unavailable for drawing placement');
+    }
+    const orbit = new THREE.Group();
+    orbit.position.y = 0.04;
+    riteDrawingCanvases.forEach(function (entry, index) {
+      const source = entry && (entry.canvas || entry.source);
+      if (!source) return;
+      const personal = index < 2;
+      const created = createDrawingMesh(THREE, source, {
+        size: personal ? 0.24 : 0.20,
+        opacity: personal ? 0.96 : 0.74
+      });
+      if (!created.contourCount) {
+        disposeDrawingMeshes(created);
+        return;
+      }
+      const angle = (index % 2 ? 1 : -1) * (personal ? 1.10 : 1.20);
+      const radius = headRadius + (personal ? 0.20 : 0.30);
+      created.group.position.set(Math.sin(angle) * radius, personal ? 0.16 : 0.28, Math.cos(angle) * radius);
+      created.group.rotation.y = -angle * 0.35;
+      orbit.add(created.group);
+      riteDrawingSets.push(created);
+    });
+    if (!riteDrawingSets.length) return 0;
+    M.head.add(orbit);
+    riteDrawingOrbit = orbit;
+    return riteDrawingSets.length;
   }
   function setGlyphLayer(kind) {
     state.glyphLayer = kind || null;
@@ -1001,6 +1067,8 @@ export function createDoll(scene, bodyCv, bodyGuides, hooks) {
     hullPainted: hullPainted,
     markHullPainted: markHullPainted,
     thoughtInk: THOUGHT_INK,
+    setRiteDrawings: setRiteDrawings,
+    getRiteDrawings: function () { return riteDrawingCanvases.slice(); },
     setFaceShell: function (on) { state.faceOn = !!on; overlaySet.forEach(function (o) { if (o.userData && o.userData.faceZone) o.visible = state.faceOn; }); },
     setHulls: function (on) { state.hullOn = !!on; overlaySet.forEach(function (o) { if (o.userData && o.userData.hull) o.visible = state.hullOn; }); },
     setGlyphLayer: setGlyphLayer,

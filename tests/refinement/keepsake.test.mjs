@@ -39,7 +39,14 @@ test('strict shelf rejects malformed records and duplicate snapshot identities w
     [{n: 1, atlas: image, face: {eyes: ''}}],
     [{n: 1, atlas: image, thoughts: {wishes: 7}}],
     [{n: 1, atlas: image, cloth: 'not-an-image'}],
-    [{n: 1, atlas: image, brush: 49}]
+    [{n: 1, atlas: image, brush: 49}],
+    [{n: 1, atlas: image, riteDrawings: {version: 1, squares: []}}],
+    [{n: 1, atlas: image, riteDrawings: {version: 1, squares: [
+      {id: 'shadow-surrender-1', source: image},
+      {id: 'personal-unconscious-2', source: image},
+      {id: 'shadow-surrender-1', source: image},
+      {id: 'shadow-surrender-2', source: image}
+    ]}}]
   ];
   for (const records of invalid) {
     const raw = JSON.stringify(records);
@@ -84,6 +91,29 @@ test('face and hull snapshot encoding errors are not converted to absent sheets'
   const k = await loadModule('poppet-lab/keepsake.js', r);
   const doll = {faceMaps: {eyes: {cv: {width: 1, toDataURL() { throw new Error('face failed'); }}}}};
   assert.throws(() => k.snapshotDollSheets(doll), /face failed/);
+});
+
+test('rite drawing snapshots preserve all four stable square identities in a saved record', async () => {
+  const r = makeRealm();
+  const k = await loadModule('poppet-lab/keepsake.js?v=rite-draw3', r);
+  const ids = [
+    'personal-unconscious-1', 'personal-unconscious-2',
+    'shadow-surrender-1', 'shadow-surrender-2'
+  ];
+  const riteDrawings = k.snapshotRiteDrawings({
+    getRiteDrawings: () => ids.map((id, index) => ({
+      id,
+      canvas: canvas('data:image/png;base64,' + Buffer.from('square-' + index).toString('base64'))
+    }))
+  });
+  assert.deepEqual(plain(riteDrawings.squares.map(square => square.id)), ids);
+
+  const saved = k.saveKeepsake(canvas(), null, spec({riteDrawings}));
+  assert.deepEqual(plain(saved.record.riteDrawings), plain(riteDrawings));
+  assert.deepEqual(plain(k.readKeepsakes()[0].riteDrawings), plain(riteDrawings));
+  assert.throws(() => k.snapshotRiteDrawings({
+    getRiteDrawings: () => [{id: ids[1], canvas: canvas()}]
+  }), /drawings are incomplete/);
 });
 
 test('keepsake materialization rejects malformed or undecodable paint', async () => {

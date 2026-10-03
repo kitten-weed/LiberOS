@@ -1,5 +1,9 @@
 const FACE_KINDS = ['eyes', 'face', 'hair'];
 const THOUGHT_KINDS = ['fears', 'wishes', 'likes', 'dislikes', 'thoughts'];
+const RITE_DRAWING_IDS = [
+  'personal-unconscious-1', 'personal-unconscious-2',
+  'shadow-surrender-1', 'shadow-surrender-2'
+];
 
 function decodeImage(source) {
   if (typeof source !== 'string' || !/^data:image\//.test(source)) {
@@ -28,6 +32,19 @@ function imageSources(record) {
     const source = modern != null ? modern : legacy;
     if (source != null) sources.push({key: 'thought:' + kind, source: source});
   });
+  if (record.riteDrawings != null) {
+    if (record.riteDrawings.version !== 1 || !Array.isArray(record.riteDrawings.squares) ||
+        record.riteDrawings.squares.length !== 4) {
+      throw new Error('saved first-rite drawings are malformed');
+    }
+    record.riteDrawings.squares.forEach(function (square, index) {
+      if (!square || square.id !== RITE_DRAWING_IDS[index] ||
+          typeof square.source !== 'string' || !/^data:image\//.test(square.source)) {
+        throw new Error('saved first-rite drawing is malformed');
+      }
+      sources.push({key: 'rite:' + index, source: square.source});
+    });
+  }
   return sources;
 }
 
@@ -63,6 +80,21 @@ export async function restoreKeptDoll({
   if (!isCurrent()) return {status: 'cancelled'};
 
   const images = new Map(decoded);
+  const riteDrawingCanvases = [];
+  if (record.riteDrawings) {
+    record.riteDrawings.squares.forEach(function (square, index) {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 128;
+      const context = canvas.getContext('2d', {willReadFrequently: true});
+      if (!context) throw new Error('first-rite drawing destination is unavailable');
+      context.drawImage(images.get('rite:' + index), 0, 0, canvas.width, canvas.height);
+      riteDrawingCanvases.push({
+        id: square.id,
+        layer: index < 2 ? 'personal-unconscious' : 'shadow-surrender',
+        canvas
+      });
+    });
+  }
   const destinations = [];
   const bodyTarget = canvasTarget(doll.bodyCtx, 'atlas');
   destinations.push({key: 'atlas', target: bodyTarget, texture: doll.bodyTex});
@@ -126,6 +158,12 @@ export async function restoreKeptDoll({
       typeof doll.setFaceShell === 'function') {
     doll.setFaceShell(true);
   }
+  if (typeof doll.setRiteDrawings === 'function') doll.setRiteDrawings(riteDrawingCanvases);
 
-  return {status: 'restored', name: record.name || null, record: record};
+  return {
+    status: 'restored',
+    name: record.name || null,
+    record: record,
+    riteDrawingCount: riteDrawingCanvases.length
+  };
 }

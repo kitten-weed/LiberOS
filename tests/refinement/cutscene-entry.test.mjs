@@ -62,13 +62,13 @@ test('completed tutorial opens the existing rite only for an explicit request', 
   assert.equal(requested.desktop.inert, false);
 });
 
-test('completed first-making request reaches workshop only through the keep callback', async () => {
+test('completed alternate first-making entry returns to desktop through the single keep callback', async () => {
   const requested = await loadCutscene({
     query: '?first-making=1',
     state: {tutorialDone: true, tutorialPaused: false, enterRiteDone: true}
   });
   requested.opened[0].onKeep({ok: true}, 'workshop');
-  assert.equal(requested.r.window.location.href, 'sigil.html');
+  assert.equal(requested.r.window.location.href, 'http://localhost/desktop.html?first-making=1');
   assert.deepEqual(requested.replacements, ['/desktop.html']);
   assert.equal(requested.desktop.inert, false);
 });
