@@ -8,6 +8,45 @@ const RITE_DRAWING_IDS = [
   'personal-unconscious-1', 'personal-unconscious-2',
   'shadow-surrender-1', 'shadow-surrender-2'
 ];
+const FIRST_RITE_CHAPTERS = ['face', 'clothes', 'personal', 'shadow'];
+
+function validFirstRite(record) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const hex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  if (!object(record)) return false;
+  if (record.version === 1) {
+    return typeof record.resultId === 'string' &&
+      typeof record.templateId === 'string' &&
+      typeof record.paletteId === 'string' &&
+      Array.isArray(record.inks) && record.inks.length === 6 &&
+      new Set(record.inks.map(ink => ink && ink.hex)).size === 6 &&
+      record.inks.every(ink => object(ink) && typeof ink.name === 'string' && hex(ink.hex));
+  }
+  if (record.version !== 2 || record.scoreVersion !== 2 || record.paletteVersion !== 2 ||
+      typeof record.resultId !== 'string' || typeof record.paletteId !== 'string' ||
+      typeof record.receiptText !== 'string' ||
+      !['template', 'blank'].includes(record.selectionMode) ||
+      (record.selectionMode === 'blank' ? record.templateId !== null : typeof record.templateId !== 'string') ||
+      !object(record.chapterPaletteIds) || !object(record.chapterPalettes)) return false;
+  if (Object.keys(record.chapterPaletteIds).length !== FIRST_RITE_CHAPTERS.length ||
+      Object.keys(record.chapterPalettes).length !== FIRST_RITE_CHAPTERS.length) return false;
+
+  let sharedCore = null;
+  for (const chapter of FIRST_RITE_CHAPTERS) {
+    const ids = record.chapterPaletteIds[chapter];
+    const inks = record.chapterPalettes[chapter];
+    if (!Array.isArray(ids) || ids.length !== 6 || !Array.isArray(inks) || inks.length !== 6 ||
+        new Set(ids).size !== 6 || new Set(inks.map(ink => ink && ink.id)).size !== 6 ||
+        new Set(inks.map(ink => ink && ink.hex)).size !== 6) return false;
+    if (inks.some((ink, index) => !object(ink) || typeof ink.id !== 'string' ||
+        typeof ink.name !== 'string' || !hex(ink.hex) || ink.id !== ids[index])) return false;
+    const core = inks.slice(0, 4).map(ink => [ink.id, ink.hex]);
+    if (sharedCore && core.some((ink, index) =>
+      ink[0] !== sharedCore[index][0] || ink[1] !== sharedCore[index][1])) return false;
+    sharedCore = sharedCore || core;
+  }
+  return true;
+}
 
 export function loadKeepsakes() {
   try {
@@ -54,13 +93,7 @@ function validateKeepsake(record) {
       });
     }
     if (record.firstRite != null) {
-      if (!object(record.firstRite) || record.firstRite.version !== 1 ||
-          typeof record.firstRite.resultId !== 'string' ||
-          typeof record.firstRite.templateId !== 'string' ||
-          typeof record.firstRite.paletteId !== 'string' ||
-          !Array.isArray(record.firstRite.inks) || record.firstRite.inks.length !== 6 ||
-          new Set(record.firstRite.inks.map(ink => ink && ink.hex)).size !== 6 ||
-          record.firstRite.inks.some(ink => !object(ink) || typeof ink.name !== 'string' || !/^#[0-9a-f]{6}$/i.test(ink.hex))) {
+      if (!validFirstRite(record.firstRite)) {
         throw new Error('keepsake first-rite record is malformed');
       }
     }

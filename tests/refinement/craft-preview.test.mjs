@@ -26,7 +26,10 @@ function trackedCanvas(width = 256, height = 256) {
       return true;
     }
   });
-  context.createRadialGradient = () => ({addColorStop() {}});
+  context.createRadialGradient = () => {
+    const colorStops = [];
+    return {colorStops, addColorStop(offset, color) { colorStops.push([offset, color]); }};
+  };
   context.clearRect = (x, y, w, h) => {
     if (x === 0 && y === 0 && w >= width && h >= height) marks.length = 0;
   };
@@ -42,7 +45,16 @@ function trackedCanvas(width = 256, height = 256) {
   };
   context.beginPath = () => { context.currentArc = null; };
   context.arc = (x, y, radius) => { context.currentArc = {x, y, radius}; };
-  context.fill = () => { if (context.currentArc) marks.push(context.currentArc); };
+  context.fill = () => {
+    if (!context.currentArc) return;
+    const style = context.fillStyle;
+    const color = typeof style === 'string'
+      ? style
+      : style && style.colorStops && style.colorStops.length
+        ? style.colorStops[0][1]
+        : undefined;
+    marks.push({...context.currentArc, color});
+  };
   context.stroke = () => { marks.push({stroke: true, color: context.strokeStyle}); };
   canvas.getContext = () => context;
   return canvas;
@@ -106,8 +118,8 @@ test('live craft and home entry points invalidate the changed doll modules', asy
   const sources = await Promise.all(paths.map(path =>
     fs.readFile(new URL(`../../${path}`, import.meta.url), 'utf8')
   ));
-  assert.match(sources[0], /src\/poppet-rite\.js\?v=rite25/);
-  assert.match(sources[0], /styles\/poppet-rite\.css\?v=rite19/);
+  assert.match(sources[0], /src\/poppet-rite\.js\?v=rite28/);
+  assert.match(sources[0], /styles\/poppet-rite\.css\?v=rite22/);
   assert.match(sources[1], /\.\.\/poppet-lab\/doll\.js\?v=rite-draw6/);
   assert.match(sources[2], /\.\/doll\.js\?v=rite-draw6/);
   assert.match(sources[3], /\.\.\/poppet-lab\/doll\.js\?v=rite-draw6/);
@@ -443,7 +455,7 @@ test('asymmetric rite brush marks map into the live doll material UVs', async ()
 
 test('all authored template marks land inside their real mesh-derived face and hull crops', async () => {
   const {realm, atlas, doll, kit} = await actualDoll();
-  const {TEMPLATES} = await loadModule('src/first-rite-data.js?v=rite-data3', realm);
+  const {TEMPLATES} = await loadModule('src/first-rite-data.js?v=rite-data5', realm);
   const sheets = kit.buildSheetSet(doll, atlas);
   for (const template of TEMPLATES) {
     for (const [key, points] of [
@@ -496,13 +508,25 @@ test('fresh first rite persists ten answers, offers three specimens, and require
   assert.equal(app.state.firstRite.phase, 'suggestions');
   assert.equal(app.session.suggestions.length, 3);
   assert.equal(app.session.suggestions[0].id, app.state.firstRite.resultId);
-  assert.equal(app.session.palette.inks.length, 6);
-  assert.equal(new Set(app.session.palette.inks.map(ink => ink.hex)).size, 6);
-  assert.equal(app.session.shell.querySelectorAll('.rite-niche').length, 3);
-  assert.equal(app.session.shell.querySelectorAll('.rite-well').length, 6);
+  assert.equal(app.session.palette.id, 'historical-colour-chart-v2');
+  const palettes = Object.values(app.session.palette.chapters);
+  assert.equal(palettes.length, 4);
+  for (const palette of palettes) {
+    assert.equal(palette.inks.length, 6);
+    assert.equal(new Set(palette.inks.map(ink => ink.id)).size, 6);
+    assert.equal(new Set(palette.inks.map(ink => ink.hex)).size, 6);
+    assert.equal(palette.accents.length, 2);
+    assert.deepEqual(Array.from(palette.inks.slice(0, 4), ink => ink.id),
+      ['r1c4', 'r2c2', 'r3c5', 'r5c5']);
+  }
+  assert.equal(new Set(palettes.map(palette =>
+    palette.inks.slice(0, 4).map(ink => ink.hex).join('|')).values()).size, 1);
+  assert.equal(app.session.shell.querySelectorAll('.rite-niche').length, 4);
+  assert.equal(app.session.shell.querySelectorAll('.rite-well').length, 12);
   const selected = app.session.shell.querySelectorAll('.rite-niche')[2];
   selected.dispatch('click');
   assert.equal(app.state.firstRite.templateId, selected.dataset.template);
+  assert.equal(app.state.firstRite.selectionMode, 'template');
   app.session.shell.querySelector('#rite-footer').querySelector('#rite-next').dispatch('click');
 
   assert.equal(app.state.firstRite.phase, 'making');
@@ -522,6 +546,60 @@ test('fresh first rite persists ten answers, offers three specimens, and require
   assert.equal(app.session.idx, 1, 'manual next moves exactly one substep');
   app.session.shell.querySelectorAll('.rite-chapter')[1].dispatch('click');
   assert.equal(app.session.idx, 1, 'chapter markers cannot pass another unresolved part');
+});
+
+test('chapter changes select only a valid remembered ink and brush with that chapter color', async t => {
+  const app = await actualRite({fresh: true});
+  t.after(app.close);
+  for (let index = 0; index < 10; index++) {
+    app.session.shell.querySelectorAll('.rite-answer')[0].dispatch('click');
+    app.session.shell.querySelector('#rite-footer').querySelector('#rite-next').dispatch('click');
+  }
+  const firstNiche = app.session.shell.querySelectorAll('.rite-niche')[0];
+  firstNiche.dispatch('click');
+  app.session.shell.querySelector('#rite-footer').querySelector('#rite-next').dispatch('click');
+
+  const faceAccent = app.session.palette.chapters.face.accents[0];
+  const accentButton = app.session.shell.querySelectorAll('.rite-ink')
+    .find(button => button.dataset.ink === faceAccent.hex);
+  assert.ok(accentButton, 'the face accent is an actual labelled ink control');
+  accentButton.dispatch('click');
+  assert.equal(app.session.ink, faceAccent.hex);
+  assert.equal(accentButton.attributes['aria-pressed'], 'true');
+
+  for (let index = 0; index < 3; index++) {
+    app.session.shell.querySelector('#rite-accept').dispatch('click');
+    if (index < 2) app.session.shell.querySelector('#rite-next').dispatch('click');
+  }
+  app.session.shell.querySelector('#rite-next').dispatch('click');
+  assert.equal(app.session.idx, 3);
+  const clothes = app.session.palette.chapters.clothes;
+  assert.ok(!clothes.inks.some(ink => ink.hex === faceAccent.hex));
+  assert.equal(app.session.ink, clothes.inks[0].hex,
+    'a face-only accent is replaced by the clothes chapter’s remembered core ink');
+  let selected = app.session.shell.querySelectorAll('.rite-ink')
+    .filter(button => button.attributes['aria-pressed'] === 'true');
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].dataset.ink, app.session.ink);
+
+  const sheet = app.session.sheets.clothes;
+  const before = sheet.cv.marks.length;
+  const canvas = app.session.shell.querySelector('#rite-sheet-wrap').children
+    .find(child => child.tagName === 'CANVAS');
+  canvas.dispatch('pointerdown', {preventDefault() {}, pointerId: 1, clientX: 210, clientY: 141});
+  canvas.dispatch('pointerup');
+  assert.equal(sheet.cv.marks.length, before + 1);
+  assert.equal(sheet.cv.marks.at(-1).color, app.session.ink,
+    'the actual clothing brush mark uses an ink in the current chapter palette');
+  assert.ok(clothes.inks.some(ink => ink.hex === sheet.cv.marks.at(-1).color));
+
+  const sharedYellow = clothes.inks[1].hex;
+  app.session.shell.querySelectorAll('.rite-ink')
+    .find(button => button.dataset.ink === sharedYellow).dispatch('click');
+  app.session.shell.querySelectorAll('.rite-chapter')[0].dispatch('click');
+  assert.equal(app.session.ink, sharedYellow, 'shared primary inks remain selected between chapters');
+  app.session.shell.querySelectorAll('.rite-chapter')[1].dispatch('click');
+  assert.equal(app.session.ink, sharedYellow, 'the shared primary remains selected on return');
 });
 
 test('the actual rite pointer path paints only the visible face crop onto the living head', async t => {

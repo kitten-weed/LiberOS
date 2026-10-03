@@ -99,7 +99,7 @@
       e.preventDefault();
       var name = nameInput.value.trim();
       if (!name) return;
-      store.set({ travellerAlias: name.slice(0, 40), enterRiteDone: true, nameTransition: true, tutorialBeat: 0 });
+      store.set({ travellerAlias: name.slice(0, 40), enterRiteDone: true, nameTransition: true });
       hide(popup);
       hide(backdrop);
       show(build);

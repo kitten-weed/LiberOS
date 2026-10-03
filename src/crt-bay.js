@@ -58,9 +58,9 @@
     if (!v.vanir) return 'vanir';
     return null;
   }
-  // Naming the console is the existing wake gate. Tutorial completion is not
-  // required: the opening ritual explicitly hands the named machine its dock.
-  function alive() { var s = getState(); return !!(s && (s.keysNamed || s.tutorialDone)); }
+  // The replacement opening keeps the dock quiet until its promise and finale
+  // have been durably completed. `keysNamed` is retained for older saves only.
+  function alive() { var s = getState(); return !!(s && s.tutorialDone === true); }
 
   function hexGlow(hex) {
     var m = /^#([0-9a-f]{6})$/i.exec(hex || '');
@@ -686,6 +686,7 @@
     openTray: out,
     closeTray: seat,
     shudder: shudder,
+    isAlive: alive,
     // Legacy callers may still ask the console to show its tray, but this
     // shim intentionally cannot navigate. Destination commits belong to Pixi.
     seatCart: function () { out(); return false; },

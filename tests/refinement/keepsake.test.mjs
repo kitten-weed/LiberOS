@@ -18,6 +18,39 @@ function spec(extra = {}) {
   return {P: {}, name: 'test poppet', ...extra};
 }
 
+function firstRiteV2(selectionMode = 'template') {
+  const core = [
+    {id: 'r1c4', name: 'Royal Blue', hex: '#253fae'},
+    {id: 'r2c2', name: 'Sun Yellow', hex: '#fdfc0a'},
+    {id: 'r3c5', name: 'Poppy Red', hex: '#e23037'},
+    {id: 'r5c5', name: 'Near-black', hex: '#090804'}
+  ];
+  const accents = {
+    face: [['r1c1', 'Lavender Mist', '#ada4cc'], ['r3c3', 'Blush', '#e27f90']],
+    clothes: [['r5c1', 'Umber', '#764941'], ['r2c3', 'Warm Ochre', '#e9a42b']],
+    personal: [['r2c1', 'Storm Blue', '#273765'], ['r4c3', 'Warm Gray', '#939389']],
+    shadow: [['r4c4', 'Lavender Gray', '#a294b1'], ['r5c3', 'Deep Rust', '#b32727']]
+  };
+  const chapterPalettes = Object.fromEntries(Object.entries(accents).map(([chapter, entries]) => [
+    chapter,
+    core.concat(entries.map(([id, name, hex]) => ({id, name, hex})))
+  ]));
+  return {
+    version: 2,
+    scoreVersion: 2,
+    paletteVersion: 2,
+    resultId: 'lantern-tender',
+    templateId: selectionMode === 'template' ? 'lantern-tender' : null,
+    selectionMode,
+    paletteId: 'historical-colour-chart-v2',
+    chapterPaletteIds: Object.fromEntries(Object.entries(chapterPalettes).map(([chapter, inks]) => [
+      chapter, inks.map(ink => ink.id)
+    ])),
+    chapterPalettes,
+    receiptText: 'From these answers, you seem drawn to a new turn.'
+  };
+}
+
 test('missing shelf is empty while corrupt and non-array shelves remain untouched', async () => {
   const absent = makeRealm();
   const module = await loadModule('poppet-lab/keepsake.js', absent);
@@ -116,6 +149,40 @@ test('rite drawing snapshots preserve all four stable square identities in a sav
   }), /drawings are incomplete/);
 });
 
+test('keepsakes preserve v1 first-rite metadata and validate v2 chapter palettes including blank', async () => {
+  const old = {
+    version: 1,
+    resultId: 'salt-cartographer',
+    templateId: 'salt-cartographer',
+    paletteId: 'openness-high',
+    inks: [
+      {name: 'Ochre', hex: '#d69b35'}, {name: 'Night ink', hex: '#242235'},
+      {name: 'Moss', hex: '#6f9361'}, {name: 'Blue glass', hex: '#547f9d'},
+      {name: 'Plum', hex: '#93607e'}, {name: 'Paper', hex: '#e7d8af'}
+    ]
+  };
+  const oldRealm = makeRealm();
+  const oldKeepsakes = await loadModule('poppet-lab/keepsake.js', oldRealm);
+  const oldSaved = oldKeepsakes.saveKeepsake(canvas(), null, spec({firstRite: old}));
+  assert.deepEqual(plain(oldSaved.record.firstRite), old);
+  assert.deepEqual(plain(oldKeepsakes.readKeepsakes()[0].firstRite), old);
+
+  const r = makeRealm();
+  const k = await loadModule('poppet-lab/keepsake.js', r);
+  const blank = firstRiteV2('blank');
+  const saved = k.saveKeepsake(canvas(), null, spec({firstRite: blank}));
+  assert.deepEqual(plain(saved.record.firstRite), blank);
+  assert.deepEqual(plain(k.readKeepsakes()[0].firstRite), blank);
+
+  const malformed = firstRiteV2('blank');
+  malformed.chapterPalettes.clothes[0] = {id: 'different-core', name: 'Other Blue', hex: '#253fae'};
+  const invalidRealm = makeRealm({'poppet.keepsakes.v1': JSON.stringify([
+    {n: 1, atlas: image, firstRite: malformed}
+  ])});
+  const invalidReader = await loadModule('poppet-lab/keepsake.js', invalidRealm);
+  assert.throws(() => invalidReader.readKeepsakes(), /first-rite record is malformed/);
+});
+
 test('keepsake materialization rejects malformed or undecodable paint', async () => {
   const r = makeRealm();
   const k = await loadModule('poppet-lab/keepsake.js', r);
@@ -183,7 +250,7 @@ test('keep coordinator holds primary payload and mirror patch across retry', asy
   });
   assert.equal(keepEditsLocked(false, coordinator), false);
   r.storage.deny = key => key === 'liber_vacui_v1__keep';
-  const failed = coordinator.commit({tutorialBeatId: 'beat-017'});
+  const failed = coordinator.commit({tutorialBeatId: 'post-rite-compliment'});
   assert.equal(failed.ok, false);
   assert.equal(failed.stage, 'mirror');
   assert.equal(failed.record.n, 1);
@@ -196,7 +263,7 @@ test('keep coordinator holds primary payload and mirror patch across retry', asy
   assert.equal(saved.record.n, 1);
   assert.equal(captures, 1);
   assert.equal(k.readKeepsakes().length, 1);
-  assert.equal(r.window.Liber.state.get().tutorialBeatId, 'beat-017');
+  assert.equal(r.window.Liber.state.get().tutorialBeatId, 'post-rite-compliment');
   assert.equal(coordinator.commit().record.n, 1);
   assert.equal(keepEditsLocked(false, null), false);
 });

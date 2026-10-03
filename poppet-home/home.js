@@ -9,7 +9,7 @@
 import * as THREE from '../vendor/three.module.js';
 import { V } from '../poppet-lab/lab.js?v=lab53';
 import { consumeDrop } from '../poppet-lab/keepdrop.js?v=lab54';
-import { readKeepsakes } from '../poppet-lab/keepsake.js?v=rite-draw3';
+import { readKeepsakes } from '../poppet-lab/keepsake.js?v=rite-meta2';
 import { restoreKeptDoll } from '../poppet-lab/restore-kept.js?v=rite-draw3';
 
 const tmpWP = new THREE.Vector3();

@@ -1,13 +1,20 @@
 (function (global) {
   'use strict';
 
-  var FLOW = 'craft-first-v1';
+  var FLOW = 'desktop-opening-v2';
+  var LEGACY_FLOW = 'craft-first-v1';
   var ORDER = [
-    'beat-001', 'beat-006', 'beat-007', 'beat-008', 'beat-009', 'beat-010',
-    'beat-011', 'beat-012', 'beat-013', 'beat-014', 'beat-015', 'beat-016',
-    'beat-017', 'beat-018', 'beat-019', 'beat-020', 'beat-021', 'beat-022',
-    'beat-002', 'beat-003', 'beat-004', 'beat-005', 'beat-006-close',
-    'beat-023', 'beat-024', 'beat-025', 'beat-026', 'beat-027', 'beat-028'
+    'opening-y-01', 'opening-y-02', 'opening-y-03', 'opening-y-04',
+    'opening-y-05', 'opening-y-06', 'opening-y-07', 'summoning-verse',
+    'wanderlust-arrival', 'y-asks-who', 'wanderlust-names-herself',
+    'manat-manifestation', 'fates-threefold', 'morrigan-threefold',
+    'wanderlust-returns', 'y-asks-why', 'vacui-extracts', 'vacui-anomalies',
+    'wanderlust-finds-machine', 'wanderlust-fourth-wall',
+    'wanderlust-invites-travellers', 'time-travel-action',
+    'wanderlust-praise', 'y-celebrates', 'wanderlust-first-making',
+    'first-rite', 'post-rite-compliment', 'y-accepts',
+    'wanderlust-mutual-care', 'mutual-care-promise', 'y-care-reply',
+    'wanderlust-parting-words', 'final-inscription'
   ];
 
   function patchAt(index) {
@@ -21,12 +28,27 @@
     };
   }
 
-  function cursorAt(index) {
+  function cursorAt(index, migrated, hasKeep) {
+    var patch = patchAt(index);
+    if (migrated) {
+      patch = Object.assign(patch, {
+        tutorialPaused: false,
+        tutorialRitualLine: 0,
+        tutorialStage: null,
+        tutorialResidue: null,
+        tutorialPromise: null,
+        tutorialTimeTravelDone: false,
+        tutorialFinaleShown: false,
+        keysNamed: false
+      });
+    }
     return {
       blocked: false,
       id: index === ORDER.length ? null : ORDER[index],
       index: index,
-      patch: patchAt(index)
+      migrated: !!migrated,
+      hasKeep: !!hasKeep,
+      patch: patch
     };
   }
 
@@ -36,49 +58,57 @@
       reason: reason,
       id: id || null,
       index: null,
+      migrated: false,
       patch: null
     };
   }
 
+  function foldedWords(value) {
+    return String(value == null ? '' : value).replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  function promiseMatches(value, alias) {
+    var expected = foldedWords('I will be nice to little ' + String(alias == null ? '' : alias));
+    var typed = foldedWords(value);
+    if (!expected || typed === expected) return !!expected;
+    if (typed.indexOf(expected) !== 0) return false;
+    return /^\s*[.!?…]+$/.test(typed.slice(expected.length));
+  }
+
   function resolveCursor(state, hasKeep) {
     var saved = state && typeof state === 'object' ? state : {};
-    if (saved.tutorialDone) return cursorAt(ORDER.length);
+    if (saved.tutorialDone) return cursorAt(ORDER.length, false, hasKeep);
 
     if (saved.tutorialFlow === FLOW) {
       if (saved.tutorialBeatId === null && saved.tutorialBeat === ORDER.length) {
-        return cursorAt(ORDER.length);
+        return cursorAt(ORDER.length, false, hasKeep);
       }
       var currentIndex = ORDER.indexOf(saved.tutorialBeatId);
       return currentIndex < 0
         ? blocked('unknown tutorial beat ID', saved.tutorialBeatId)
-        : cursorAt(currentIndex);
-    }
-    if (saved.tutorialBeatId != null || saved.tutorialFlow != null) {
-      return blocked('unknown tutorial flow marker', saved.tutorialBeatId);
+        : cursorAt(currentIndex, false, hasKeep);
     }
 
-    var legacyIndex = Number.isInteger(saved.tutorialBeat) && saved.tutorialBeat >= 0
-      ? saved.tutorialBeat : 0;
-    if (legacyIndex > 28) {
-      return blocked('legacy tutorial cursor is outside the authored flow');
+    var legacyCursor = saved.tutorialFlow === LEGACY_FLOW ||
+      (saved.tutorialFlow == null && (
+        saved.tutorialBeatId != null ||
+        Number.isInteger(saved.tutorialBeat) ||
+        saved.tutorialStage != null ||
+        saved.keysNamed === true
+      ));
+    if (legacyCursor) return cursorAt(0, true, hasKeep);
+    if (saved.tutorialFlow != null) {
+      return blocked('unknown tutorial flow marker', saved.tutorialFlow);
     }
-    if (legacyIndex === 28) return cursorAt(ORDER.length);
-    if (!hasKeep && legacyIndex >= 15) return cursorAt(ORDER.indexOf('beat-016'));
-    if (!hasKeep && legacyIndex >= 1 && legacyIndex <= 4) {
-      return cursorAt(ORDER.indexOf('beat-006'));
-    }
-
-    var originalId = 'beat-' + String(legacyIndex + 1).padStart(3, '0');
-    var newIndex = ORDER.indexOf(originalId);
-    return newIndex < 0
-      ? blocked('legacy tutorial beat has no stable identity', originalId)
-      : cursorAt(newIndex);
+    return cursorAt(0, false, hasKeep);
   }
 
   global.LiberTutorialFlow = {
     FLOW: FLOW,
+    LEGACY_FLOW: LEGACY_FLOW,
     ORDER: ORDER.slice(),
     patchAt: patchAt,
+    promiseMatches: promiseMatches,
     resolveCursor: resolveCursor
   };
 })(window);

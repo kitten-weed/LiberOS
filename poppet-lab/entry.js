@@ -1,4 +1,4 @@
-import {readKeepsakes} from './keepsake.js?v=rite-draw3';
+import {readKeepsakes} from './keepsake.js?v=rite-meta2';
 
 function showRestoreError(error) {
   console.error('poppet keepsake entry failed', String(error).slice(0, 160));

@@ -9,6 +9,7 @@ Liber Vacui ShipBuild: static multi-page game (index/about/arcana/desktop/divina
 - `npm start` → http://localhost:8080
 - `npm test` → runs the zero-dependency smoke checks (boots `serve.cjs` on :8124; asserts index 200 + "Liber Vacui" marker, `api/health.json` `{status:"ok"}`, and 404 fallback) and the deterministic native regression suites in `tests/refinement/`.
 - Refinement tests cover source-level and simulated behavior invariants; they do not replace rendered, pointer/keyboard acceptance checks in a browser.
+- The opening story and first poppet rite are desktop-only surfaces. Verify at 1280×800 and 1600×1000, plus a 1024×768 desktop fit check; do not add phone-specific rite layouts or scroll prompts. Cropped paint display and pointer mapping must share the source-view transform and keep off-crop pixels unpaintable.
 
 ## Deploy
 Push to `main` → `.github/workflows/pages.yml` stamps `api/health.json.sha`, uploads `./`, deploys. Pages source: GitHub Actions. PRs get `preview-<sha>` artifact from `ci.yml`.

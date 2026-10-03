@@ -20,10 +20,12 @@
     tutorialPaused: false,
     tutorialRitualLine: 0,
     tutorialStage: null,
+    tutorialPromise: null,
+    tutorialTimeTravelDone: false,
+    tutorialFinaleShown: false,
     firstRite: null,          // versioned opening quiz and specimen-choice recovery
     enterRiteDone: false,
-    keysNamed: false,      // Wanderlust named the console in the opening;
-                           // the dock stays quiet until then (crt-bay.js)
+    keysNamed: false,         // the new opening wakes the named console after its finale
     travellerAlias: '',      // optional local name for the chat traveller,
                            // chosen in the handshake close (pitch §07 D→name)
     buddy: [],              // buddy artifacts: stone casts (kind stone) + sealed chats (kind sealed)

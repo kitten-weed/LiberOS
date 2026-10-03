@@ -17,62 +17,70 @@
     { text: 'Come to the void and sing again…', effect: 'chatbox-construct' }
   ];
 
-  // kind: dialogue | arrival | ritual | poppet-app | poppet-door |
-  // poppet-draw | poppet-keep | artifact | breach | finale.
-  // Every dialogue beat receives the existing progress gate. Angle-bracket
-  // responses remain player choices; >> remains a simple progress response.
+  // The stable IDs in this script are the source of truth for the new
+  // desktop-opening-v2 cursor. Manifestations reuse Wanderlust's one plate.
   var BEATS = [
-    { id: 'beat-001', speaker: 'liber-vacui', kind: 'dialogue', text: 'Oh hello <name>!', response: '>>', effect: 'opening-disturbance' },
-    { id: 'beat-006', speaker: 'liber-vacui', kind: 'dialogue', text: 'We are just starting this journey. We can cast a spell and summon some help.', response: 'a spell?' },
-    { id: 'beat-007', speaker: 'liber-vacui', kind: 'dialogue', text: 'Yes. On the next screen I will conjure up some text, type it and my friend out here in the imaginary world will come assist us.', response: 'okay..' },
-    { id: 'beat-008', speaker: 'liber-vacui', kind: 'ritual', text: '', response: '' },
-    { id: 'beat-009', speaker: 'wanderlust', kind: 'arrival', text: 'Oh, a new traveller! How exciting! Hello <you>, how are you?', tone: 'jovial', effect: 'infection', grand: true },
-    { id: 'beat-010', speaker: 'liber-vacui', kind: 'dialogue', text: 'Scared, it\'s dark and cold.', response: '>>', tone: 'still' },
-    { id: 'beat-011', speaker: 'wanderlust', kind: 'dialogue', text: 'OH! You\'re so right, let me fix that.', response: '>>', effect: 'infection', tone: 'jovial' },
-    { id: 'beat-012', speaker: 'liber-vacui', kind: 'dialogue', text: 'Nothing happened', response: '>>', tone: 'still' },
-    { id: 'beat-013', speaker: 'wanderlust', kind: 'dialogue', text: 'Oh. A fresh slate, how exciting. Let’s move the Vacui through time and get you some friends. I do love these guys.', response: '>>', effect: 'room-cycle', tone: 'suspicious' },
-    { id: 'beat-014', speaker: 'wanderlust', kind: 'dialogue', text: 'WHOA.', response: '>>', tone: 'still' },
-    { id: 'beat-015', speaker: 'wanderlust', kind: 'dialogue', text: 'Well we better make a poppet first and see what happens', response: '>>', tone: 'suspicious', auto: true },
-    { id: 'beat-016', kind: 'handoff', text: '', response: '' },
-    { id: 'beat-017', speaker: 'wanderlust', kind: 'arrival', text: 'OH! Aren’t you just precious!', tone: 'jovial', effect: 'finale-envelope', wait: 1400 },
-    { id: 'beat-018', speaker: 'liber-vacui', kind: 'dialogue', text: 'Yay!', response: '>>', tone: 'jovial' },
-    { id: 'beat-019', speaker: 'wanderlust', kind: 'dialogue', text: 'Oh and monosyllabic too. Little <name> why don’t you ask for some more travellers?', response: '>>', tone: 'jovial' },
-    { id: 'beat-020', speaker: 'wanderlust', kind: 'dialogue', text: 'WOW! That was amazing!', response: '>>', tone: 'jovial' },
-    { id: 'beat-021', speaker: 'liber-vacui', kind: 'dialogue', text: 'THANKS!', response: '>>', tone: 'jovial' },
-    { id: 'beat-022', speaker: 'wanderlust', kind: 'dialogue', text: 'No worries, buddy.', response: '>>', tone: 'jovial' },
-    { id: 'beat-002', speaker: 'liber-vacui', kind: 'dialogue', text: 'I am literally you.', response: 'no you\u2019re not..', effect: 'name-loosen' },
-    { id: 'beat-003', speaker: 'liber-vacui', kind: 'dialogue', text: 'Okay let me explain. In this artifact, the liber vacui, the imaginary and real are the same thing.', response: 'so I am playing pretend?', effect: 'floor-inscription' },
-    { id: 'beat-004', speaker: 'liber-vacui', kind: 'dialogue', text: 'You could look at it that way, if you want. You actually prefer to define yourself with research backed terminology.', response: 'why are you saying \u2018you\u2019' },
-    { id: 'beat-005', speaker: 'liber-vacui', kind: 'dialogue', text: 'For instance, that is object-relational theory. By yourself identifying uh.. itself.. with..', response: 'this is confusing' },
-    { id: 'beat-006-close', speaker: 'liber-vacui', kind: 'dialogue', text: 'You\u2019re right. After all, we are just starting this journey.', response: '>>' },
-    { id: 'beat-023', speaker: 'wanderlust', kind: 'dialogue', text: 'I think it’s time I let you explore. More changes are to come', response: '>>', tone: 'suspicious' },
-    { id: 'beat-024', kind: 'rat', text: '', response: '' },
-    { id: 'beat-025', speaker: 'wanderlust', kind: 'dialogue', text: 'The fourth wall breaks. RAT — thank you for the watch. Go carefully.', response: '>>', tone: 'still' },
-    { id: 'beat-026', speaker: 'rat', kind: 'dialogue', text: 'Understood. I built this; I can let it go. Good luck in there.', response: '>>', tone: 'still', effect: 'skulks-away' },
-    { id: 'beat-027', speaker: 'wanderlust', kind: 'dialogue', text: 'Before you continue, let me leave you with some parting words:', response: '>>', tone: 'suspicious' },
-    { id: 'beat-028', speaker: 'liber-vacui', kind: 'finale', text: 'I ARISE THE SAME BUT DIFFERENT', response: '' }
+    { id: 'opening-y-01', speaker: 'liber-vacui', kind: 'dialogue', text: 'Ugh.. What just happened.', response: '>>', effect: 'opening-reflection' },
+    { id: 'opening-y-02', speaker: 'liber-vacui', kind: 'dialogue', text: 'Whoa.. That\'s.. me.. Looking back at the screen?', response: '>>', effect: 'partial-recognition' },
+    { id: 'opening-y-03', speaker: 'liber-vacui', kind: 'dialogue', text: 'I just typed in my name and then.. what..', response: '>>' },
+    { id: 'opening-y-04', speaker: 'liber-vacui', kind: 'dialogue', text: 'I can\'t tell you how I know this but, <name>, I am you.', response: '>>', effect: 'inside-screen-reveal' },
+    { id: 'opening-y-05', speaker: 'liber-vacui', kind: 'dialogue', text: 'There\'s something written on the side of the wall in here..', response: '>>', effect: 'wall-inscription' },
+    { id: 'opening-y-06', speaker: 'liber-vacui', kind: 'dialogue', text: '"The Liber Vacui has temporarily borrowed a piece of your soul, it will return it stronger!"', response: '>>', effect: 'soul-inscription' },
+    { id: 'opening-y-07', speaker: 'liber-vacui', kind: 'dialogue', text: 'Wait, there\'s something else written here too..', response: '>>', effect: 'wall-inscription' },
+    { id: 'summoning-verse', speaker: 'liber-vacui', kind: 'ritual', text: '', response: '' },
+    { id: 'wanderlust-arrival', speaker: 'wanderlust', kind: 'dialogue', text: 'OH! It\'s good to be back!!', response: '>>', tone: 'jovial', effect: 'wanderlust-arrival' },
+    { id: 'y-asks-who', speaker: 'liber-vacui', kind: 'dialogue', text: 'Who are you?', response: '>>' },
+    { id: 'wanderlust-names-herself', speaker: 'wanderlust', kind: 'dialogue', text: 'Oh.. I dunno, I\'ve been called a lot of things over the years.', response: '>>', tone: 'jovial', form: 'wanderlust' },
+    { id: 'manat-manifestation', speaker: 'wanderlust', kind: 'dialogue', text: 'The Banu Aws understood my power, their stories still buried beneath the sand.', response: '>>', tone: 'still', form: 'manat' },
+    { id: 'fates-threefold', speaker: 'wanderlust', kind: 'dialogue', text: 'I spilled my secrets of imagination and archetype to the greeks.', response: '>>', tone: 'still', form: 'fates', threefold: true },
+    { id: 'morrigan-threefold', speaker: 'wanderlust', kind: 'dialogue', text: 'I instill bravery, power, and courage in those fated to suffer.', response: '>>', tone: 'still', form: 'morrigan', threefold: true },
+    { id: 'wanderlust-returns', speaker: 'wanderlust', kind: 'dialogue', text: 'But you can call me Wanderlust. For that is truly what fate is, the external drive to pursue something greater.', response: '>>', tone: 'jovial', form: 'wanderlust' },
+    { id: 'y-asks-why', speaker: 'liber-vacui', kind: 'dialogue', text: 'Why am I here?', response: '>>' },
+    { id: 'vacui-extracts', speaker: 'wanderlust', kind: 'dialogue', text: 'The Vacui, yes, a powerful artifact indeed. This machine is able to extract minute portions of the soul into itself.', response: '>>', tone: 'still' },
+    { id: 'vacui-anomalies', speaker: 'wanderlust', kind: 'dialogue', text: 'Although due to some.. anomalous properties it can draw from the imaginary and real simultaneously.', response: '>>', tone: 'still' },
+    { id: 'wanderlust-finds-machine', speaker: 'wanderlust', kind: 'dialogue', text: 'It looks like you\'ve found it..', response: '>>', tone: 'suspicious' },
+    { id: 'wanderlust-fourth-wall', speaker: 'wanderlust', kind: 'dialogue', text: 'Hmm.. Javascript web applet made by some.. aspiring psychologist... That won\'t do.', response: '>>', tone: 'suspicious', effect: 'code-tendrils' },
+    { id: 'wanderlust-invites-travellers', speaker: 'wanderlust', kind: 'dialogue', text: 'Let\'s get some travellers who have used this in different times and pull them in here.', response: '>>', tone: 'jovial' },
+    { id: 'time-travel-action', speaker: 'wanderlust', kind: 'time-travel', text: '', response: '' },
+    { id: 'wanderlust-praise', speaker: 'wanderlust', kind: 'dialogue', text: 'WHOO! Good job little buddy!!', response: '>>', tone: 'jovial' },
+    { id: 'y-celebrates', speaker: 'liber-vacui', kind: 'dialogue', text: 'YAY!', response: '>>', tone: 'jovial' },
+    { id: 'wanderlust-first-making', speaker: 'wanderlust', kind: 'dialogue', text: 'There\'s a lot of travellers in here now.. Let\'s make you a body so you can start enjoying their apps!', response: '>>', tone: 'jovial' },
+    { id: 'first-rite', speaker: 'wanderlust', kind: 'rite', text: '', response: '' },
+    { id: 'post-rite-compliment', speaker: 'wanderlust', kind: 'dialogue', text: 'You look amazing, you can revisit Physius\'s lab later to see more.', response: '>>', tone: 'jovial' },
+    { id: 'y-accepts', speaker: 'liber-vacui', kind: 'dialogue', text: 'Okay I will!', response: '>>', tone: 'jovial' },
+    { id: 'wanderlust-mutual-care', speaker: 'wanderlust', kind: 'dialogue', text: 'And you and big <name> at the computer better get along. Be nice to each other.', response: '>>', tone: 'still' },
+    { id: 'mutual-care-promise', speaker: 'wanderlust', kind: 'promise', text: '', response: '' },
+    { id: 'y-care-reply', speaker: 'liber-vacui', kind: 'dialogue', text: 'And I will be nice to you! <name>', response: '>>', tone: 'jovial' },
+    { id: 'wanderlust-parting-words', speaker: 'wanderlust', kind: 'dialogue', text: 'Aww. Okay, lets finish this up. Before we go I will leave you with some parting words', response: '>>', tone: 'jovial' },
+    { id: 'final-inscription', kind: 'finale', text: 'I appear the same but different', response: '' }
   ];
 
   // Production metadata is deliberately derived from the authored rows. The
   // prose above remains the source of truth; this table only gives the stage
   // controller a deterministic visual contract for each line.
   var PRODUCTION = BEATS.map(function (beat) {
-    var action = beat.kind === 'ritual' || beat.kind.indexOf('poppet') === 0 || beat.kind === 'artifact';
+    var action = beat.kind === 'ritual' || beat.kind === 'rite' ||
+      beat.kind === 'time-travel' || beat.kind === 'promise' || beat.kind === 'finale';
     var response = beat.response || '';
     var mode = action ? 'action-lock' : (response && response !== '>>' ? 'choice' : 'advance');
     var effect = beat.effect || 'voice-pulse';
     var speaker = beat.speaker || 'liber-vacui';
     var anchor = speaker === 'wanderlust' ? 'upper-right' : speaker === 'riason' ? 'left-middle' : speaker === 'physius' ? 'lower-left' : speaker === 'arcana' ? 'right-middle' : speaker === 'vanir' ? 'far-right' : 'near-focus';
     var surface = beat.kind === 'ritual' ? 'ritual' :
-      (beat.kind.indexOf('poppet') === 0 ? 'poppet-worktable' :
-      (beat.kind === 'artifact' ? 'relation-card' :
-      (beat.kind === 'breach' || beat.kind === 'finale' ? 'full-machine' : 'cast-box')));
-    var authority = beat.authority || (beat.kind === 'ritual' ? 'machine' : speaker);
+      (beat.kind === 'rite' ? 'poppet-worktable' :
+      (beat.kind === 'time-travel' || beat.kind === 'promise' || beat.kind === 'finale'
+        ? 'full-machine' : 'cast-box'));
+    var authority = beat.authority ||
+      (beat.kind === 'ritual' || beat.kind === 'time-travel' || beat.kind === 'promise' || beat.kind === 'finale'
+        ? 'machine' : speaker);
     return {
       id: beat.id,
       speaker: speaker,
       text: beat.text || '',
       response: response,
+      kind: beat.kind,
+      form: beat.form || null,
+      threefold: !!beat.threefold,
       effect: effect,
       mode: mode,
       anchor: anchor,
@@ -88,10 +96,14 @@
         relationship: beat.kind === 'artifact' ? 'attempted-relation' : null
       },
       enter: beat.enter || ('body:' + speaker),
-      hold: beat.hold || (beat.kind === 'ritual' ? 'until-action-complete' : 'line-complete'),
+      hold: beat.hold || (beat.kind === 'ritual' ? 'until-action-complete' :
+        beat.kind === 'time-travel' ? 'until-activation' :
+        beat.kind === 'promise' ? 'until-submission' :
+        beat.kind === 'rite' ? 'until-keep' :
+        beat.kind === 'finale' ? 'until-inscription' : 'line-complete'),
       exit: beat.exit || (effect === 'shrink-to-themes' ? 'suction' : effect === 'skulks-away' ? 'withdraw' : 'settle'),
       consequence: beat.consequence || effect,
-      nextMode: beat.nextMode || (mode === 'action-lock' ? 'advance' : 'dialogue')
+      nextMode: beat.nextMode || (mode === 'action-lock' ? 'action' : 'dialogue')
     };
   });
 

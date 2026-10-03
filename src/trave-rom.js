@@ -45,6 +45,18 @@
   var stateUnsubscribe = null;
   var machine = document.querySelector('.machine');
 
+  function consoleUnlocked() {
+    var controls = global.Liber && global.Liber.crtBay;
+    return !!(controls && typeof controls.isAlive === 'function' && controls.isAlive());
+  }
+
+  function updateDeskKey() {
+    if (!deskKey) return;
+    var unlocked = consoleUnlocked();
+    deskKey.disabled = !unlocked;
+    deskKey.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+  }
+
   var PALETTE = {
     shell: 0xcdbfa0,
     shellHi: 0xf0e5c9,
@@ -450,7 +462,7 @@
   function soloPoppet() {
     soloMask = { sigil: true };
     if (viewport) layout();
-    openConsole(false);
+    openConsole(false, true);
   }
   /* the summon brings the travellers in one at a time: each cartridge takes
      the stage alone for a beat before the next arrives, so the first
@@ -671,6 +683,7 @@
       deskKey.setAttribute('aria-expanded', open ? 'true' : 'false');
       deskKey.setAttribute('aria-label', open ? 'Close the TraveROM cartridge console' : 'Open the TraveROM cartridge console');
     }
+    updateDeskKey();
     if (consolePrompt) consolePrompt.visible = !open;
     var desktop = document.querySelector('.state-desktop');
     if (desktop) desktop.classList.toggle('traverom-open', open);
@@ -710,8 +723,8 @@
     if (invalidateLayer) invalidateLayer();
   }
 
-  function openConsole(focusFirst) {
-    if (possessing || !externalActive) return false;
+  function openConsole(focusFirst, tutorialPreview) {
+    if (possessing || !externalActive || (!tutorialPreview && !consoleUnlocked())) return false;
     if (global.Liber && global.Liber.crtBay && global.Liber.crtBay.openTray) {
       global.Liber.crtBay.openTray();
     }
@@ -995,6 +1008,7 @@
       desk.appendChild(key);
     }
     deskKey = key;
+    updateDeskKey();
     vacuiPortElement = desk.querySelector('.traverom-vacui-port');
     if (!vacuiPortElement) {
       vacuiPortElement = document.createElement('span');
@@ -1059,6 +1073,7 @@
             stateUnsubscribe = state.on('change', function () {
               if (!externalActive) return;
               try {
+                updateDeskKey();
                 layout();
               } catch (error) {
                 global.__liberTraveROMError = String((error && error.message) || error);

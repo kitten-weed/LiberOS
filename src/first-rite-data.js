@@ -1,22 +1,58 @@
 export const FACTORS = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'stability'];
+export const ONBOARDING_VERSION = 2;
+export const SCORING_VERSION = 2;
+export const PALETTE_VERSION = 2;
+export const PALETTE_ID = 'historical-colour-chart-v2';
 
-const answers = (labels) => labels.map((label, index) => ({
-  id: String.fromCharCode(97 + index),
-  label,
-  value: [-2, -1, 1, 2][index]
-}));
+function options(entries) {
+  return entries.map(([label, score], index) => ({
+    id: String.fromCharCode(97 + index),
+    label,
+    score
+  }));
+}
 
 export const QUESTIONS = [
-  { id: 'locked-drawer', factor: 'openness', direction: 1, prompt: 'A drawer in the old machine clicks open by itself. What do you do?', options: answers(['Look for what is hidden inside', 'Listen for a moment, then peek', 'Check whether it belongs to the machine', 'Close it and leave the mystery alone']) },
-  { id: 'known-path', factor: 'openness', direction: -1, prompt: 'A familiar path has grown a new, strange turn.', options: answers(['Take the turn before it disappears', 'Try it if someone comes along', 'Stay on the path I know', 'Keep to the marked route']) },
-  { id: 'small-task', factor: 'conscientiousness', direction: 1, prompt: 'A small job is waiting beside the door.', options: answers(['Finish it before anything else', 'Make a little start now', 'Do it when the moment feels right', 'Let it wait; another thing will call']) },
-  { id: 'packing', factor: 'conscientiousness', direction: -1, prompt: 'There is room for one more thing in the travel bag.', options: answers(['Make a list, then pack it neatly', 'Pack it after a quick check', 'Toss it in and see what happens', 'Leave space for whatever turns up']) },
-  { id: 'gathering', factor: 'extraversion', direction: 1, prompt: 'A gathering is already humming in the next room.', options: answers(['Go in and find the liveliest circle', 'Join after I know someone there', 'Listen from the doorway first', 'Keep the quiet room company']) },
-  { id: 'long-evening', factor: 'extraversion', direction: -1, prompt: 'After a long evening with others, what sounds best?', options: answers(['Stay for one more story', 'Leave after saying goodnight', 'Find a little quiet to recharge', 'Slip away and be alone awhile']) },
-  { id: 'lost-button', factor: 'agreeableness', direction: 1, prompt: 'Someone drops a button and does not notice.', options: answers(['Pick it up and catch them', 'Point it out if we cross paths', 'Leave it where it fell', 'Keep walking; they may not want help']) },
-  { id: 'shared-table', factor: 'agreeableness', direction: -1, prompt: 'There is one chair left at a crowded table.', options: answers(['Make room and ask who needs it', 'Offer it to someone nearby', 'Take it before it goes', 'Keep my place; others can ask']) },
-  { id: 'storm-glass', factor: 'stability', direction: 1, prompt: 'Stormlight flickers behind the glass. What helps first?', options: answers(['Take a slow breath and look again', 'Find one small thing I can steady', 'Call out for someone I trust', 'Move away until the feeling settles']) },
-  { id: 'missed-train', factor: 'stability', direction: -1, prompt: 'The train leaves just before you reach the platform.', options: answers(['Pause, then work out the next route', 'Feel the sting and keep moving', 'Ask someone what to do next', 'Let the day take a different shape']) }
+  { id: 'locked-drawer', factor: 'openness', prompt: 'A drawer in the old machine clicks open by itself. What do you do?', options: options([
+    ['Look for what is hidden inside', 2], ['Listen for a moment, then peek', 1],
+    ['Check whether it belongs to the machine', -1], ['Close it and leave the mystery alone', -2]
+  ]) },
+  { id: 'known-path', factor: 'openness', prompt: 'A familiar path has grown a new, strange turn.', options: options([
+    ['Take the turn before it disappears', 2], ['Try it if someone comes along', 1],
+    ['Stay on the path I know', -1], ['Keep to the marked route', -2]
+  ]) },
+  { id: 'small-task', factor: 'conscientiousness', prompt: 'A small job is waiting beside the door.', options: options([
+    ['Finish it before anything else', 2], ['Make a little start now', 1],
+    ['Do it when the moment feels right', -1], ['Let it wait; another thing will call', -2]
+  ]) },
+  { id: 'packing', factor: 'conscientiousness', prompt: 'There is room for one more thing in the travel bag.', options: options([
+    ['Make a list, then pack it neatly', 2], ['Pack it after a quick check', 1],
+    ['Toss it in and see what happens', -1], ['Leave space for whatever turns up', -2]
+  ]) },
+  { id: 'gathering', factor: 'extraversion', prompt: 'A gathering is already humming in the next room.', options: options([
+    ['Go in and find the liveliest circle', 2], ['Join after I know someone there', 1],
+    ['Listen from the doorway first', -1], ['Keep the quiet room company', -2]
+  ]) },
+  { id: 'long-evening', factor: 'extraversion', prompt: 'After a long evening with others, what sounds best?', options: options([
+    ['Stay for one more story', 2], ['Leave after saying goodnight', 1],
+    ['Find a little quiet to recharge', -1], ['Slip away and be alone awhile', -2]
+  ]) },
+  { id: 'lost-button', factor: 'agreeableness', prompt: 'Someone drops a button and does not notice.', options: options([
+    ['Pick it up and catch them', 2], ['Point it out if we cross paths', 1],
+    ['Leave it where it fell', -1], ['Keep walking; they may not want help', -2]
+  ]) },
+  { id: 'shared-table', factor: 'agreeableness', prompt: 'There is one chair left at a crowded table.', options: options([
+    ['Make room and ask who needs it', 2], ['Offer it to someone nearby', 1],
+    ['Take it before it goes', -1], ['Keep my place; others can ask', -2]
+  ]) },
+  { id: 'storm-glass', factor: 'stability', prompt: 'Stormlight flickers behind the glass. What is closest to your first response?', options: options([
+    ['Pause and see what the storm does', 2], ['Steady one small thing, then decide', 1],
+    ['Take a little distance before deciding', -1], ['Wait to decide until the storm has passed', -2]
+  ]) },
+  { id: 'missed-train', factor: 'stability', prompt: 'The train leaves just before you reach the platform. What now?', options: options([
+    ['Pause; the next route can wait one breath', 2], ['Feel the sting, then look for another route', 1],
+    ['Take a moment away from the platform', -1], ['Let the plan go for today', -2]
+  ]) }
 ];
 
 export const ARCHETYPES = [
@@ -61,18 +97,128 @@ export const TEMPLATES = [
   }
 ];
 
-export const PALETTES = {
-  'openness-high': [{name:'Ochre',hex:'#d69b35'},{name:'Night ink',hex:'#242235'},{name:'Moss',hex:'#6f9361'},{name:'Blue glass',hex:'#547f9d'},{name:'Plum',hex:'#93607e'},{name:'Paper',hex:'#e7d8af'}],
-  'openness-low': [{name:'Rust',hex:'#a95036'},{name:'Coal',hex:'#292324'},{name:'Olive',hex:'#8b8a4f'},{name:'Lake',hex:'#4e7982'},{name:'Lilac',hex:'#93789b'},{name:'Linen',hex:'#e4d4b8'}],
-  'conscientiousness-high': [{name:'Ink',hex:'#28231f'},{name:'Brick',hex:'#a74737'},{name:'Citrine',hex:'#c69d3f'},{name:'Fern',hex:'#668a58'},{name:'Slate',hex:'#5b7488'},{name:'Bone',hex:'#e6d8bc'}],
-  'conscientiousness-low': [{name:'Umber',hex:'#51382d'},{name:'Coral',hex:'#c76d51'},{name:'Saffron',hex:'#d5a84e'},{name:'Sage',hex:'#7c9a77'},{name:'Denim',hex:'#5a789b'},{name:'Chalk',hex:'#e7dfc5'}],
-  'extraversion-high': [{name:'Garnet',hex:'#a63642'},{name:'Black tea',hex:'#2b2722'},{name:'Gold',hex:'#d3a742'},{name:'Leaf',hex:'#52825b'},{name:'Cobalt',hex:'#466b9b'},{name:'Cream',hex:'#e9dcb8'}],
-  'extraversion-low': [{name:'Mulberry',hex:'#744358'},{name:'Charcoal',hex:'#26272a'},{name:'Honey',hex:'#c29a52'},{name:'Pine',hex:'#426d5d'},{name:'Mist',hex:'#648a9b'},{name:'Parchment',hex:'#e4d8c2'}],
-  'agreeableness-high': [{name:'Rosewood',hex:'#a35555'},{name:'Sepia',hex:'#4b3932'},{name:'Marigold',hex:'#cca045'},{name:'Meadow',hex:'#6e956c'},{name:'Harbor',hex:'#557f92'},{name:'Ivory',hex:'#e9deca'}],
-  'agreeableness-low': [{name:'Oxide',hex:'#98503d'},{name:'Iron',hex:'#343638'},{name:'Brass',hex:'#b79751'},{name:'Juniper',hex:'#527d6b'},{name:'Storm',hex:'#5d718e'},{name:'Canvas',hex:'#e2d3b4'}],
-  'stability-high': [{name:'Cedar',hex:'#8f4938'},{name:'Inkstone',hex:'#292a31'},{name:'Wheat',hex:'#c7a659'},{name:'Olive leaf',hex:'#728957'},{name:'Dusk blue',hex:'#577a94'},{name:'Wool',hex:'#e7dcc6'}],
-  'stability-low': [{name:'Wine',hex:'#824956'},{name:'Burnt sugar',hex:'#4b352e'},{name:'Amber',hex:'#d09d46'},{name:'Lichen',hex:'#7b9166'},{name:'Blue hour',hex:'#4f7188'},{name:'Cotton',hex:'#e5d7bd'}]
-};
+export const CHART_SOURCE = Object.freeze({
+  title: 'User-supplied historical 5×5 colour chart',
+  sampling: 'Representative sRGB hues authored from an uncalibrated, textured photograph.',
+  use: 'Artistic palette source only; neither the colours nor their historical labels assess a person.'
+});
+
+const HISTORICAL_MEANINGS = [
+  'High Spirituality', 'Devotion mixed with Affection', 'Devotion to a Noble Ideal', 'Pure Religious Feeling', 'Selfish Religious Feeling',
+  'Religious Feeling tinged with Fear', 'Highest Intellect', 'Strong Intellect', 'Low type of Intellect', 'Pride',
+  'Sympathy', 'Love for Humanity', 'Unselfish Affection', 'Selfish Affection', 'Pure Affection',
+  'Adaptability', 'Jealousy', 'Deceit', 'Fear', 'Depression',
+  'Selfishness', 'Avarice', 'Anger', 'Sensuality', 'Malice'
+];
+
+export const CHART_MANIFEST = [
+  ['Lavender Mist', '#ada4cc'], ['Indigo', '#231856'], ['Periwinkle', '#6c88d9'], ['Royal Blue', '#253fae'], ['Night-sky Blue', '#243568'],
+  ['Storm Blue', '#273765'], ['Sun Yellow', '#fdfc0a'], ['Warm Ochre', '#e9a42b'], ['Golden Earth', '#d67735'], ['Copper Red', '#e14131'],
+  ['Moss Green', '#91b870'], ['Rose Violet', '#c79ec6'], ['Blush', '#e27f90'], ['Deep Rose', '#66191f'], ['Poppy Red', '#e23037'],
+  ['Olive', '#75763c'], ['Patterned Vermilion', '#7d3d2b'], ['Warm Gray', '#939389'], ['Lavender Gray', '#a294b1'], ['Dark Plum', '#543b48'],
+  ['Umber', '#764941'], ['Rust', '#992623'], ['Deep Rust', '#b32727'], ['Garnet', '#a22e2f'], ['Near-black', '#090804']
+].map(([name, hex], index) => {
+  const row = Math.floor(index / 5) + 1;
+  const column = index % 5 + 1;
+  const notes = row === 1 && column === 5
+    ? 'Patterned blue-and-dark cell; the representative hue follows its blue field.'
+    : row === 4 && column === 2
+      ? 'Patterned red-on-olive cell; the representative hue follows its red field.'
+      : null;
+  return Object.freeze({
+    id: 'r' + row + 'c' + column,
+    row,
+    column,
+    name,
+    hex,
+    symbolism: HISTORICAL_MEANINGS[index],
+    source: CHART_SOURCE.title,
+    samplingNote: notes
+  });
+});
+
+export const CORE_INK_IDS = Object.freeze(['r1c4', 'r2c2', 'r3c5', 'r5c5']);
+
+export const CHAPTER_ACCENT_RULES = Object.freeze({
+  face: {
+    label: 'Face',
+    intent: 'expression, curiosity, and social energy',
+    slots: [
+      {weights: {openness: 0.65, extraversion: 0.35}, low: 'r1c2', balanced: 'r1c1', high: 'r1c3'},
+      {weights: {extraversion: 0.55, agreeableness: 0.45}, low: 'r4c5', balanced: 'r3c3', high: 'r3c2'}
+    ]
+  },
+  clothes: {
+    label: 'Clothes',
+    intent: 'outward style, intentionality, and spontaneity',
+    slots: [
+      {weights: {conscientiousness: 0.65, openness: 0.35}, low: 'r5c1', balanced: 'r4c1', high: 'r2c3'},
+      {weights: {conscientiousness: 0.5, openness: 0.3, extraversion: 0.2}, low: 'r3c4', balanced: 'r5c2', high: 'r2c5'}
+    ]
+  },
+  personal: {
+    label: 'Personal unconscious',
+    intent: 'quiet attention, inward imagination, and connection',
+    slots: [
+      {weights: {openness: 0.55, stability: 0.25, agreeableness: 0.2}, low: 'r2c1', balanced: 'r4c3', high: 'r1c1'},
+      {weights: {agreeableness: 0.55, extraversion: -0.25, openness: 0.2}, low: 'r1c2', balanced: 'r3c4', high: 'r3c1'}
+    ]
+  },
+  shadow: {
+    label: 'Shadow & surrender',
+    intent: 'sensitivity, uncertainty, and emotional intensity as expression',
+    slots: [
+      {weights: {stability: 0.6, openness: 0.25, agreeableness: 0.15}, low: 'r4c4', balanced: 'r4c5', high: 'r1c2'},
+      {weights: {stability: 0.5, extraversion: 0.3, conscientiousness: 0.2}, low: 'r2c1', balanced: 'r5c3', high: 'r5c4'}
+    ]
+  }
+});
+
+const CHART_BY_ID = new Map(CHART_MANIFEST.map(swatch => [swatch.id, swatch]));
+const CORE_SWATCHES = CORE_INK_IDS.map(id => CHART_BY_ID.get(id));
+
+function checkedScores(scores) {
+  if (!scores || typeof scores !== 'object' || Array.isArray(scores) ||
+      Object.keys(scores).length !== FACTORS.length || FACTORS.some(factor =>
+    !Number.isFinite(scores[factor]) || scores[factor] < -2 || scores[factor] > 2)) {
+    throw new TypeError('complete finite trait scores between -2 and 2 are required');
+  }
+  return scores;
+}
+
+function accentBand(scores, weights) {
+  const terms = Object.entries(weights);
+  const magnitude = terms.reduce((sum, [, weight]) => sum + Math.abs(weight), 0);
+  const signal = terms.reduce((sum, [factor, weight]) => sum + scores[factor] * weight, 0) / magnitude;
+  return signal > 0.4 ? 'high' : signal < -0.4 ? 'low' : 'balanced';
+}
+
+export function paletteFor(scores) {
+  checkedScores(scores);
+  const chapters = Object.fromEntries(Object.entries(CHAPTER_ACCENT_RULES).map(([id, rule]) => {
+    const accents = rule.slots.map(slot => {
+      const swatch = CHART_BY_ID.get(slot[accentBand(scores, slot.weights)]);
+      if (!swatch) throw new Error('chapter accent is missing from the chart manifest');
+      return {...swatch, role: 'accent'};
+    });
+    const inks = CORE_SWATCHES.map(swatch => ({...swatch, role: 'core'})).concat(accents);
+    if (inks.length !== 6 || new Set(inks.map(ink => ink.id)).size !== 6 ||
+        new Set(inks.map(ink => ink.hex)).size !== 6) {
+      throw new Error('each chapter palette must contain six distinct chart swatches');
+    }
+    return [id, {id, label: rule.label, intent: rule.intent, core: inks.slice(0, 4), accents, inks}];
+  }));
+  return {id: PALETTE_ID, version: PALETTE_VERSION, chapters};
+}
+
+export function chapterPaletteIds(palette) {
+  if (!palette || !palette.chapters) throw new TypeError('chapter palettes are required');
+  return Object.fromEntries(Object.keys(CHAPTER_ACCENT_RULES).map(id => {
+    const chapter = palette.chapters[id];
+    if (!chapter || !Array.isArray(chapter.inks)) throw new Error('chapter palette is incomplete: ' + id);
+    return [id, chapter.inks.map(ink => ink.id)];
+  }));
+}
 
 export function scoreAnswers(answerIds) {
   if (!answerIds || typeof answerIds !== 'object' || Array.isArray(answerIds)) {
@@ -84,11 +230,12 @@ export function scoreAnswers(answerIds) {
   }
   const totals = Object.fromEntries(FACTORS.map(factor => [factor, 0]));
   const counts = Object.fromEntries(FACTORS.map(factor => [factor, 0]));
-  // Two responses per factor are averaged on an authored -2..2 scale; reverse-keyed scenes flip direction.
+  // Each option carries its own authored semantic score; no question reverses
+  // the meaning of its choices by position or hidden direction multiplier.
   QUESTIONS.forEach(question => {
     const option = question.options.find(item => item.id === answerIds[question.id]);
     if (!option) throw new Error('unknown answer for ' + question.id);
-    totals[question.factor] += option.value * question.direction;
+    totals[question.factor] += option.score;
     counts[question.factor]++;
   });
   return Object.fromEntries(FACTORS.map(factor => [
@@ -98,9 +245,7 @@ export function scoreAnswers(answerIds) {
 }
 
 export function suggestions(scores) {
-  if (!scores || FACTORS.some(factor => !Number.isFinite(scores[factor]))) {
-    throw new TypeError('complete finite trait scores are required');
-  }
+  checkedScores(scores);
   // Profiles are authored reference vectors, not population norms; catalog order breaks exact ties.
   return ARCHETYPES.map((item, index) => ({
     ...item,
@@ -113,17 +258,45 @@ export function suggestions(scores) {
     .slice(0, 3).map(({distance, ...item}) => item);
 }
 
-export function paletteFor(scores) {
-  // Strongest absolute factor selects the creative palette; FACTORS order breaks ties.
-  const dominant = FACTORS.reduce((best, factor) =>
-    Math.abs(scores[factor]) > Math.abs(scores[best]) ? factor : best, FACTORS[0]);
-  const direction = scores[dominant] < 0 ? 'low' : 'high';
-  const id = dominant + '-' + direction;
-  const inks = PALETTES[id];
-  if (!inks || inks.length !== 6 || new Set(inks.map(ink => ink.hex)).size !== 6) {
-    throw new Error('first-rite palette must contain six distinct inks');
-  }
-  return {id, inks: inks.map(ink => ({...ink}))};
+function tendencyBand(score) {
+  return score > 0.4 ? 'positive' : score < -0.4 ? 'negative' : 'balanced';
+}
+
+export function personalityReceipt(scores) {
+  checkedScores(scores);
+  const openness = tendencyBand(scores.openness);
+  const conscientiousness = tendencyBand(scores.conscientiousness);
+  const extraversion = tendencyBand(scores.extraversion);
+  const agreeableness = tendencyBand(scores.agreeableness);
+  const stability = tendencyBand(scores.stability);
+  const open = openness === 'balanced'
+    ? 'comfortable moving between familiar routes and new turns as the moment asks'
+    : openness === 'positive'
+      ? 'drawn to new turns and hidden possibilities'
+      : 'more at ease with a known route, while leaving room for surprises';
+  const organised = conscientiousness === 'balanced'
+    ? 'shift between a little structure and room to improvise'
+    : conscientiousness === 'positive'
+      ? 'like giving a task a little structure before it grows'
+      : 'often leave a task open for the next thing that calls';
+  const social = extraversion === 'balanced'
+    ? 'make room for both company and quiet, depending on the day'
+    : extraversion === 'positive'
+      ? 'often find another story or lively circle worth joining'
+      : 'often make space for quiet after time with others';
+  const cooperative = agreeableness === 'balanced'
+    ? 'balance offering a hand with keeping your own space'
+    : agreeableness === 'positive'
+      ? 'notice chances to make a little more room for someone'
+      : 'tend to keep your own boundaries clear before offering help';
+  const uncertainty = stability === 'balanced'
+    ? 'may steady one small thing or take a little distance before choosing'
+    : stability === 'positive'
+      ? 'often pause and choose a next step when something unexpected happens'
+      : 'may take a moment away and let a change settle before deciding';
+  return 'From these answers, you seem ' + open + '. With plans, you ' +
+    organised + '; around other people, you ' + social + '. You may ' + cooperative +
+    '. When something unexpected happens, you ' + uncertainty + '.';
 }
 
 function trace(ctx, canvas, points, color, width) {
@@ -143,15 +316,25 @@ function trace(ctx, canvas, points, color, width) {
   ctx.restore();
 }
 
-export function applyTemplate(doll, template, inks) {
-  if (!doll || !template || !Array.isArray(inks) || inks.length !== 6) {
-    throw new TypeError('a doll, template, and six-ink palette are required');
+function paletteInks(palette, chapter) {
+  const inks = Array.isArray(palette) ? palette : palette && palette.chapters &&
+    palette.chapters[chapter] && palette.chapters[chapter].inks;
+  if (!Array.isArray(inks) || inks.length !== 6 ||
+      inks.some(ink => !ink || typeof ink.hex !== 'string')) {
+    throw new TypeError('a six-ink ' + chapter + ' palette is required');
   }
+  return inks;
+}
+
+export function applyTemplate(doll, template, palette) {
+  if (!doll || !template) throw new TypeError('a doll and template are required');
+  const faceInks = paletteInks(palette, 'face');
+  const clothingInks = paletteInks(palette, 'clothes');
   for (const kind of ['hair', 'eyes', 'face']) {
     const map = doll.faceMaps[kind];
     map.ctx.clearRect(0, 0, map.cv.width, map.cv.height);
     (template.marks[kind] || []).forEach((points, index) =>
-      trace(map.ctx, map.cv, points, inks[index % 3].hex, 0.055));
+      trace(map.ctx, map.cv, points, faceInks[(index + 4) % faceInks.length].hex, 0.055));
     map.tex.needsUpdate = true;
   }
   doll.hullCtx.clearRect(0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
@@ -165,7 +348,7 @@ export function applyTemplate(doll, template, inks) {
     ctx.beginPath();
     ctx.rect(rect[0] * doll.hullCanvas.width, 0, rect[2] * doll.hullCanvas.width, doll.hullCanvas.height);
     ctx.clip();
-    ctx.fillStyle = inks[(index + 3) % inks.length].hex;
+    ctx.fillStyle = clothingInks[(index + 4) % clothingInks.length].hex;
     ctx.beginPath();
     ctx.arc(px, py, doll.hullCanvas.width / 72, 0, Math.PI * 2);
     ctx.fill();
@@ -185,36 +368,124 @@ export function applyTemplate(doll, template, inks) {
   return params;
 }
 
-export function validateOnboarding(record) {
-  if (!record || record.version !== 1 || !record.answers ||
-      !['questions', 'suggestions', 'making', 'kept'].includes(record.phase) ||
-      !Number.isInteger(record.questionIndex) || record.questionIndex < 0 ||
-      record.questionIndex >= QUESTIONS.length) return false;
+function validAnswers(answers) {
+  if (!answers || typeof answers !== 'object' || Array.isArray(answers)) return false;
+  const keys = Object.keys(answers);
+  if (keys.some(id => !QUESTIONS.some(question => question.id === id))) return false;
+  return QUESTIONS.every(question => !Object.hasOwn(answers, question.id) ||
+    question.options.some(option => option.id === answers[question.id]));
+}
+
+function validRecordShell(record) {
+  return !!record && typeof record === 'object' && !Array.isArray(record) &&
+    ['questions', 'suggestions', 'making', 'kept'].includes(record.phase) &&
+    Number.isInteger(record.questionIndex) && record.questionIndex >= 0 &&
+    record.questionIndex < QUESTIONS.length && validAnswers(record.answers);
+}
+
+function validateV1(record) {
+  if (!validRecordShell(record)) return false;
   try {
-    if (Object.keys(record.answers).length) {
-      const partial = {};
-      QUESTIONS.forEach(q => {
-        if (Object.hasOwn(record.answers, q.id)) {
-          if (!q.options.some(option => option.id === record.answers[q.id])) throw new Error('invalid');
-          partial[q.id] = record.answers[q.id];
-        }
-      });
-      if (Object.keys(partial).length !== Object.keys(record.answers).length) return false;
-    }
     if (record.phase !== 'questions' && Object.keys(record.answers).length !== QUESTIONS.length) return false;
-    if (record.phase !== 'questions') {
-      const scores = scoreAnswers(record.answers);
-      const ranked = suggestions(scores);
-      const palette = paletteFor(scores);
-      if (record.resultId !== ranked[0].id || record.paletteId !== palette.id) return false;
-      if (record.templateId != null && !ranked.some(item => item.template === record.templateId)) return false;
-    }
+    if (record.phase !== 'questions' &&
+        (typeof record.resultId !== 'string' || typeof record.paletteId !== 'string')) return false;
+    if (record.templateId != null && !TEMPLATES.some(item => item.id === record.templateId)) return false;
     if (record.phase === 'making' || record.phase === 'kept') {
-      if (!record.confirmed || !record.templateId ||
-          !TEMPLATES.some(item => item.id === record.templateId)) return false;
+      if (!record.confirmed || !record.templateId) return false;
     }
     return true;
   } catch (_) {
     return false;
   }
+}
+
+function sameChapterPaletteIds(saved, expected) {
+  if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return false;
+  return Object.keys(CHAPTER_ACCENT_RULES).every(id =>
+    Array.isArray(saved[id]) && saved[id].length === 6 &&
+    saved[id].every((swatchId, index) => swatchId === expected[id][index]));
+}
+
+function validateV2(record) {
+  if (!validRecordShell(record) || record.scoreVersion !== SCORING_VERSION ||
+      record.paletteVersion !== PALETTE_VERSION) return false;
+  if (record.phase !== 'questions' && Object.keys(record.answers).length !== QUESTIONS.length) return false;
+  if (record.phase === 'questions') return true;
+  try {
+    const scores = scoreAnswers(record.answers);
+    const ranked = suggestions(scores);
+    const palette = paletteFor(scores);
+    if (record.resultId !== ranked[0].id || record.paletteId !== palette.id ||
+        record.receiptText !== personalityReceipt(scores) ||
+        !sameChapterPaletteIds(record.chapterPaletteIds, chapterPaletteIds(palette))) return false;
+    if (record.selectionMode == null) {
+      if (record.templateId != null) return false;
+    } else if (record.selectionMode === 'template') {
+      if (record.templateId == null || !ranked.some(item => item.template === record.templateId)) return false;
+    } else if (record.selectionMode === 'blank') {
+      if (record.templateId != null) return false;
+    } else {
+      return false;
+    }
+    if (record.phase === 'suggestions') return record.confirmed === false;
+    if (!record.confirmed || !record.selectionMode) return false;
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+export function validateOnboarding(record) {
+  if (!record || typeof record !== 'object') return false;
+  if (record.version === 1) return validateV1(record);
+  if (record.version === ONBOARDING_VERSION) return validateV2(record);
+  return false;
+}
+
+export function migrateOnboarding(record) {
+  if (!validateOnboarding(record)) throw new TypeError('saved first-rite answers are malformed');
+  if (record.version === ONBOARDING_VERSION) {
+    return {...record, answers: {...record.answers}};
+  }
+  const answers = {...record.answers};
+  const migrated = {
+    version: ONBOARDING_VERSION,
+    scoreVersion: SCORING_VERSION,
+    paletteVersion: PALETTE_VERSION,
+    phase: record.phase,
+    questionIndex: record.questionIndex,
+    answers,
+    resultId: null,
+    templateId: null,
+    selectionMode: null,
+    paletteId: null,
+    chapterPaletteIds: null,
+    receiptText: null,
+    confirmed: false
+  };
+  if (record.phase === 'questions') return migrated;
+
+  const scores = scoreAnswers(answers);
+  const ranked = suggestions(scores);
+  const palette = paletteFor(scores);
+  const rankedTemplate = templateId =>
+    ranked.some(item => item.template === templateId) &&
+    TEMPLATES.some(item => item.id === templateId);
+  const preserveChoice = !!record.templateId && rankedTemplate(record.templateId);
+  migrated.resultId = ranked[0].id;
+  migrated.paletteId = palette.id;
+  migrated.chapterPaletteIds = chapterPaletteIds(palette);
+  migrated.receiptText = personalityReceipt(scores);
+  if ((record.phase === 'making' || record.phase === 'kept') && record.confirmed && preserveChoice) {
+    migrated.phase = 'making';
+    migrated.templateId = record.templateId;
+    migrated.selectionMode = 'template';
+    migrated.confirmed = true;
+  } else if (record.phase === 'suggestions' && preserveChoice) {
+    migrated.templateId = record.templateId;
+    migrated.selectionMode = 'template';
+  } else {
+    migrated.phase = 'suggestions';
+  }
+  return migrated;
 }

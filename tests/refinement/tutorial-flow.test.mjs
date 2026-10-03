@@ -1,102 +1,179 @@
-import fs from 'node:fs/promises';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {makeRealm, runClassic, plain} from './harness.mjs';
 
+const FLOW = 'desktop-opening-v2';
 const ORDER = [
-  'beat-001', 'beat-006', 'beat-007', 'beat-008', 'beat-009', 'beat-010',
-  'beat-011', 'beat-012', 'beat-013', 'beat-014', 'beat-015', 'beat-016',
-  'beat-017', 'beat-018', 'beat-019', 'beat-020', 'beat-021', 'beat-022',
-  'beat-002', 'beat-003', 'beat-004', 'beat-005', 'beat-006-close',
-  'beat-023', 'beat-024', 'beat-025', 'beat-026', 'beat-027', 'beat-028'
+  'opening-y-01', 'opening-y-02', 'opening-y-03', 'opening-y-04',
+  'opening-y-05', 'opening-y-06', 'opening-y-07', 'summoning-verse',
+  'wanderlust-arrival', 'y-asks-who', 'wanderlust-names-herself',
+  'manat-manifestation', 'fates-threefold', 'morrigan-threefold',
+  'wanderlust-returns', 'y-asks-why', 'vacui-extracts', 'vacui-anomalies',
+  'wanderlust-finds-machine', 'wanderlust-fourth-wall',
+  'wanderlust-invites-travellers', 'time-travel-action',
+  'wanderlust-praise', 'y-celebrates', 'wanderlust-first-making',
+  'first-rite', 'post-rite-compliment', 'y-accepts',
+  'wanderlust-mutual-care', 'mutual-care-promise', 'y-care-reply',
+  'wanderlust-parting-words', 'final-inscription'
 ];
-const FLOW = 'craft-first-v1';
-
-async function baseline() {
-  return JSON.parse(await fs.readFile(new URL('./fixtures/baseline.json', import.meta.url), 'utf8'));
-}
 
 async function flowRealm() {
-  const r = makeRealm();
-  await runClassic('src/tutorial-flow.js', r);
-  return {r, flow: r.window.LiberTutorialFlow};
+  const realm = makeRealm();
+  await runClassic('src/tutorial-flow.js', realm);
+  return {realm, flow: realm.window.LiberTutorialFlow};
 }
 
-test('the craft-first order preserves every retained beat and ritual line by original identity', async () => {
-  const fixture = await baseline();
-  const r = makeRealm();
-  await runClassic('src/cutscene-v2.data.js', r);
-  const data = r.window.CutsceneV2Data;
-  assert.deepEqual(plain(data.RITUAL), fixture.CutsceneV2Data.RITUAL);
-  assert.equal(data.BEATS.length, ORDER.length);
-  assert.deepEqual(plain(data.BEATS.map(beat => beat.id)), ORDER);
-
-  const expectedClose = 'You\u2019re right. After all, we are just starting this journey.';
-  for (let i = 0; i < fixture.CutsceneV2Data.BEATS.length; i++) {
-    const id = 'beat-' + String(i + 1).padStart(3, '0');
-    const actual = plain(data.BEATS.find(beat => beat.id === id));
-    delete actual.id;
-    const expected = plain(fixture.CutsceneV2Data.BEATS[i]);
-    if (id === 'beat-006') {
-      expected.text = 'We are just starting this journey. We can cast a spell and summon some help.';
-    }
-    assert.deepEqual(actual, expected, id + ' changed outside the approved text split');
-  }
-  const close = data.BEATS.find(beat => beat.id === 'beat-006-close');
-  assert.deepEqual(plain(close), {
-    id: 'beat-006-close',
-    speaker: 'liber-vacui',
-    kind: 'dialogue',
-    text: expectedClose,
-    response: '>>'
-  });
-  assert.equal(data.BEATS[1].response, 'a spell?');
-  assert.deepEqual(
-    plain(data.PRODUCTION.map(beat => beat.id)),
-    ORDER
-  );
+test('the replacement script preserves the exact authored opening, actions, and summoning verse', async () => {
+  const realm = makeRealm();
+  await runClassic('src/cutscene-v2.data.js', realm);
+  const {BEATS, RITUAL, PRODUCTION} = realm.window.CutsceneV2Data;
+  const text = plain(BEATS.map(beat => beat.text || ''));
+  assert.deepEqual(plain(BEATS.map(beat => beat.id)), ORDER);
+  assert.deepEqual(text, [
+    'Ugh.. What just happened.',
+    'Whoa.. That\'s.. me.. Looking back at the screen?',
+    'I just typed in my name and then.. what..',
+    'I can\'t tell you how I know this but, <name>, I am you.',
+    'There\'s something written on the side of the wall in here..',
+    '"The Liber Vacui has temporarily borrowed a piece of your soul, it will return it stronger!"',
+    'Wait, there\'s something else written here too..',
+    '',
+    'OH! It\'s good to be back!!',
+    'Who are you?',
+    'Oh.. I dunno, I\'ve been called a lot of things over the years.',
+    'The Banu Aws understood my power, their stories still buried beneath the sand.',
+    'I spilled my secrets of imagination and archetype to the greeks.',
+    'I instill bravery, power, and courage in those fated to suffer.',
+    'But you can call me Wanderlust. For that is truly what fate is, the external drive to pursue something greater.',
+    'Why am I here?',
+    'The Vacui, yes, a powerful artifact indeed. This machine is able to extract minute portions of the soul into itself.',
+    'Although due to some.. anomalous properties it can draw from the imaginary and real simultaneously.',
+    'It looks like you\'ve found it..',
+    'Hmm.. Javascript web applet made by some.. aspiring psychologist... That won\'t do.',
+    'Let\'s get some travellers who have used this in different times and pull them in here.',
+    '',
+    'WHOO! Good job little buddy!!',
+    'YAY!',
+    'There\'s a lot of travellers in here now.. Let\'s make you a body so you can start enjoying their apps!',
+    '',
+    'You look amazing, you can revisit Physius\'s lab later to see more.',
+    'Okay I will!',
+    'And you and big <name> at the computer better get along. Be nice to each other.',
+    '',
+    'And I will be nice to you! <name>',
+    'Aww. Okay, lets finish this up. Before we go I will leave you with some parting words',
+    'I appear the same but different'
+  ]);
+  assert.deepEqual(plain(RITUAL), [
+    {text: 'I summon you from somewhere else…', effect: 'pink-cracks'},
+    {text: 'To find the pieces of ourselves', effect: 'starfield'},
+    {text: 'With violet eyes and sun like skin…', effect: 'warm-weather'},
+    {text: 'Come to the void and sing again…', effect: 'chatbox-construct'}
+  ]);
+  assert.equal(BEATS[12].threefold, true);
+  assert.equal(BEATS[13].threefold, true);
+  assert.equal(BEATS[12].form, 'fates');
+  assert.equal(BEATS[13].form, 'morrigan');
+  assert.equal(BEATS[21].kind, 'time-travel');
+  assert.equal(BEATS[25].kind, 'rite');
+  assert.equal(BEATS[29].kind, 'promise');
+  assert.equal(BEATS[32].kind, 'finale');
+  assert.deepEqual(plain(PRODUCTION.map(beat => beat.id)), ORDER);
+  assert.ok(!BEATS.some(beat => beat.kind === 'rat' || beat.speaker === 'rat' ||
+    /object-relational theory|RAT —/.test(beat.text || '')));
 });
 
-test('legacy numeric cursors resolve by original beat identity and protect craft-first exceptions', async () => {
+test('new cursors resume by stable semantic ID and never reinterpret ordinals', async () => {
   const {flow} = await flowRealm();
   assert.equal(flow.FLOW, FLOW);
   assert.deepEqual(plain(flow.ORDER), ORDER);
-  for (let index = 0; index < 28; index++) {
-    const id = 'beat-' + String(index + 1).padStart(3, '0');
-    assert.equal(flow.resolveCursor({tutorialBeat: index}, true).index, ORDER.indexOf(id));
-  }
-  for (const index of [1, 2, 3, 4]) {
-    assert.equal(flow.resolveCursor({tutorialBeat: index}, false).id, 'beat-006');
-  }
-  const partial = flow.resolveCursor({tutorialBeat: 7, tutorialRitualLine: 2}, false);
-  assert.equal(partial.id, 'beat-008');
-  assert.equal('tutorialRitualLine' in partial.patch, false);
-  assert.equal(flow.resolveCursor({tutorialBeat: 23}, false).id, 'beat-016');
-  assert.equal(flow.resolveCursor({tutorialBeat: 28}, true).index, ORDER.length);
-  assert.equal(flow.resolveCursor({tutorialBeat: 28}, false).index, ORDER.length);
-  assert.equal(flow.resolveCursor({tutorialDone: true, tutorialBeat: 28}, false).index, ORDER.length);
-});
-
-test('stable IDs win over numeric positions, cursor patches are idempotent, and unknown IDs block', async () => {
-  const {flow} = await flowRealm();
   const current = flow.resolveCursor({
     tutorialFlow: FLOW,
     tutorialBeat: 0,
-    tutorialBeatId: 'beat-014'
-  }, true);
-  assert.equal(current.index, 9);
-  assert.deepEqual(
-    plain(flow.resolveCursor(current.patch, true).patch),
-    plain(current.patch)
-  );
+    tutorialBeatId: 'time-travel-action'
+  }, false);
+  assert.equal(current.index, 21);
+  assert.equal(current.migrated, false);
+  assert.deepEqual(plain(flow.resolveCursor(current.patch, false).patch), plain(current.patch));
   const unknown = flow.resolveCursor({
     tutorialFlow: FLOW,
     tutorialBeat: 3,
-    tutorialBeatId: 'beat-999'
-  }, true);
+    tutorialBeatId: 'old-ordinal-3'
+  }, false);
   assert.equal(unknown.blocked, true);
   assert.equal(unknown.patch, null);
-  const rangeError = {name: 'RangeError', message: 'tutorial cursor out of range'};
-  assert.throws(() => flow.patchAt(-1), rangeError);
-  assert.throws(() => flow.patchAt(ORDER.length + 1), rangeError);
+  assert.throws(() => flow.patchAt(-1), {name: 'RangeError'});
+  assert.throws(() => flow.patchAt(ORDER.length + 1), {name: 'RangeError'});
+});
+
+test('unfinished legacy tutorials restart once without clearing the name, quiz, keeps, or artifacts', async () => {
+  const {flow} = await flowRealm();
+  const legacy = {
+    tutorialFlow: 'craft-first-v1',
+    tutorialBeat: 23,
+    tutorialBeatId: 'beat-024',
+    tutorialDone: false,
+    tutorialPaused: true,
+    tutorialRitualLine: 3,
+    tutorialStage: 'old-stage',
+    tutorialResidue: {old: true},
+    tutorialPromise: {old: true},
+    tutorialTimeTravelDone: true,
+    keysNamed: true,
+    travellerAlias: 'Robin',
+    enterRiteDone: true,
+    firstRite: {version: 1, answers: {'locked-drawer': 'a'}},
+    buddy: [{id: 'kept-poppet'}],
+    relations: [{from: 'kept-poppet', to: 'buddy'}]
+  };
+  const migrated = flow.resolveCursor(legacy, true);
+  assert.equal(migrated.blocked, false);
+  assert.equal(migrated.migrated, true);
+  assert.equal(migrated.index, 0);
+  assert.equal(migrated.id, ORDER[0]);
+  assert.equal(migrated.hasKeep, true);
+  assert.deepEqual(plain(migrated.patch), {
+    tutorialFlow: FLOW,
+    tutorialBeat: 0,
+    tutorialBeatId: ORDER[0],
+    tutorialPaused: false,
+    tutorialRitualLine: 0,
+    tutorialStage: null,
+    tutorialResidue: null,
+    tutorialPromise: null,
+    tutorialTimeTravelDone: false,
+    tutorialFinaleShown: false,
+    keysNamed: false
+  });
+  assert.equal(flow.resolveCursor(migrated.patch, true).migrated, false);
+  for (const key of ['travellerAlias', 'enterRiteDone', 'firstRite', 'buddy', 'relations']) {
+    assert.equal(key in migrated.patch, false, key + ' must remain untouched');
+  }
+});
+
+test('completed legacy tutorials remain complete and unknown future flows fail closed', async () => {
+  const {flow} = await flowRealm();
+  const completed = flow.resolveCursor({
+    tutorialFlow: 'craft-first-v1',
+    tutorialBeat: 24,
+    tutorialDone: true,
+    keysNamed: true
+  }, true);
+  assert.equal(completed.blocked, false);
+  assert.equal(completed.index, ORDER.length);
+  assert.equal(completed.patch.tutorialBeatId, null);
+  assert.equal(completed.patch.keysNamed, undefined);
+  const unknown = flow.resolveCursor({tutorialFlow: 'desktop-opening-v3'}, false);
+  assert.equal(unknown.blocked, true);
+});
+
+test('promise matching permits only case, whitespace, and terminal punctuation differences', async () => {
+  const {flow} = await flowRealm();
+  assert.equal(flow.promiseMatches('I will be nice to little Robin', 'Robin'), true);
+  assert.equal(flow.promiseMatches('  i   WILL be nice to LITTLE   robin... ', 'Robin'), true);
+  assert.equal(flow.promiseMatches('I will be nice to little Robin !', 'Robin'), true);
+  assert.equal(flow.promiseMatches('I will be nice to little Robin and everyone', 'Robin'), false);
+  assert.equal(flow.promiseMatches('I will be nice to little Rowan', 'Robin'), false);
+  assert.equal(flow.promiseMatches('I will be nice to little Robin', 'Rory'), false);
+  assert.equal(flow.promiseMatches('I will be nice to little Robin.', 'Robin!'), false);
 });

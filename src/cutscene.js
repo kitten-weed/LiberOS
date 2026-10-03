@@ -1,19 +1,10 @@
-// cutscene.js — tutorial cutscene v3 controller (desktop only).
-// Beat-accurate to the V3 traveller script. Content lives in
-// src/cutscene-v2.data.js (RITUAL + BEATS) for loader compatibility; this file is behavior only —
-// stage directions become controller/CSS behavior, never rendered copy.
-// Starts at "Oh hello <name>!" — the name gate already ran in enter-rite.
-// Typewriter ~40cps letter-by-letter on every dialogue beat, no skip.
-// Chatboxes are bodies keyed by dataset.speaker [liber-vacui, wanderlust,
-// riason, physius]: a new speaker enters physically, the single gate sits
-// under both when they are done. The liber-vacui body IS the traveller:
-// it is labeled with the alias they entered in the rite and wears the
-// room's cream/gold material — the machine speaks in their voice.
-// Persistence is state.js ONLY: tutorialBeat (reload-resume cursor),
-// keysNamed (wakes the dock), tutorialDone/tutorialStage, plus the one
-// REAL poppet the embedded worktable teaches + its relation
-// (LiberPoppet.mountTutor drives the genuine app; addArtifact/
-// bindRelation are the fallback path only).
+// cutscene.js — desktop-opening-v2 controller.
+// Content and stable semantic IDs live in cutscene-v2.data.js; stage
+// directions become controller/CSS behavior rather than additional dialogue.
+// The existing name gate runs first. Y is labelled "little <name>", dialogue
+// advances by the visible >> gate, and actions own their input/checkpoint.
+// TraveROM and playable app access stay locked until the submitted promise,
+// final inscription, and completion checkpoint are durably saved.
 
 (function () {
   'use strict';
@@ -34,6 +25,8 @@
   var tutorialStartToken = 0;
   var spellRoot = null;
   var spellBodyInertStates = [];
+  var timeTravelCancel = null;
+  var endingTutorial = false;
 
   function st() {
     return (window.Liber && window.Liber.state) || null;
@@ -44,6 +37,11 @@
   }
 
   function el(id) { return document.getElementById(id); }
+
+  function prefersReducedMotion() {
+    return !!(window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
 
   function data() {
     return window.CutsceneV2Data || { RITUAL: [], BEATS: [] };
@@ -120,7 +118,9 @@
       '.ctv-wander-weather', '.ctv-rainy-card',
       '.ctv-divination-table', '.ctv-artifact', '.ctv-relate', '.ctv-breach',
       '.ctv-breach-ring', '.ctv-finale', '.ctv-finale-orbit', '.ctv-poppet-montage',
-      '.ctv-cracks', '.ctv-stars', '.ctv-vanir-puddle', '.ctv-self-figure', '.ctv-sheen'
+      '.ctv-cracks', '.ctv-stars', '.ctv-vanir-puddle', '.ctv-self-figure', '.ctv-sheen',
+      '.ctv-code-tendrils', '.ctv-wanderlust-sparkles', '.ctv-wall-inscription',
+      '.ctv-linked-voice'
     ];
     for (var i = 0; i < selectors.length; i++) {
       document.querySelectorAll(selectors[i]).forEach(function (node) {
@@ -161,13 +161,19 @@
     setTimeout(function () { if (f.parentNode) f.parentNode.removeChild(f); }, ms || 500);
   }
 
-  function cursor(idx) {
+  function cursor(idx, extraPatch) {
     var flow = window.LiberTutorialFlow;
     if (!flow) {
       reportTutorialFailure('tutorial-cursor-helper-missing', new Error('tutorial flow helper is unavailable'));
-      return;
+      return false;
     }
-    if (st()) st().set(flow.patchAt(idx));
+    var api = st();
+    var patch = Object.assign({}, flow.patchAt(idx), extraPatch || {});
+    if (!api || typeof api.trySet !== 'function' || !api.trySet(patch)) {
+      reportTutorialFailure('tutorial-cursor-save-failed', new Error('tutorial checkpoint could not be saved'));
+      return false;
+    }
+    return true;
   }
 
   function reportTutorialFailure(event, error) {
@@ -176,10 +182,40 @@
     else if (window.console && window.console.error) window.console.error(event, error);
   }
 
+  function showCheckpointRetry(retry, message, actionLabel) {
+    var root = el('cutscene');
+    if (!root) return;
+    root.classList.add('is-action-locked');
+    setResponseMode('action-lock');
+    var previous = root.querySelector('.ctv-checkpoint-failure');
+    if (previous) previous.remove();
+    var panel = document.createElement('section');
+    panel.className = 'ctv-checkpoint-failure';
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', actionLabel === 'retry finale'
+      ? 'retry the finale' : 'retry saving the tutorial checkpoint');
+    var status = document.createElement('p');
+    status.className = 'ctv-checkpoint-status';
+    status.setAttribute('role', 'status');
+    status.textContent = message || 'This moment could not be kept. Try saving the checkpoint again.';
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ctv-response ctv-checkpoint-retry';
+    button.textContent = actionLabel || 'retry checkpoint';
+    button.addEventListener('click', function () {
+      button.disabled = true;
+      retry();
+    });
+    panel.appendChild(status);
+    panel.appendChild(button);
+    root.appendChild(panel);
+    button.focus();
+  }
+
   function loadPrimaryKeepReader() {
     if (primaryKeepReader) return Promise.resolve(primaryKeepReader);
     if (!primaryKeepReadPromise) {
-      primaryKeepReadPromise = import('../poppet-lab/keepsake.js?v=rite-draw3').then(function (module) {
+      primaryKeepReadPromise = import('../poppet-lab/keepsake.js?v=rite-meta2').then(function (module) {
         if (!module || typeof module.readKeepsakes !== 'function') {
           throw new Error('strict keepsake reader is unavailable');
         }
@@ -323,9 +359,13 @@
         liftVeil();
         return;
       }
-      if (st()) {
-        st().set(resolved.patch);
-        if (clearPause) st().set({ tutorialPaused: false });
+      var patch = Object.assign({}, resolved.patch);
+      if (clearPause) patch.tutorialPaused = false;
+      var api = st();
+      if (!api || typeof api.trySet !== 'function' || !api.trySet(patch)) {
+        reportTutorialFailure('tutorial-cursor-save-failed', new Error('tutorial opening checkpoint could not be saved'));
+        liftVeil();
+        return;
       }
       if (resolved.index >= beats().length) {
         endClean(true);
@@ -351,9 +391,7 @@
   }
 
   function voiceLabel(speaker) {
-    // the liber vacui speaks as the traveller's own voice: its chatbox
-    // carries the name entered in the enter rite, not the machine's name.
-    if (speaker === 'liber-vacui') return aliasOf() || 'liber vacui';
+    if (speaker === 'liber-vacui') return 'little ' + aliasOf();
     return speaker;
   }
 
@@ -391,6 +429,7 @@
       placePoppetSidecar(b, speaker);
       return b;
     }
+
     b = document.createElement('div');
     b.className = 'ctv-body ctv-' + speaker + (speaker === 'liber-vacui' ? ' ctv-traveller' : '');
     b.dataset.speaker = speaker;
@@ -407,6 +446,42 @@
     b.classList.add('is-live');
     placePoppetSidecar(b, speaker);
     return b;
+  }
+
+  function setWanderlustForm(body, beat) {
+    var root = el('cutscene');
+    var castRoot = cast();
+    if (!body || !root || !castRoot) return [body && body.querySelector('.ctv-line')].filter(Boolean);
+    root.querySelectorAll('.ctv-linked-voice').forEach(function (node) {
+      if (node.parentNode) node.parentNode.removeChild(node);
+    });
+    body.classList.remove('is-manat', 'is-fates', 'is-morrigan', 'is-wanderlust', 'is-threefold-master');
+    var form = beat.form || 'wanderlust';
+    body.classList.add('is-' + form);
+    var labels = {wanderlust:'Wanderlust', manat:'Manāt', fates:'Fates', morrigan:'The Morrigan'};
+    var voice = body.querySelector('.ctv-voice');
+    if (voice) voice.textContent = labels[form] || 'Wanderlust';
+    var lines = [body.querySelector('.ctv-line')].filter(Boolean);
+    if (!beat.threefold) return lines;
+
+    body.classList.add('is-threefold-master');
+    var linked = [];
+    for (var index = 0; index < 2; index++) {
+      var plate = document.createElement('div');
+      plate.className = 'ctv-linked-voice ctv-linked-voice--' + form +
+        ' ctv-linked-voice--' + (index + 1);
+      plate.setAttribute('aria-hidden', 'true');
+      var heading = document.createElement('div');
+      heading.className = 'ctv-linked-title';
+      heading.textContent = labels[form];
+      var line = document.createElement('div');
+      line.className = 'ctv-linked-line';
+      plate.appendChild(heading);
+      plate.appendChild(line);
+      castRoot.appendChild(plate);
+      linked.push(line);
+    }
+    return lines.concat(linked);
   }
 
   function dimOthers(speaker) {
@@ -677,6 +752,24 @@
     return timer;
   }
 
+  function typewriteLinked(lines, text, done) {
+    var full = fillName(text);
+    var targets = (lines || []).filter(Boolean);
+    if (!targets.length) { if (done) done(); return 0; }
+    targets.forEach(function (line) { line.textContent = ''; });
+    var index = 0;
+    var per = Math.round(1000 / CPS);
+    var timer = setInterval(function () {
+      index += 1;
+      targets.forEach(function (line) { line.textContent = full.slice(0, index); });
+      if (index >= full.length) {
+        clearInterval(timer);
+        if (done) done();
+      }
+    }, per);
+    return timer;
+  }
+
   // A name is not a password: the summoning accepts a damaged, hurried
   // transcription. Case, punctuation, repeated spaces and trailing ellipses
   // are disposable; typed characters only need to arrive in the right order.
@@ -724,16 +817,6 @@
       setTimeout(take, Math.max(38, 132 - lineIndex * 20));
     }
     setTimeout(take, Math.max(90, 260 - lineIndex * 42));
-  }
-
-  function fxLogicSlip(body) {
-    if (!body) return;
-    var slip = document.createElement('div');
-    slip.className = 'ctv-logic-slip';
-    slip.setAttribute('aria-hidden', 'true');
-    slip.innerHTML = '<span>OBJECT</span><i>↔</i><span>SELF?</span>';
-    body.appendChild(slip);
-    setTimeout(function () { if (slip.parentNode) slip.parentNode.removeChild(slip); }, 2100);
   }
 
   function revealIdentities(lineEl, names, done) {
@@ -911,7 +994,7 @@
 
   function fxRoomCycle(done) {
     var root = el('cutscene');
-    if (!root) { if (done) done(); return; }
+    if (!root) { if (done) done(); return null; }
     // Wanderlust does not merely change the background: she takes the whole
     // machine offline and pours the future travellers through its circuitry.
     var machine = document.querySelector('.machine');
@@ -943,18 +1026,35 @@
     void m.offsetWidth;
     m.classList.add('go', 'is-hijacking');
     var shakes = 0;
-    var shakeTimer = setInterval(function () {
-      shakeMachine(360);
-      shakes += 1;
-      if (shakes > 5) clearInterval(shakeTimer);
-    }, 430);
-    setTimeout(function () {
+    var finished = false;
+    var shakeTimer = 0;
+    var finishTimer = 0;
+    function cleanup() {
+      if (finished) return;
+      finished = true;
       clearInterval(shakeTimer);
+      clearTimeout(finishTimer);
       if (m.parentNode) m.parentNode.removeChild(m);
       if (machine) machine.classList.remove('ctv-time-hijack-machine');
       if (stage) stage.classList.remove('ctv-time-hijack-stage');
+      if (timeTravelCancel === cleanup) timeTravelCancel = null;
+    }
+    function finish() {
+      if (finished) return;
+      cleanup();
       if (done) done();
-    }, 3600);
+    }
+    var reducedMotion = prefersReducedMotion();
+    if (!reducedMotion) {
+      shakeTimer = setInterval(function () {
+        shakeMachine(360);
+        shakes += 1;
+        if (shakes > 5) clearInterval(shakeTimer);
+      }, 430);
+    }
+    finishTimer = setTimeout(finish, reducedMotion ? 480 : 3600);
+    timeTravelCancel = cleanup;
+    return cleanup;
   }
 
   function fxShrinkToThemes() {
@@ -1067,16 +1167,64 @@
     return overlay;
   }
 
-  function fxV3Effect(name) {
+  function fxV3Effect(name, body, beat) {
     var root = el('cutscene');
     if (!root || !name) return;
     var slug = String(name).replace(/[^a-z0-9-]/gi, '-');
     root.classList.remove('ctv-v3-effect-' + slug);
     void root.offsetWidth;
     root.classList.add('ctv-v3-effect-' + slug);
-    if (name === 'opening-disturbance') {
+    if (name === 'opening-disturbance' || name === 'opening-reflection') {
       root.classList.add('ctv-opening-displaced');
       setTimeout(function () { root.classList.remove('ctv-opening-displaced'); }, 1900);
+    }
+    if (name === 'wall-inscription' || name === 'soul-inscription') {
+      var wall = root.querySelector('.ctv-world');
+      if (wall) {
+        wall.classList.add('is-inscribed');
+        var writing = wall.querySelector('.ctv-wall-inscription');
+        if (!writing) {
+          writing = document.createElement('div');
+          writing.className = 'ctv-wall-inscription';
+          writing.setAttribute('aria-hidden', 'true');
+          wall.appendChild(writing);
+        }
+        if (name === 'soul-inscription' && beat) {
+          writing.textContent = fillName(beat.text);
+          writing.classList.add('is-readable');
+        }
+      }
+    }
+    if (name === 'wanderlust-arrival' && body) {
+      body.classList.add('is-arriving');
+      var sparkles = document.createElement('div');
+      sparkles.className = 'ctv-wanderlust-sparkles';
+      sparkles.setAttribute('aria-hidden', 'true');
+      for (var sparkleIndex = 0; sparkleIndex < 9; sparkleIndex++) {
+        var sparkle = document.createElement('i');
+        sparkle.style.setProperty('--spark-i', String(sparkleIndex));
+        sparkles.appendChild(sparkle);
+      }
+      body.appendChild(sparkles);
+      setTimeout(function () {
+        body.classList.remove('is-arriving');
+        if (sparkles.parentNode) sparkles.parentNode.removeChild(sparkles);
+      }, 2200);
+    }
+    if (name === 'code-tendrils') {
+      var tendrils = document.createElement('div');
+      tendrils.className = 'ctv-code-tendrils';
+      tendrils.setAttribute('aria-hidden', 'true');
+      ['<echo / borrowed>', 'if (memory) return;', 'window.before = you'].forEach(function (fragment, index) {
+        var node = document.createElement('span');
+        node.textContent = fragment;
+        node.style.setProperty('--fragment-i', String(index));
+        tendrils.appendChild(node);
+      });
+      root.appendChild(tendrils);
+      setTimeout(function () {
+        if (tendrils.parentNode) tendrils.parentNode.removeChild(tendrils);
+      }, 5200);
     }
     if (name === 'partial-recognition') {
       root.classList.add('ctv-partial-recognition');
@@ -1202,11 +1350,6 @@
       // warm the cast so the room reads as changed before she speaks.
       root.classList.add('ctv-finale-warm');
       setTimeout(function () { root.classList.remove('ctv-finale-warm'); }, 3200);
-      // The travellers arrive WITH the finale now (no separate summoning
-      // ceremony): lift the handoff's solo mask the moment the finale opens.
-      try {
-        if (window.LiberTraveROM && window.LiberTraveROM.revealAll) window.LiberTraveROM.revealAll();
-      } catch (e) {}
     }
     if (name === 'vanir-ritual') {
       root.classList.add('ctv-vanir-threshold');
@@ -1900,53 +2043,243 @@
     stage.appendChild(mark);
   }
 
-  /* The finale's desktop residue (empty table, four material doors, Y's box)
-     was retired at the author's request: on the live desktop it read as a
-     lattice of stray outlines and a mystery textbox over the home room.
-     persistFinaleResidue still records that the finale happened; nothing
-     renders it anymore. */
-  function persistFinaleResidue() {
-    var s = st();
-    if (!s) return;
-    var prior = store().tutorialResidue || {};
-    s.set({ tutorialResidue: Object.assign({}, prior, {
-      final: { kind: 'empty-poppet-table', materials: ['outline', 'clothes', 'traits', 'Others'], waiting: true, yStable: true }
-    }) });
+  function lockedActionPanel(className, label) {
+    var root = el('cutscene');
+    if (!root) return null;
+    closeGate('action-lock');
+    root.classList.add('is-action-locked');
+    setResponseMode('action-lock');
+    var panel = document.createElement('section');
+    panel.className = className;
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', label);
+    root.appendChild(panel);
+    return panel;
   }
 
-  function playFinale(beat, next) {
+  function clearActionPanel(panel) {
+    if (panel && panel.parentNode) panel.parentNode.removeChild(panel);
     var root = el('cutscene');
-    if (!root) { next(); return; }
+    if (root) root.classList.remove('is-action-locked');
+  }
+
+  function playTimeTravel(at, beat, next) {
+    var root = el('cutscene');
+    var panel = lockedActionPanel('ctv-time-travel-action', 'time travel control');
+    if (!root || !panel) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ctv-time-travel-switch';
+    button.textContent = 'TIME TRAVEL';
+    button.setAttribute('aria-label', 'TIME TRAVEL');
+    var status = document.createElement('p');
+    status.className = 'ctv-action-status';
+    status.setAttribute('role', 'status');
+    status.textContent = 'Press the switch once to move the room through time.';
+    panel.appendChild(button);
+    panel.appendChild(status);
+    var busy = false;
+    var travelled = false;
+    var finished = false;
+
+    function finishTravel() {
+      if (finished || el('cutscene') !== root) return;
+      finished = true;
+      clearActionPanel(panel);
+      advanceFrom(at, next, {tutorialTimeTravelDone: true});
+    }
+    button.addEventListener('click', function () {
+      if (busy || finished) return;
+      if (travelled || store().tutorialTimeTravelDone) {
+        travelled = true;
+        status.textContent = 'Time has moved. Saving its place…';
+        finishTravel();
+        return;
+      }
+      var machine = document.querySelector('.machine');
+      var stage = document.querySelector('.screen-stage');
+      if (!machine || !stage) {
+        status.textContent = 'The machine cannot cycle the room yet. The switch is still here to try again.';
+        return;
+      }
+      busy = true;
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      status.textContent = 'The room is moving through time…';
+      try {
+        var cancel = fxRoomCycle(function () {
+          if (el('cutscene') !== root || !root.isConnected) return;
+          travelled = true;
+          busy = false;
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          status.textContent = 'Time moved. Saving the new checkpoint…';
+          finishTravel();
+        });
+        if (!cancel) {
+          busy = false;
+          button.disabled = false;
+          button.removeAttribute('aria-busy');
+          status.textContent = 'The time scene could not start. The switch is ready to try again.';
+        }
+      } catch (error) {
+        busy = false;
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        status.textContent = 'The time scene stopped before it finished. The switch is ready to try again.';
+        reportTutorialFailure('tutorial-time-travel-failed', error);
+      }
+    });
+    button.focus();
+  }
+
+  function validPromiseRecord(record) {
+    return !!record && record.version === 1 && record.accepted === true &&
+      record.alias === aliasOf();
+  }
+
+  function playPromise(at, beat, next) {
+    var saved = store().tutorialPromise;
+    if (validPromiseRecord(saved)) {
+      advanceFrom(at, next, {tutorialPromise: saved});
+      return;
+    }
+    var root = el('cutscene');
+    var panel = lockedActionPanel('ctv-promise-action', 'mutual care promise');
+    if (!root || !panel) return;
+    var expected = 'I will be nice to little ' + aliasOf();
+    var heading = document.createElement('p');
+    heading.className = 'ctv-promise-copy';
+    heading.textContent = expected;
+    var form = document.createElement('form');
+    form.className = 'ctv-promise-form';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'ctv-promise-input';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.setAttribute('aria-label', 'type the promise');
+    input.setAttribute('aria-describedby', 'ctv-promise-status');
+    var submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.className = 'ctv-promise-submit';
+    submit.textContent = 'submit promise';
+    var status = document.createElement('p');
+    status.id = 'ctv-promise-status';
+    status.className = 'ctv-action-status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    status.textContent = 'Type the sentence, then submit it.';
+    form.appendChild(input);
+    form.appendChild(submit);
+    panel.appendChild(heading);
+    panel.appendChild(form);
+    panel.appendChild(status);
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (typeof window.LiberTutorialFlow.promiseMatches !== 'function' ||
+          !window.LiberTutorialFlow.promiseMatches(input.value, aliasOf())) {
+        status.textContent = 'That is not the promise yet. Try the sentence as written.';
+        input.focus();
+        return;
+      }
+      var promise = {version:1, accepted:true, alias:aliasOf(), acceptedAt:Date.now()};
+      status.textContent = 'The promise is being kept…';
+      clearActionPanel(panel);
+      advanceFrom(at, next, {tutorialPromise:promise});
+    });
+    input.focus();
+  }
+
+  function playFinale(at, beat, next) {
+    var root = el('cutscene');
+    var promise = store().tutorialPromise;
+    if (!validPromiseRecord(promise)) {
+      reportTutorialFailure('tutorial-finale-locked', new Error('the mutual-care promise is not durably kept'));
+      var blocked = lockedActionPanel('ctv-finale-blocked', 'finale is still locked');
+      if (blocked) {
+        var status = document.createElement('p');
+        status.className = 'ctv-action-status';
+        status.setAttribute('role', 'status');
+        status.textContent = 'The promise must be kept before the console can wake.';
+        blocked.appendChild(status);
+      }
+      return;
+    }
+    if (!root) return;
+    if (store().tutorialFinaleShown) {
+      advanceFrom(at, next, {tutorialFinaleShown:true});
+      return;
+    }
+    closeGate('action-lock');
+    root.classList.add('is-action-locked');
+    setResponseMode('action-lock');
     flash('rgba(255,240,220,0.85)', 450);
     fxShake();
-    setTimeout(function () {
-      var r2 = el('cutscene');
-      if (!r2) { next(); return; }
-      var full = document.createElement('div');
-      full.className = 'ctv-finale';
-      full.id = 'ctv-finale';
-      full.innerHTML = '<div class="ctv-finale-memory" aria-hidden="true"><i></i><b></b><em>' + fillName(aliasOf()) + '</em></div>'
-        + '<div class="ctv-finale-line">' + fillName(beat.text) + '</div>'
-        + '<div class="ctv-finale-traces" aria-hidden="true">'
-        + '<i class="ctv-trace-outline"><b>outline</b></i>'
-        + '<i class="ctv-trace-clothes"><b>clothes</b></i>'
-        + '<i class="ctv-trace-traits"><b>traits</b></i>'
-        + '<i class="ctv-trace-others"><b>Others</b></i>'
-        + '</div>'
-        + '<div class="ctv-finale-after" aria-hidden="true">the machine learned the shape of you</div>';
-      r2.appendChild(full);
-      var finaleOrbit = document.createElement('div');
-      finaleOrbit.className = 'ctv-finale-orbit';
-      finaleOrbit.setAttribute('aria-hidden', 'true');
-      finaleOrbit.innerHTML = '<i></i><i></i><i></i>';
-      r2.appendChild(finaleOrbit);
-      void full.offsetWidth;
-      full.classList.add('go');
+    var full = document.createElement('div');
+    full.className = 'ctv-finale';
+    full.id = 'ctv-finale';
+    full.setAttribute('role', 'status');
+    full.setAttribute('aria-live', 'polite');
+    var inscription = document.createElement('div');
+    inscription.className = 'ctv-finale-line';
+    inscription.textContent = fillName(beat.text);
+    full.appendChild(inscription);
+    var finaleOrbit = document.createElement('div');
+    finaleOrbit.className = 'ctv-finale-orbit';
+    finaleOrbit.setAttribute('aria-hidden', 'true');
+    finaleOrbit.innerHTML = '<i></i><i></i><i></i>';
+    root.appendChild(full);
+    root.appendChild(finaleOrbit);
+    void full.offsetWidth;
+    full.classList.add('go');
+    function finishFinale() {
+      if (el('cutscene') !== root || !root.isConnected) return;
+      var retryPanel = root.querySelector('.ctv-checkpoint-failure');
+      if (retryPanel) retryPanel.remove();
       setTimeout(function () {
+        if (el('cutscene') !== root || !root.isConnected) return;
         full.classList.add('is-fade');
-        setTimeout(function () { next(); }, 2100);
-      }, 3000);
-    }, 1300);
+        playDesktopFinale(function () {
+          if (el('cutscene') !== root || !root.isConnected) return;
+          advanceFrom(at, next, {tutorialFinaleShown:true});
+        });
+      }, prefersReducedMotion() ? 0 : 1400);
+    }
+    function persistFinaleShown() {
+      var api = st();
+      if (!api || typeof api.trySet !== 'function' || !api.trySet({tutorialFinaleShown:true})) {
+        reportTutorialFailure('tutorial-finale-save-failed',
+          new Error('the completed inscription could not be saved'));
+        showCheckpointRetry(persistFinaleShown,
+          'The inscription appeared, but its checkpoint could not be saved. Try again.');
+        return;
+      }
+      finishFinale();
+    }
+    function revealTravellers() {
+      if (el('cutscene') !== root || !root.isConnected) return;
+      var runtime = window.LiberTraveROM;
+      if (!runtime || typeof runtime.revealAll !== 'function') {
+        var unavailable = new Error('the TraveROM reveal control is unavailable');
+        reportTutorialFailure('tutorial-traveller-reveal-failed', unavailable);
+        showCheckpointRetry(revealTravellers,
+          'The console could not wake. The apps stay asleep; retry the finale.',
+          'retry finale');
+        return;
+      }
+      try {
+        runtime.revealAll();
+      } catch (error) {
+        reportTutorialFailure('tutorial-traveller-reveal-failed', error);
+        showCheckpointRetry(revealTravellers,
+          'The console could not wake. The apps stay asleep; retry the finale.',
+          'retry finale');
+        return;
+      }
+      persistFinaleShown();
+    }
+    typewrite(inscription, beat.text, revealTravellers);
   }
 
   // ── dialogue beat ─────────────────────────────────────────────────────
@@ -1957,6 +2290,17 @@
     'infection': 'is-infect',
     'arcana-enter': 'is-creep',
     'vanir-enter': 'is-stone'
+  };
+  var EFFECT_AT_SPEECH_START = {
+    'opening-reflection': true,
+    'partial-recognition': true,
+    'inside-screen-reveal': true,
+    'wanderlust-arrival': true,
+    'wall-inscription': true
+  };
+  var EFFECT_BEFORE_GATE = {
+    'soul-inscription': true,
+    'code-tendrils': true
   };
 
   function persistTutorReturn() {
@@ -2014,6 +2358,10 @@
     }
     var body = ensureBody(beat.speaker, enterFx);
     if (!body) { next(); return; }
+    var linkedLines = beat.speaker === 'wanderlust'
+      ? setWanderlustForm(body, beat)
+      : [body.querySelector('.ctv-line')];
+    if (EFFECT_AT_SPEECH_START[beat.effect]) fxV3Effect(beat.effect, body, beat);
     // V3 lets Riason leave on his authored "skulks-away" beat; do not
     // tear Physius out merely because Riason speaks later while carrying Y.
     dimOthers(beat.speaker);
@@ -2028,11 +2376,9 @@
         if (beat.speaker === 'riason') revealRiasonParentheticals(lineEl);
         if (beat.speaker === 'riason' && beat.text.indexOf('LEARN') >= 0) markLineWord(lineEl, 'LEARN', 'ctv-learn-door');
         if (beat.text && /imaginary/i.test(beat.text)) fxImaginaryWord(body);
-        // the OBJECT↔SELF slip rides the object-relations beat; keyed to the
-        // words rather than a beat number so retuned openings keep it.
-        if (beat.text && /by yourself identifying/i.test(beat.text)) fxLogicSlip(body);
         if (beat.effect === 'room-cycle' || beat.effect === 'pixel-smoke' || beat.effect === 'diegetic-cracks') fxWindowBreath();
         if (beat.effect === 'color-cycle') fxColorCycle(body, 2400);
+        if (EFFECT_BEFORE_GATE[beat.effect]) fxV3Effect(beat.effect, body, beat);
         // The shadow material arrives with Vanir's authored warning; the
         // response rail remains the only tutorial control in this scene.
         // Fit after every inline mark is in place: the five-concept line only
@@ -2120,7 +2466,10 @@
           fxPhysiusReturnToDesktop();
           flash('rgba(0,0,0,0.9)', 600);
         }
-        if (beat.effect !== 'noble-shadow' && beat.effect !== 'rainy-day' && beat.effect !== 'as-above') fxV3Effect(beat.effect);
+        if (!EFFECT_AT_SPEECH_START[beat.effect] && !EFFECT_BEFORE_GATE[beat.effect] &&
+            beat.effect !== 'noble-shadow' && beat.effect !== 'rainy-day' && beat.effect !== 'as-above') {
+          fxV3Effect(beat.effect, body, beat);
+        }
         advanceFrom(idx, next);
         }, beat.auto);
       };
@@ -2130,10 +2479,11 @@
     // The ritual line changes the textbox at the moment its authored speech
     // begins, rather than after the response gate has been clicked.
     if (beat.effect === 'as-above') fxV3Effect('as-above');
-    typewrite(lineEl, beat.text, typed);
+    if (beat.threefold) typewriteLinked(linkedLines, beat.text, typed);
+    else typewrite(lineEl, beat.text, typed);
   }
 
-  function advanceFrom(idx, next) {
+  function advanceFrom(idx, next, extraPatch) {
     var root = el('cutscene');
     var beat = beats()[idx];
     if (root) {
@@ -2145,8 +2495,15 @@
         root.classList.remove('is-ritual-line');
       }
     }
-    if (idx === 0 && st()) st().set({ keysNamed: true });
-    cursor(idx + 1);
+    if (!cursor(idx + 1, extraPatch)) {
+      showCheckpointRetry(function () { advanceFrom(idx, next, extraPatch); });
+      return;
+    }
+    if (root) {
+      root.classList.remove('is-action-locked');
+      var retryPanel = root.querySelector('.ctv-checkpoint-failure');
+      if (retryPanel) retryPanel.remove();
+    }
     next();
   }
 
@@ -2169,14 +2526,17 @@
     // The release script is Wanderlust's show end to end: she is on stage
     // from her first arrival through the desktop finale. The rebuild keys
     // off her authored arrival rows, not hardcoded beat numbers. The rule:
-    // pre-mount her only when NO wanderlust arrival lies at or ahead of the
-    // cursor — an upcoming arrival owns her entrance itself, so the stage
+    // pre-mount her only when NO authored Wanderlust arrival lies at or ahead
+    // of the cursor — an upcoming entrance owns its own empty stage, so it
     // breathes empty through the handoff and its wait before the finale
     // brings her back (and through the wait before her first entrance).
     var wanderIdx = firstWanderlustIndex();
     var pendingArrival = false;
     for (var pa = idx; pa < list.length; pa++) {
-      if (list[pa].kind === 'arrival' && list[pa].speaker === 'wanderlust') { pendingArrival = true; break; }
+      if (list[pa].speaker === 'wanderlust' && list[pa].effect === 'wanderlust-arrival') {
+        pendingArrival = true;
+        break;
+      }
     }
     if (wanderIdx >= 0 && !pendingArrival) ensureBody('wanderlust', null);
     // resume inside the poppet walk: the real bench comes back mounted.
@@ -2237,21 +2597,14 @@
             if (b.wait) setTimeout(begin, b.wait);
             else begin();
           })(at, b, go);
-        } else if (b.kind === 'poppet-app' || b.kind === 'poppet-door' || b.kind === 'poppet-draw' || b.kind === 'poppet-keep') {
-          poppetStepIdx = at;
-          playPoppetStage(b, function () { advanceFrom(at, go); });
-        } else if (b.kind === 'handoff') {
+        } else if (b.kind === 'rite') {
           playHandoff(function () { advanceFrom(at, go); });
-        } else if (b.kind === 'rat') {
-          playRat(function () { advanceFrom(at, go); });
-        } else if (b.kind === 'rat-explode') {
-          playRatExplode(function () { advanceFrom(at, go); });
-        } else if (b.kind === 'artifact') {
-          playArtifact(b, function () { advanceFrom(at, go); });
-        } else if (b.kind === 'breach') {
-          playBreach(b, function () { advanceFrom(at, go); });
+        } else if (b.kind === 'time-travel') {
+          playTimeTravel(at, b, go);
+        } else if (b.kind === 'promise') {
+          playPromise(at, b, go);
         } else if (b.kind === 'finale') {
-          playFinale(b, function () { playDesktopFinale(function () { advanceFrom(at, go); }); });
+          playFinale(at, b, go);
         } else {
           playDialogue(at, b, go);
         }
@@ -2261,7 +2614,7 @@
 
   // ── the new-opening and desktop-finale beats ───────────────────────────
 
-  /* The beat-016 handoff owns the first rite; Keep resumes at beat-017. */
+  /* The first-rite action owns the handoff; Keep resumes at post-rite dialogue. */
   function keptRecords() {
     if (!primaryKeepReader) throw new Error('strict keepsake reader has not loaded');
     return primaryKeepReader();
@@ -2299,7 +2652,7 @@
         var readKeepsakes = modules[1];
         var flow = window.LiberTutorialFlow;
         if (!flow || !Array.isArray(flow.ORDER)) throw new Error('tutorial cursor helper is unavailable');
-        var cursorIndex = flow.ORDER.indexOf('beat-017');
+        var cursorIndex = flow.ORDER.indexOf('post-rite-compliment');
         if (cursorIndex < 0) throw new Error('first-making return cursor is unavailable');
         var latestShelf = readKeepsakes();
         var pending = latestShelf.find(function (item) { return item.n === record.n; });
@@ -2410,36 +2763,6 @@
     closeGate('action-lock');
   }
 
-  /* summon: Wanderlust's four-line rhyming call, staged like the opening */
-  /* rat: the creator's fourth-wall note, glitching into existence */
-  function playRat(next) {
-    var root = el('cutscene');
-    if (!root) { next(); return; }
-    var box = document.createElement('div');
-    box.className = 'ctv-body ctv-rat ctv-rat-glitch';
-    box.dataset.speaker = 'rat';
-    box.innerHTML = '<div class="ctv-aura" aria-hidden="true"><i></i><i></i><i></i></div>'
-      + '<div class="ctv-head"><div class="ctv-voice">RAT</div></div>'
-      + '<div class="ctv-line">Hi! It’s rose, the creator of this. This is an early alpha build, please try it out and give your feedback to libervacui@gmail.com</div>';
-    box.style.cssText = 'position:absolute;right:4%;top:38%;width:min(400px,52%);z-index:30;';
-    root.appendChild(box);
-    typewrite(box.querySelector('.ctv-line'), box.querySelector('.ctv-line').textContent, function () {
-      setTimeout(next, 1200);
-    });
-  }
-  function playRatExplode(next) {
-    var root = el('cutscene');
-    var box = root && root.querySelector('.ctv-rat');
-    if (!box) { next(); return; }
-    box.classList.add('ctv-rat-die');
-    flash('rgba(220,255,220,0.6)', 400);
-    fxShake();
-    setTimeout(function () {
-      if (box.parentNode) box.remove();
-      next();
-    }, 950);
-  }
-
   /* the desktop finale: pink envelope, Wanderlust orb + chat, in place of
      the old in-cutscene finale for the beats the script now runs live on
      the desktop after the poppet comes home. The finale beat itself reuses
@@ -2450,7 +2773,7 @@
     setTimeout(function () {
       stage.classList.remove('ctv-pink-envelope');
       if (next) next();
-    }, 4000);
+    }, prefersReducedMotion() ? 0 : 4000);
   }
 
   // ── re-entry: two beats for the returned ──────────────────────────────
@@ -2469,15 +2792,47 @@
   }
 
   function endClean(forceComplete) {
+    if (endingTutorial) return;
+    endingTutorial = true;
+    var api = st();
+    var current = store();
+    var promiseKept = validPromiseRecord(current.tutorialPromise);
+    var authorized = current.tutorialDone ||
+      (current.tutorialFlow === (window.LiberTutorialFlow && window.LiberTutorialFlow.FLOW) &&
+        promiseKept && current.tutorialFinaleShown === true);
+    if (forceComplete === true && !authorized) {
+      endingTutorial = false;
+      reportTutorialFailure('tutorial-completion-locked',
+        new Error('completion requires the durably kept promise and finale'));
+      showCheckpointRetry(function () { endClean(true); });
+      return;
+    }
+    if (forceComplete === true && !current.tutorialDone &&
+        (!api || typeof api.trySet !== 'function' ||
+          !api.trySet({tutorialDone:true, tutorialStage:'done', tutorialPaused:false, keysNamed:true}))) {
+      endingTutorial = false;
+      reportTutorialFailure('tutorial-completion-save-failed',
+        new Error('the finished opening could not be saved'));
+      showCheckpointRetry(function () { endClean(true); });
+      return;
+    }
+    if (forceComplete !== true && api && typeof api.trySet === 'function' &&
+        !api.trySet({tutorialPaused:true})) {
+      reportTutorialFailure('tutorial-pause-save-failed',
+        new Error('the paused opening checkpoint could not be saved'));
+    }
     if (poppetApi && typeof poppetApi.exit === 'function') {
       try { poppetApi.exit(); } catch (e) {}
     }
     // Escape is a safe cancellation, not a completed lesson: preserve the
     // saved cursor and let the user reopen the same beat.
-    var canceled = forceComplete !== true;
     restoreSpellPresentation();
     clearTransientTutorialNodes();
     clearBox();
+    if (timeTravelCancel) {
+      timeTravelCancel();
+      timeTravelCancel = null;
+    }
     poppetBenchWrap = null;
     poppetApi = null;
     var rootClean = el('cutscene');
@@ -2505,15 +2860,8 @@
     // over now, and the desktop is not a dimmed room: hand the desktop its own
     // brightness back.
     document.body.classList.remove('ctv-poppet-glow');
-    if (st()) {
-      if (!canceled) {
-        persistFinaleResidue();
-        st().set({ tutorialDone: true, tutorialStage: 'done', tutorialPaused: false });
-      } else {
-        st().set({ tutorialPaused: true });
-      }
-    }
     chime();
+    endingTutorial = false;
   }
 
   function resumeTutorial() {

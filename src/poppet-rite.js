@@ -23,14 +23,15 @@
     {id:'shadow-2', label:'second shadow', surf:'drawing', drawing:3, chapter:3, hint:'One last little shadow, or leave this slip blank.'}
   ]);
   var CHAPTERS = [
-    {label:'Face', start:0, end:2},
-    {label:'Clothes', start:3, end:10},
-    {label:'Personal unconscious', start:11, end:12},
-    {label:'Shadow & surrender', start:13, end:14}
+    {id:'face', label:'Face', start:0, end:2},
+    {id:'clothes', label:'Clothes', start:3, end:10},
+    {id:'personal', label:'Personal unconscious', start:11, end:12},
+    {id:'shadow', label:'Shadow & surrender', start:13, end:14}
   ];
   var DRAWING_IDS = ['personal-unconscious-1', 'personal-unconscious-2',
     'shadow-surrender-1', 'shadow-surrender-2'];
   var ATTRIBUTION = 'The five broad traits are informed by the public-domain International Personality Item Pool (IPIP) Big Five factor markers (Goldberg, 1992). These ten original scenes are a creative adaptation, not the validated IPIP inventory, a diagnostic tool, or a measure of worth. Colours are chosen for this rite; they do not reveal personality.';
+  var CHART_ATTRIBUTION = 'The historical 5×5 colour chart is an artistic reference. These representative hues come from a textured, uncalibrated photograph; its original labels are not scientific findings or judgements about you.';
 
   function loadModules() {
     if (MOD) return Promise.resolve(MOD);
@@ -39,10 +40,10 @@
       import('../poppet-lab/doll.js?v=rite-draw6'),
       import('../poppet-lab/frame-doll.js?v=frame1'),
       import('../poppet-lab/surface.js?v=rite-crop1'),
-      import('../poppet-lab/keepsake.js?v=rite-draw3'),
+      import('../poppet-lab/keepsake.js?v=rite-meta2'),
       import('../poppet-lab/keep-commit.js?v=commit1'),
       import('../poppet-lab/paint-kit.js?v=kit3'),
-      import('./first-rite-data.js?v=rite-data3')
+      import('./first-rite-data.js?v=rite-data6')
     ]).then(function (modules) {
       MOD = {
         THREE: modules[0], doll: modules[1], framing: modules[2], surface: modules[3],
@@ -226,12 +227,33 @@
     if (!MOD.data.validateOnboarding(record)) {
       throw new Error('saved first-rite answers are malformed; they have not been replaced');
     }
+    if (record.version === 1) {
+      var upgraded = MOD.data.migrateOnboarding(record);
+      var api = stateApi();
+      if (!api || typeof api.trySet !== 'function' || !api.trySet({firstRite:upgraded})) {
+        throw new Error('legacy first-rite answers could not be upgraded in this slot');
+      }
+      return upgraded;
+    }
     return record;
   }
 
   function initialOnboarding() {
-    return {version:1, phase:'questions', questionIndex:0, answers:{},
-      resultId:null, templateId:null, paletteId:null, confirmed:false};
+    return {
+      version:MOD.data.ONBOARDING_VERSION,
+      scoreVersion:MOD.data.SCORING_VERSION,
+      paletteVersion:MOD.data.PALETTE_VERSION,
+      phase:'questions',
+      questionIndex:0,
+      answers:{},
+      resultId:null,
+      templateId:null,
+      selectionMode:null,
+      paletteId:null,
+      chapterPaletteIds:null,
+      receiptText:null,
+      confirmed:false
+    };
   }
 
   function esc(text) {
@@ -264,7 +286,7 @@
     s.suggestions = s.scores ? MOD.data.suggestions(s.scores) : [];
     s.palette = s.scores ? MOD.data.paletteFor(s.scores) : null;
     s.selectedTemplate = null;
-    if (s.onboarding && s.onboarding.templateId) {
+    if (s.onboarding && s.onboarding.selectionMode === 'template' && s.onboarding.templateId) {
       s.selectedTemplate = MOD.data.TEMPLATES.find(function (template) {
         return template.id === s.onboarding.templateId;
       }) || null;
@@ -273,7 +295,16 @@
         s.onboarding.paletteId !== s.palette.id) {
       throw new Error('saved first-rite palette does not match its answers');
     }
-    s.ink = s.palette ? s.palette.inks[0].hex : INKS[0];
+    s.ink = s.palette ? s.palette.chapters.face.inks[0].hex : INKS[0];
+    s.chapterInks = {};
+    if (s.palette) {
+      Object.keys(s.palette.chapters).forEach(function (chapterId) {
+        s.chapterInks[chapterId] = s.palette.chapters[chapterId].inks[0].hex;
+      });
+    } else {
+      CHAPTERS.forEach(function (chapter) { s.chapterInks[chapter.id] = INKS[0]; });
+    }
+    s.currentChapterId = null;
     s.size = SIZES[1];
     s.tool = 'brush';
     s.idx = 0;
@@ -314,7 +345,7 @@
     doll.setHulls(true);
     doll.physicsFrame(0);
     if (s.selectedTemplate) {
-      s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette.inks);
+      s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette);
       doll.physicsFrame(0);
     }
     s.atlasCv = atlasCv;
@@ -398,6 +429,11 @@
     function persistOnboarding(next) {
       if (!s.quizEnabled) return true;
       var api = stateApi();
+      if (!MOD.data.validateOnboarding(next)) {
+        s.headerStatus = 'this answer could not be kept because the result record is incomplete. try again.';
+        headerLine.textContent = s.headerStatus;
+        return false;
+      }
       if (!api || typeof api.trySet !== 'function' || !api.trySet({firstRite:next})) {
         s.headerStatus = 'this answer could not be kept in the current slot. try again before continuing.';
         headerLine.textContent = s.headerStatus;
@@ -415,6 +451,15 @@
     function updateOnboarding(patch) {
       var next = Object.assign({}, s.onboarding, patch);
       next.answers = Object.assign({}, s.onboarding.answers, patch.answers || {});
+      if (patch.phase === 'questions') {
+        next.resultId = null;
+        next.templateId = null;
+        next.selectionMode = null;
+        next.paletteId = null;
+        next.chapterPaletteIds = null;
+        next.receiptText = null;
+        next.confirmed = false;
+      }
       return persistOnboarding(next);
     }
     function renderHeader(text, progress) {
@@ -435,17 +480,29 @@
     }
     function makeCandidateDolls() {
       if (s.candidateDolls.length || !s.suggestions.length) return;
-      s.suggestions.forEach(function (suggestion, index) {
+      var specimens = s.suggestions.map(function (suggestion) {
         var template = MOD.data.TEMPLATES.find(function (entry) { return entry.id === suggestion.template; });
         if (!template) throw new Error('suggested specimen has no authored template');
+        return {template:template};
+      });
+      specimens.push({template:null});
+      specimens.forEach(function (specimen, index) {
         var cv = document.createElement('canvas');
         cv.width = cv.height = 1024;
         var candidate = MOD.doll.createDoll(pvScene, cv, null, {
-          rng:null, brush:function () { return {ink:s.palette.inks[0].hex, size:10}; }
+          rng:null, brush:function () { return {ink:s.palette.chapters.face.inks[0].hex, size:10}; }
         });
-        MOD.data.applyTemplate(candidate, template, s.palette.inks);
-        candidate.body.position.x = (index - 1) * 0.68;
-        candidate.body.scale.setScalar(0.68);
+        if (specimen.template) {
+          MOD.data.applyTemplate(candidate, specimen.template, s.palette);
+        } else {
+          var params = MOD.kit.defaultProportions();
+          candidate.setParams(params);
+          candidate.rebuild('stand');
+          candidate.setFaceShell(true);
+          candidate.setHulls(true);
+        }
+        candidate.body.position.x = (index - 1.5) * 0.5;
+        candidate.body.scale.setScalar(0.56);
         candidate.physicsFrame(0);
         Object.values(candidate.M().rings || {}).forEach(function (ring) { ring.visible = false; });
         candidate.body.visible = false;
@@ -544,9 +601,7 @@
         + options + '</div><details class="rite-colophon"><summary>about these questions</summary>'
         + '<p>' + esc(ATTRIBUTION) + '</p><p><a href="https://ipip.ori.org/newBigFive5broadKey.htm" target="_blank" rel="noreferrer">IPIP factor markers</a> · '
         + '<a href="https://ipip.ori.org/newPermission.htm" target="_blank" rel="noreferrer">IPIP permissions</a></p></details></div></section>';
-      var questionLine = window.innerWidth <= 650
-        ? 'Scroll each slip; Wanderlust listens without a score.'
-        : 'Wanderlust listens for the shape of your answers, not a score.';
+      var questionLine = 'Wanderlust listens for the shape of your answers, not a score.';
       renderHeader(questionLine, 'scene ' + (index + 1) + ' / 10');
       addFooter('<div class="rite-nav"><button id="rite-back" type="button"' +
         (index === 0 ? ' disabled' : '') + '>back</button></div>'
@@ -579,8 +634,15 @@
         var scores = MOD.data.scoreAnswers(s.answers);
         var ranked = MOD.data.suggestions(scores);
         var palette = MOD.data.paletteFor(scores);
+        var receiptText = MOD.data.personalityReceipt(scores);
         if (updateOnboarding({phase:'suggestions', questionIndex:index,
-          resultId:ranked[0].id, templateId:null, paletteId:palette.id, confirmed:false})) {
+          resultId:ranked[0].id,
+          templateId:null,
+          selectionMode:null,
+          paletteId:palette.id,
+          chapterPaletteIds:MOD.data.chapterPaletteIds(palette),
+          receiptText:receiptText,
+          confirmed:false})) {
           s.scores = scores;
           s.suggestions = ranked;
           s.palette = palette;
@@ -590,38 +652,75 @@
       focusFirst('#rite-question');
     }
 
+    function littleAlias() {
+      var api = stateApi();
+      var value = api && typeof api.get === 'function' ? api.get().travellerAlias : '';
+      return String(value || 'traveller').replace(/\s+/g, ' ').trim() || 'traveller';
+    }
+    function paletteWell(ink, label) {
+      return '<span class="rite-well" role="img" aria-label="' + esc(label + ': ' + ink.name + ' ink') +
+        '" title="' + esc(ink.name) + '"><i style="background:' + esc(ink.hex) + '"></i><span>' +
+        esc(ink.name) + '</span></span>';
+    }
     function renderSuggestions() {
       var tiles = s.suggestions.map(function (suggestion, index) {
         var template = MOD.data.TEMPLATES.find(function (entry) { return entry.id === suggestion.template; });
-        var chosen = s.onboarding.templateId === template.id;
+        var chosen = s.onboarding.selectionMode === 'template' &&
+          s.onboarding.templateId === template.id;
         return '<button type="button" class="rite-niche' + (chosen ? ' is-on' : '') +
-          '" data-template="' + esc(template.id) + '" aria-pressed="' + (chosen ? 'true' : 'false') + '">'
+          '" data-mode="template" data-template="' + esc(template.id) +
+          '" aria-pressed="' + (chosen ? 'true' : 'false') + '">'
           + '<span class="rite-niche-name">' + esc(template.name) + '</span>'
           + (index === 0 ? '<span class="rite-match">closest match</span>' : '')
           + '<span class="rite-niche-line">' + esc(template.line) + '</span></button>';
       }).join('');
-      var wells = s.palette.inks.map(function (ink) {
-        return '<span class="rite-well" role="img" aria-label="' + esc(ink.name + ' ink') +
-          '" title="' + esc(ink.name) + '"><i style="background:' + esc(ink.hex) + '"></i><span>' +
-          esc(ink.name) + '</span></span>';
+      var blankChosen = s.onboarding.selectionMode === 'blank';
+      tiles += '<button type="button" class="rite-niche rite-blank-niche' +
+        (blankChosen ? ' is-on' : '') + '" data-mode="blank" aria-pressed="' +
+        (blankChosen ? 'true' : 'false') + '"><span class="rite-niche-name">start unpainted</span>'
+        + '<span class="rite-niche-line">Bare clay, the same answers and the same chapter inks.</span></button>';
+      var coreWells = s.palette.chapters.face.core.map(function (ink) {
+        return paletteWell(ink, 'shared primaries and support');
+      }).join('');
+      var accentRows = Object.keys(s.palette.chapters).map(function (chapterId) {
+        var chapter = s.palette.chapters[chapterId];
+        var accents = chapter.accents.map(function (ink) {
+          return paletteWell(ink, chapter.label + ' accent');
+        }).join('');
+        return '<div class="rite-accent-recipe"><span class="rite-recipe-name">' +
+          esc(chapter.label) + '</span><div class="rite-wells" aria-label="' +
+          esc(chapter.label + ' personalized accents') + '">' + accents + '</div></div>';
       }).join('');
       content.innerHTML = '<section class="rite-specimens" aria-labelledby="rite-specimen-title">'
-        + '<div class="rite-specimen-heading"><h2 id="rite-specimen-title" tabindex="-1">Three small lives, none assigned.</h2>'
-        + '<p>Choose the one you want to make. Each is pre-painted with the same six inks.</p></div>'
-        + '<div class="rite-specimen-view" id="rite-specimen-view" aria-label="three generated poppet specimens"></div>'
-        + '<div class="rite-niches">' + tiles + '</div>'
-        + '<div class="rite-wells" aria-label="the six inks chosen for this rite">' + wells + '</div></section>';
-      var suggestionLine = window.innerWidth <= 650
-        ? 'Scroll to compare; these storybook shapes are not diagnoses.'
-        : 'These are storybook shapes, not personality labels or diagnoses.';
+        + '<div class="rite-receipt" aria-labelledby="rite-receipt-title"><span class="rite-slip-stamp">answer receipt</span>'
+        + '<p class="rite-receipt-kicker">a note from the listening plate</p>'
+        + '<h2 id="rite-receipt-title">little ' + esc(littleAlias()) + '</h2>'
+        + '<p>' + esc(s.onboarding.receiptText) + '</p></div>'
+        + '<div class="rite-specimen-heading"><h2 id="rite-specimen-title" tabindex="-1">Three small lives, or bare clay.</h2>'
+        + '<p>Choose one pre-painted shape or start unpainted. Every choice keeps this receipt and these chapter inks.</p></div>'
+        + '<div class="rite-specimen-view" id="rite-specimen-view" aria-label="three suggested poppets and one unpainted clay poppet"></div>'
+        + '<div class="rite-niches" role="group" aria-label="three suggestions and the unpainted choice">' + tiles + '</div>'
+        + '<details class="rite-palette-details"><summary>view the shared primaries and four chapter palettes</summary>'
+        + '<section class="rite-palette-ledger" aria-label="the four shared inks and chapter accents">'
+        + '<div class="rite-core-recipe"><span class="rite-recipe-name">shared primaries + support</span>'
+        + '<div class="rite-wells" aria-label="same four core inks in every chapter">' + coreWells + '</div></div>'
+        + '<div class="rite-layer-recipes" aria-label="two personalised chart accents per chapter">' +
+          accentRows + '</div></section>'
+        + '<p class="rite-chart-note">' + esc(CHART_ATTRIBUTION) + '</p></details></section>';
+      var suggestionLine = 'These are storybook shapes, not personality labels or diagnoses.';
       renderHeader(suggestionLine, 'three suggestions');
-      var selected = !!s.onboarding.templateId;
+      var selected = s.onboarding.selectionMode === 'template' || s.onboarding.selectionMode === 'blank';
       addFooter('<button class="rite-back" id="rite-back" type="button">back to questions</button>'
-        + '<button class="rite-next" id="rite-next" type="button"' + (!selected ? ' disabled' : '') + '>choose this specimen</button>');
+        + '<button class="rite-next" id="rite-next" type="button"' + (!selected ? ' disabled' : '') + '>begin the first making</button>');
       content.querySelectorAll('.rite-niche').forEach(function (button) {
         button.addEventListener('click', function () {
-          var template = MOD.data.TEMPLATES.find(function (entry) { return entry.id === button.dataset.template; });
-          if (!template || !updateOnboarding({phase:'suggestions', templateId:template.id, confirmed:false})) return;
+          var mode = button.dataset.mode;
+          var template = mode === 'template'
+            ? MOD.data.TEMPLATES.find(function (entry) { return entry.id === button.dataset.template; })
+            : null;
+          if ((mode !== 'blank' && !template) ||
+              !updateOnboarding({phase:'suggestions', selectionMode:mode,
+                templateId:template ? template.id : null, confirmed:false})) return;
           content.querySelectorAll('.rite-niche').forEach(function (choice) {
             var active = choice === button;
             choice.classList.toggle('is-on', active);
@@ -635,14 +734,34 @@
         if (updateOnboarding({phase:'questions', questionIndex:MOD.data.QUESTIONS.length - 1})) renderQuestion();
       });
       bindFooter('rite-next', function () {
-        if (!s.onboarding.templateId) return;
+        if (s.onboarding.selectionMode !== 'template' && s.onboarding.selectionMode !== 'blank') return;
         if (!updateOnboarding({phase:'making', confirmed:true})) return;
-        s.selectedTemplate = MOD.data.TEMPLATES.find(function (entry) {
-          return entry.id === s.onboarding.templateId;
-        });
-        s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette.inks);
+        s.selectedTemplate = s.onboarding.selectionMode === 'template'
+          ? MOD.data.TEMPLATES.find(function (entry) { return entry.id === s.onboarding.templateId; })
+          : null;
+        if (s.selectedTemplate) {
+          s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette);
+        } else {
+          s.params = MOD.kit.defaultProportions();
+          ['hair', 'eyes', 'face'].forEach(function (kind) {
+            var map = doll.faceMaps[kind];
+            map.ctx.clearRect(0, 0, map.cv.width, map.cv.height);
+            map.tex.needsUpdate = true;
+          });
+          doll.hullCtx.clearRect(0, 0, doll.hullCanvas.width, doll.hullCanvas.height);
+          doll.hullTex.needsUpdate = true;
+          s.drawSheets.forEach(function (entry) {
+            entry.surface.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
+            entry.texture.needsUpdate = true;
+          });
+          doll.setParams(s.params);
+          doll.rebuild('stand');
+          doll.setFaceShell(true);
+          doll.setHulls(true);
+          refreshDrawingMeshes();
+        }
         doll.physicsFrame(0);
-        s.ink = s.palette.inks[0].hex;
+        s.ink = s.palette.chapters.face.inks[0].hex;
         disposeCandidates();
         s.idx = 0;
         renderMaking();
@@ -654,23 +773,42 @@
     function stepChapter(index) {
       return index < 3 ? 0 : index < 11 ? 1 : index < 13 ? 2 : 3;
     }
-    function paintPalettes() {
-      var available = s.palette ? s.palette.inks : INKS.map(function (hex) {
+    function paintPalettes(chapterId) {
+      var chapterPalette = s.palette && s.palette.chapters[chapterId];
+      var available = chapterPalette ? chapterPalette.inks : INKS.map(function (hex) {
         return {name:MOD.kit.inkName(hex), hex:hex};
       });
-      var inks = available.map(function (ink) {
+      if (!available.some(function (ink) { return ink.hex === s.ink; })) {
+        var remembered = s.chapterInks[chapterId];
+        s.ink = available.some(function (ink) { return ink.hex === remembered; })
+          ? remembered : available[0].hex;
+      }
+      s.currentChapterId = chapterId;
+      function inksMarkup(inks) {
+        return inks.map(function (ink) {
         var name = /(?:^|\s)ink$/i.test(ink.name) ? ink.name : ink.name + ' ink';
         return '<button type="button" class="rite-ink' + (s.ink === ink.hex ? ' is-on' : '') +
           '" data-ink="' + esc(ink.hex) + '" aria-label="use ' + esc(name) + '" aria-pressed="' +
           (s.ink === ink.hex ? 'true' : 'false') + '"><i style="background:' + esc(ink.hex) +
           '"></i><span>' + esc(ink.name) + '</span></button>';
-      }).join('');
+        }).join('');
+      }
+      var core = available.slice(0, chapterPalette ? 4 : available.length);
+      var accents = chapterPalette ? available.slice(4) : [];
       var sizes = SIZES.map(function (size, index) {
         return '<button type="button" class="rite-size' + (s.size === size ? ' is-on' : '') +
           '" data-size="' + size + '" aria-label="brush size ' + size + '" aria-pressed="' +
           (s.size === size ? 'true' : 'false') + '">' + ['small', 'medium', 'large'][index] + '</button>';
       }).join('');
-      return '<div class="rite-tools"><div class="rite-inks" role="group" aria-label="six labelled inks">' + inks + '</div>'
+      return '<div class="rite-tools"><div class="rite-ink-sections">'
+        + '<div class="rite-ink-section"><span class="rite-ink-section-label">shared primaries + support</span>'
+        + '<div class="rite-inks" role="group" aria-label="four shared primary and support inks">' +
+          inksMarkup(core) + '</div></div>'
+        + (accents.length ? '<div class="rite-ink-section"><span class="rite-ink-section-label">' +
+          esc(chapterPalette.label + ' accents') + '</span><div class="rite-inks" role="group" aria-label="' +
+          esc(chapterPalette.label + ' personalized chart accents') + '">' +
+          inksMarkup(accents) + '</div></div>' : '')
+        + '</div>'
         + '<div class="rite-tool-row"><button class="rite-tool is-on" data-tool="brush" type="button" aria-pressed="true">brush</button>'
         + '<button class="rite-tool" data-tool="bucket" type="button" aria-pressed="false">bucket</button>'
         + '<div class="rite-sizes" role="group" aria-label="brush size">' + sizes + '</div>'
@@ -698,15 +836,13 @@
           '</p><h2 id="rite-target-title" tabindex="-1">' + esc(step.label) + '</h2></div>'
         + '<span class="rite-step-count">part ' + (localIndex + 1) + ' of ' + localTotal + '</span></div>'
         + '<p class="rite-instruction">' + esc(step.hint) + '</p>'
-        + '<div class="rite-sheet-wrap" id="rite-sheet-wrap"></div>' + paintPalettes()
+        + '<div class="rite-sheet-wrap" id="rite-sheet-wrap"></div>' + paintPalettes(chapter.id)
         + '</div><aside class="rite-companion"><div class="rite-live-view" id="rite-live-view" aria-label="live whole poppet preview"></div>'
         + '<p class="rite-hint">' + (step.surf === 'drawing'
           ? 'Your drawn outline keeps its pigment and grows a little depth beside the head.'
           : 'Every stroke appears on the whole poppet as you make it.') + '</p></aside></div></section>';
-      renderHeader(window.innerWidth <= 650
-        ? 'Scroll inside the glass to reach the paint and inks; keep each part to continue.'
-        : 'The living poppet keeps every mark where you put it.',
-      'chapter ' + (chapterIndex + 1) + ' / 4');
+      renderHeader('The living poppet keeps every mark where you put it.',
+        'chapter ' + (chapterIndex + 1) + ' / 4');
       var allResolved = STEPS.every(function (part) { return s.resolved[part.id]; });
       addFooter('<div class="rite-nav"><button id="rite-back" type="button"' +
         (s.idx === 0 ? ' disabled' : '') + '>back</button>'
@@ -738,6 +874,8 @@
       content.querySelectorAll('.rite-ink').forEach(function (button) {
         button.addEventListener('click', function () {
           s.ink = button.dataset.ink;
+          s.chapterInks[chapter.id] = s.ink;
+          s.currentChapterId = chapter.id;
           content.querySelectorAll('.rite-ink').forEach(function (ink) {
             var active = ink === button;
             ink.classList.toggle('is-on', active);
@@ -882,7 +1020,7 @@
         } else {
           var flow = window.LiberTutorialFlow;
           if (!flow || !Array.isArray(flow.ORDER)) throw new Error('tutorial cursor helper is unavailable');
-          var index = flow.ORDER.indexOf('beat-017');
+          var index = flow.ORDER.indexOf('post-rite-compliment');
           if (index < 0) throw new Error('first-making return cursor is unavailable');
           patch = Object.assign({}, flow.patchAt(index), {tutorialPaused:false});
         }
@@ -953,11 +1091,20 @@
             hull:sheets.hull,
             riteDrawings:MOD.keep.snapshotRiteDrawings(doll),
             firstRite:s.quizEnabled ? {
-              version:1,
+              version:2,
+              scoreVersion:s.onboarding.scoreVersion,
+              paletteVersion:s.onboarding.paletteVersion,
               resultId:s.onboarding.resultId,
               templateId:s.onboarding.templateId,
+              selectionMode:s.onboarding.selectionMode,
               paletteId:s.onboarding.paletteId,
-              inks:s.palette.inks.map(function (ink) { return {name:ink.name, hex:ink.hex}; })
+              chapterPaletteIds:s.onboarding.chapterPaletteIds,
+              chapterPalettes:Object.fromEntries(Object.keys(s.palette.chapters).map(function (chapterId) {
+                return [chapterId, s.palette.chapters[chapterId].inks.map(function (ink) {
+                  return {id:ink.id, name:ink.name, hex:ink.hex};
+                })];
+              })),
+              receiptText:s.onboarding.receiptText
             } : null
           }
         };
@@ -973,14 +1120,15 @@
         }
         renderSuggestions();
       } else {
-        if (s.quizEnabled && s.onboarding.phase === 'making' && !s.selectedTemplate) {
+        if (s.quizEnabled && s.onboarding.phase === 'making' &&
+            s.onboarding.selectionMode === 'template' && !s.selectedTemplate) {
           throw new Error('the saved first-rite specimen choice is unavailable');
         }
-        s.selectedTemplate = s.selectedTemplate || (s.onboarding && s.onboarding.templateId
-          ? MOD.data.TEMPLATES.find(function (template) { return template.id === s.onboarding.templateId; })
-          : null);
+        s.selectedTemplate = s.selectedTemplate || (s.onboarding &&
+          s.onboarding.selectionMode === 'template' && s.onboarding.templateId
+          ? MOD.data.TEMPLATES.find(function (template) { return template.id === s.onboarding.templateId; }) : null);
         if (s.selectedTemplate && s.quizEnabled && !Object.keys(s.sheets || {}).length) {
-          s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette.inks);
+          s.params = MOD.data.applyTemplate(doll, s.selectedTemplate, s.palette);
         }
         if (s.quizEnabled && s.onboarding.phase === 'kept') {
           throw new Error('a kept first rite has no matching saved poppet');
