@@ -1,7 +1,7 @@
 // cutscene.js — desktop-opening-v2 controller.
 // Content and stable semantic IDs live in cutscene-v2.data.js; stage
 // directions become controller/CSS behavior rather than additional dialogue.
-// The existing name gate runs first. Y is labelled "little <name>", dialogue
+// The existing name gate runs first. Y is labelled "<name>", dialogue
 // advances by the visible >> gate, and actions own their input/checkpoint.
 // TraveROM and playable app access stay locked until the submitted promise,
 // final inscription, and completion checkpoint are durably saved.
@@ -391,7 +391,7 @@
   }
 
   function voiceLabel(speaker) {
-    if (speaker === 'liber-vacui') return 'little ' + aliasOf();
+    if (speaker === 'liber-vacui') return aliasOf();
     return speaker;
   }
 

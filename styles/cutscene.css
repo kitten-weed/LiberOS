@@ -2471,7 +2471,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
 .cutscene.ctv > .ctv-finale-blocked,
 .cutscene.ctv > .ctv-checkpoint-failure {
   position: absolute;
-  z-index: 32;
+  z-index: 220;
   left: 50%;
   top: 50%;
   width: min(660px, 88%);
@@ -2484,6 +2484,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
     #100b0d;
   box-shadow: 0 20px 70px rgb(0 0 0 / 78%), inset 0 0 0 5px rgb(212 175 101 / 8%);
   text-align: center;
+  pointer-events: auto;
 }
 
 .ctv-time-travel-switch {
@@ -2501,6 +2502,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
   text-shadow: 0 2px 0 #090609, 0 0 14px rgb(255 216 106 / 45%);
   box-shadow: 0 9px 0 #050406, inset 0 0 25px rgb(255 255 255 / 9%), 0 0 34px rgb(255 105 180 / 22%);
   cursor: pointer;
+  pointer-events: auto;
   transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
 }
 
@@ -2555,6 +2557,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
   color: #251b16;
   background: #ead9b8;
   font: 17px/1.35 'House Font', Georgia, serif;
+  pointer-events: auto;
 }
 
 .ctv-promise-submit {
@@ -2566,6 +2569,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
   background: #ddc389;
   font: 700 15px/1.2 'House Font', Georgia, serif;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .cutscene.ctv .ctv-finale {
@@ -2614,6 +2618,7 @@ html.pixel-register #crt-cartridge-sigil .crt-cart-label { animation: ctv-cart-g
 .ctv-checkpoint-retry {
   min-width: 140px;
   min-height: 44px;
+  pointer-events: auto;
 }
 
 .cutscene.ctv > .ctv-finale {
